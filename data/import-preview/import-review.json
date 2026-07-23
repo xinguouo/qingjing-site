@@ -1,0 +1,386 @@
+{
+  "generatedAt": "2026-07-23T01:43:02.355Z",
+  "dryRun": true,
+  "sanityWriteTokenExists": true,
+  "sanityProjectConfigured": true,
+  "noSanityWritesPerformed": true,
+  "sourceLists": {
+    "artCreation": [
+      {
+        "label": "玻璃艺术",
+        "labelEn": "Glass Art",
+        "url": "http://www.qingjingart.com/product/class/?155.html",
+        "mapped": "glass-art"
+      },
+      {
+        "label": "装置艺术",
+        "labelEn": "Installation Art",
+        "url": "http://www.qingjingart.com/product/class/?156.html",
+        "mapped": "installation-art"
+      },
+      {
+        "label": "公共艺术",
+        "labelEn": "Public Art",
+        "url": "http://www.qingjingart.com/product/class/?157.html",
+        "mapped": "public-art"
+      },
+      {
+        "label": "雕塑艺术",
+        "labelEn": "Sculpture Art",
+        "url": "http://www.qingjingart.com/product/class/?158.html",
+        "mapped": "sculpture-art"
+      }
+    ],
+    "derivatives": [
+      {
+        "label": "器物",
+        "labelEn": "Vessel",
+        "url": "http://www.qingjingart.com/product/class/167/",
+        "mapped": "vessel"
+      },
+      {
+        "label": "肖物",
+        "labelEn": "Wearable / Figure",
+        "url": "http://www.qingjingart.com/product/class/161/",
+        "mapped": "wearable"
+      },
+      {
+        "label": "玩物",
+        "labelEn": "Toy",
+        "url": "http://www.qingjingart.com/product/class/162/",
+        "mapped": "toy"
+      },
+      {
+        "label": "饰物",
+        "labelEn": "Ornament",
+        "url": "http://www.qingjingart.com/product/class/163/",
+        "mapped": "ornament"
+      },
+      {
+        "label": "境物",
+        "labelEn": "Object",
+        "url": "http://www.qingjingart.com/product/class/164/",
+        "mapped": "object"
+      },
+      {
+        "label": "包装",
+        "labelEn": "Packaging",
+        "url": "http://www.qingjingart.com/page/yyysp/bz.php",
+        "mapped": "packaging",
+        "staticImagePage": true
+      }
+    ]
+  },
+  "counts": {
+    "artworks": {
+      "glass-art": 16,
+      "installation-art": 13,
+      "public-art": 0,
+      "sculpture-art": 0
+    },
+    "derivatives": {
+      "vessel": 0,
+      "wearable": 0,
+      "toy": 0,
+      "ornament": 0,
+      "object": 0,
+      "packaging": 0
+    },
+    "totalArtworks": 29,
+    "totalDerivatives": 0,
+    "artworkItemsNeedingReview": 20,
+    "derivativeItemsNeedingReview": 0
+  },
+  "listPageResults": {
+    "artworks": {
+      "glass-art": {
+        "url": "http://www.qingjingart.com/product/class/?155.html",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 16,
+        "fromCache": true
+      },
+      "installation-art": {
+        "url": "http://www.qingjingart.com/product/class/?156.html",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 13,
+        "fromCache": true
+      },
+      "public-art": {
+        "url": "http://www.qingjingart.com/product/class/?157.html",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "sculpture-art": {
+        "url": "http://www.qingjingart.com/product/class/?158.html",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      }
+    },
+    "derivatives": {
+      "vessel": {
+        "url": "http://www.qingjingart.com/product/class/167/",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "wearable": {
+        "url": "http://www.qingjingart.com/product/class/161/",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "toy": {
+        "url": "http://www.qingjingart.com/product/class/162/",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "ornament": {
+        "url": "http://www.qingjingart.com/product/class/163/",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "object": {
+        "url": "http://www.qingjingart.com/product/class/164/",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      },
+      "packaging": {
+        "url": "http://www.qingjingart.com/page/yyysp/bz.php",
+        "status": null,
+        "detailLinks": 0,
+        "entries": 0,
+        "fromCache": false
+      }
+    }
+  },
+  "imageSamples": [
+    {
+      "sourceCategory": "玻璃艺术",
+      "mappedCategory": "glass-art",
+      "samplesChecked": 2,
+      "checks": [
+        {
+          "url": "http://qty83k.creatby.com/materials/52928/hd/13ed0ca7f1dc976413ba1a8a8ad40d36_4096_z0zCOJL.jpg",
+          "status": 206,
+          "contentType": "image/jpeg",
+          "ok": true,
+          "likelySanityUploadable": true,
+          "hotlinkBlocked": false
+        },
+        {
+          "url": "http://qty83k.creatby.com/materials/52928/hd/ca9cf9996ac3a51ddef3c2432445ef1e_4096.jpg",
+          "status": 206,
+          "contentType": "image/jpeg",
+          "ok": true,
+          "likelySanityUploadable": true,
+          "hotlinkBlocked": false
+        }
+      ]
+    },
+    {
+      "sourceCategory": "装置艺术",
+      "mappedCategory": "installation-art",
+      "samplesChecked": 2,
+      "checks": [
+        {
+          "url": "http://www.qingjingart.com/kindeditor/attached/image/20201202/0c501c2473fdea047c94943878b1fa1a_4096.jpg",
+          "status": null,
+          "contentType": null,
+          "ok": false,
+          "likelySanityUploadable": false,
+          "hotlinkBlocked": false,
+          "error": "fetch failed"
+        },
+        {
+          "url": "http://www.qingjingart.com/kindeditor/attached/image/20201202/92a642da878c85c030bed41a473940eb_origin.jpg",
+          "status": null,
+          "contentType": null,
+          "ok": false,
+          "likelySanityUploadable": false,
+          "hotlinkBlocked": false,
+          "error": "fetch failed"
+        }
+      ]
+    },
+    {
+      "sourceCategory": "公共艺术",
+      "mappedCategory": "public-art",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "雕塑艺术",
+      "mappedCategory": "sculpture-art",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "器物",
+      "mappedCategory": "vessel",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "肖物",
+      "mappedCategory": "wearable",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "玩物",
+      "mappedCategory": "toy",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "饰物",
+      "mappedCategory": "ornament",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "境物",
+      "mappedCategory": "object",
+      "samplesChecked": 0,
+      "checks": []
+    },
+    {
+      "sourceCategory": "包装",
+      "mappedCategory": "packaging",
+      "samplesChecked": 0,
+      "checks": []
+    }
+  ],
+  "failedImageChecks": [
+    {
+      "url": "http://www.qingjingart.com/kindeditor/attached/image/20201202/0c501c2473fdea047c94943878b1fa1a_4096.jpg",
+      "status": null,
+      "contentType": null,
+      "ok": false,
+      "likelySanityUploadable": false,
+      "hotlinkBlocked": false,
+      "error": "fetch failed",
+      "sourceCategory": "装置艺术",
+      "mappedCategory": "installation-art"
+    },
+    {
+      "url": "http://www.qingjingart.com/kindeditor/attached/image/20201202/92a642da878c85c030bed41a473940eb_origin.jpg",
+      "status": null,
+      "contentType": null,
+      "ok": false,
+      "likelySanityUploadable": false,
+      "hotlinkBlocked": false,
+      "error": "fetch failed",
+      "sourceCategory": "装置艺术",
+      "mappedCategory": "installation-art"
+    }
+  ],
+  "fetchErrors": [
+    {
+      "kind": "artwork",
+      "sourceCategory": "玻璃艺术",
+      "mappedCategory": "glass-art",
+      "url": "http://www.qingjingart.com/product/class/?155.html",
+      "error": "fetch failed",
+      "reusedCachedEntries": 16
+    },
+    {
+      "kind": "artwork",
+      "sourceCategory": "装置艺术",
+      "mappedCategory": "installation-art",
+      "url": "http://www.qingjingart.com/product/class/?156.html",
+      "error": "fetch failed",
+      "reusedCachedEntries": 13
+    },
+    {
+      "kind": "artwork",
+      "sourceCategory": "公共艺术",
+      "mappedCategory": "public-art",
+      "url": "http://www.qingjingart.com/product/class/?157.html",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "artwork",
+      "sourceCategory": "雕塑艺术",
+      "mappedCategory": "sculpture-art",
+      "url": "http://www.qingjingart.com/product/class/?158.html",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "器物",
+      "mappedCategory": "vessel",
+      "url": "http://www.qingjingart.com/product/class/167/",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "肖物",
+      "mappedCategory": "wearable",
+      "url": "http://www.qingjingart.com/product/class/161/",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "玩物",
+      "mappedCategory": "toy",
+      "url": "http://www.qingjingart.com/product/class/162/",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "饰物",
+      "mappedCategory": "ornament",
+      "url": "http://www.qingjingart.com/product/class/163/",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "境物",
+      "mappedCategory": "object",
+      "url": "http://www.qingjingart.com/product/class/164/",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    },
+    {
+      "kind": "derivative",
+      "sourceCategory": "包装",
+      "mappedCategory": "packaging",
+      "url": "http://www.qingjingart.com/page/yyysp/bz.php",
+      "error": "fetch failed",
+      "reusedCachedEntries": 0
+    }
+  ],
+  "uploadCheck": {
+    "actualSanityAssetUploadAttempted": false,
+    "reason": "Dry Run safety rule: no Sanity writes or asset uploads performed.",
+    "likelyUploadableWhenImported": false
+  },
+  "notes": [
+    "所有预览条目均设置 needsReview = true。",
+    "抓不到的字段保持 null，没有根据图片或文件名编造名称。",
+    "艺术衍生品统一导入 product schema，productType 固定为 derivatives。",
+    "包装页未提供 product/html 详情链接，预览条目仅来自页面图片，sourceDetailUrl 为 null。",
+    "部分列表页或详情页抓取失败，详见 fetchErrors。"
+  ]
+}
