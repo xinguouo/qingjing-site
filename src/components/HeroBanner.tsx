@@ -1,5 +1,8 @@
+"use client";
+
 import type {SanityImageSource} from "@sanity/image-url";
 import Link from "next/link";
+import {useEffect, useState} from "react";
 
 import {urlForImage} from "@/sanity/image";
 import {glassStyle} from "../../styles/glassStyle";
@@ -15,6 +18,7 @@ type HeroBannerProps = {
   actions?: HeroBannerAction[];
   eyebrow?: string | null;
   image?: SanityImage;
+  images?: SanityImage[] | null;
   mobileHideText?: boolean;
   showIndicators?: boolean;
   subtitle?: string | null;
@@ -37,12 +41,31 @@ export function HeroBanner({
   actions = [],
   eyebrow,
   image,
+  images,
   mobileHideText = false,
   showIndicators = true,
   subtitle,
   title,
 }: HeroBannerProps) {
-  const heroImage = imageUrl(image, 1800);
+  const heroImages = (images?.filter(Boolean) || (image ? [image] : []))
+    .map((item) => imageUrl(item, 1800))
+    .filter(Boolean) as string[];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const hasCarousel = heroImages.length > 1;
+
+  useEffect(() => {
+    if (!hasCarousel) {
+      setActiveIndex(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % heroImages.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [hasCarousel, heroImages.length]);
+
   const mobileBottomLayout = mobileHideText
     ? "items-end pb-14 pt-24 md:items-stretch md:pb-8 md:pt-24 lg:pt-[280px]"
     : "pb-8 pt-24 lg:pt-[280px]";
@@ -56,13 +79,16 @@ export function HeroBanner({
 
   return (
     <section className={`${glassStyle.banner} home-hero relative isolate flex min-h-[390px] overflow-hidden px-5 sm:px-8 lg:min-h-[510px] lg:px-[60px] lg:pb-8 ${mobileBottomLayout}`}>
-      {heroImage ? (
+      {heroImages.map((heroImage, index) => (
         <img
           alt={title}
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          className={`absolute inset-0 -z-10 h-full w-full object-cover transition-opacity duration-1000 ease-out ${
+            index === activeIndex ? "opacity-100" : "opacity-0"
+          }`}
+          key={`${heroImage}-${index}`}
           src={heroImage}
         />
-      ) : null}
+      ))}
       <div className="home-hero-overlay absolute inset-0 -z-10" />
       <div className={`${glassStyle.bannerRefraction} absolute inset-0 -z-10`} />
 
@@ -99,11 +125,19 @@ export function HeroBanner({
         ) : null}
       </div>
 
-      {showIndicators ? (
-        <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-4 lg:flex">
-          <span className="h-0.5 w-12 rounded-full bg-[var(--soft-foreground)]" />
-          <span className="h-0.5 w-12 rounded-full bg-[var(--glass-border)]" />
-          <span className="h-0.5 w-12 rounded-full bg-[var(--glass-border)]" />
+      {showIndicators && hasCarousel ? (
+        <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex">
+          {heroImages.map((heroImage, index) => (
+            <span
+              aria-hidden="true"
+              className={`h-2 w-2 rounded-full transition ${
+                index === activeIndex
+                  ? "bg-[var(--soft-foreground)]"
+                  : "bg-[var(--glass-border)]"
+              }`}
+              key={`indicator-${heroImage}-${index}`}
+            />
+          ))}
         </div>
       ) : null}
     </section>

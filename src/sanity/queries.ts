@@ -103,6 +103,7 @@ const experienceCourseFields = `
   "title": ${localizedText('titleEn', 'titleZh')},
   "slug": slug.current,
   heroImage{${imageFields}},
+  heroImages[]{${imageFields}, alt},
   coverImage{${imageFields}},
   galleryImages[]{${imageFields}},
   descriptionZh,

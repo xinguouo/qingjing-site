@@ -34,6 +34,7 @@ type HomePageData = {
   featuredEvents?: HomeCardItem[] | null;
   featuredStudyPrograms?: HomeCardItem[] | null;
   heroImage?: SanityImage;
+  heroImages?: SanityImage[] | null;
   heroSubtitle?: string | null;
   heroTitle?: string | null;
 };
@@ -258,6 +259,8 @@ export async function HomePage({ locale }: HomePageProps) {
     compactText(siteSettings?.siteName) ||
     labels.fallbackHeroTitle;
   const subtitle = compactText(homePage?.heroSubtitle);
+  const heroImages = homePage?.heroImages?.filter(Boolean) || [];
+  const heroImage = heroImages[0] || homePage?.heroImage;
   const featuredStudyPrograms =
     homePage?.featuredStudyPrograms?.filter(Boolean) || [];
   const featuredEvents = homePage?.featuredEvents?.filter(Boolean) || [];
@@ -282,7 +285,8 @@ export async function HomePage({ locale }: HomePageProps) {
               label: labels.bookExperience,
             },
           ]}
-          image={homePage?.heroImage}
+          image={heroImage}
+          images={heroImages.length ? heroImages : null}
           mobileHideText
           subtitle={subtitle}
           title={title}

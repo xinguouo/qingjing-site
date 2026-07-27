@@ -43,6 +43,28 @@ export const homePage = defineType({
       type: 'image',
       group: 'hero',
       options: {hotspot: true},
+      hidden: true,
+    }),
+    defineField({
+      name: 'heroImages',
+      title: '首页主视觉轮播图 / Hero Carousel Images',
+      type: 'array',
+      group: 'hero',
+      of: [
+        defineField({
+          name: 'heroCarouselImage',
+          title: '首页 Banner 图片 / Hero Banner Image',
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            defineField({
+              name: 'alt',
+              title: '替代文字 / Alt Text',
+              type: 'string',
+            }),
+          ],
+        }),
+      ],
     }),
     defineField({
       name: 'introTitleZh',
@@ -119,7 +141,7 @@ export const homePage = defineType({
     select: {
       title: 'heroTitleZh',
       subtitle: 'heroTitleEn',
-      media: 'heroImage',
+      media: 'heroImages.0',
     },
   },
 })
