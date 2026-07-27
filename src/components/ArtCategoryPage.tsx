@@ -8,6 +8,7 @@ import {AppShell} from "./AppShell";
 import {BaseImageCard} from "./BaseImageCard";
 import {PageContainer} from "./PageContainer";
 import {PageHeader} from "./PageHeader";
+import {ArtCategorySortableGrid} from "./ArtCategorySortableGrid";
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -288,20 +289,13 @@ export async function ArtCategoryPage({
           <PageHeader titleEn={config.titleEn} titleZh={config.titleZh} />
         </div>
 
-        <section className="mt-9 max-w-[1120px] lg:mt-10">
-          <div className="grid justify-items-start gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            {artworks.map((artwork, index) => (
-              <ArtworkCard
-                artwork={artwork}
-                category={category}
-                includeLocalePrefix={includeLocalePrefix}
-                index={index}
-                key={artwork._id || artwork._key || artwork.slug || `${category}-${index}`}
-                locale={locale}
-              />
-            ))}
-          </div>
-        </section>
+        <ArtCategorySortableGrid
+          artworks={artworks}
+          category={category}
+          enableSorting={category === "glass-art"}
+          includeLocalePrefix={includeLocalePrefix}
+          locale={locale}
+        />
       </PageContainer>
     </AppShell>
   );

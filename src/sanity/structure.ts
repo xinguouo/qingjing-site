@@ -1,6 +1,7 @@
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 import type {StructureResolver} from 'sanity/structure'
 
-export const structure: StructureResolver = (S) => {
+export const structure: StructureResolver = (S, context) => {
   const singleton = ({
     id,
     title,
@@ -59,6 +60,25 @@ export const structure: StructureResolver = (S) => {
           filter,
         }),
       )
+
+  const orderableArtProjectListItem = ({
+    id,
+    title,
+    category,
+  }: {
+    id: string
+    title: string
+    category: string
+  }) =>
+    orderableDocumentListDeskItem({
+      type: 'artProject',
+      id,
+      title,
+      filter: '_type == "artProject" && coalesce(category, projectType) == $category',
+      params: {category},
+      S,
+      context,
+    })
 
   return S.list()
     .id('content')
@@ -245,29 +265,25 @@ export const structure: StructureResolver = (S) => {
             .id('artCreationPageEntries')
             .title('艺术创作 / Art Creation')
             .items([
-              typedListItem({
+              orderableArtProjectListItem({
                 id: 'artCreationGlassArt',
                 title: '玻璃艺术 / Glass Art',
-                schemaType: 'artProject',
-                filter: '_type == "artProject" && coalesce(category, projectType) == "glass-art"',
+                category: 'glass-art',
               }),
-              typedListItem({
+              orderableArtProjectListItem({
                 id: 'artCreationInstallationArt',
                 title: '装置艺术 / Installation Art',
-                schemaType: 'artProject',
-                filter: '_type == "artProject" && coalesce(category, projectType) == "installation-art"',
+                category: 'installation-art',
               }),
-              typedListItem({
+              orderableArtProjectListItem({
                 id: 'artCreationPublicArt',
                 title: '公共艺术 / Public Art',
-                schemaType: 'artProject',
-                filter: '_type == "artProject" && coalesce(category, projectType) == "public-art"',
+                category: 'public-art',
               }),
-              typedListItem({
+              orderableArtProjectListItem({
                 id: 'artCreationSculptureArt',
                 title: '雕塑艺术 / Sculpture Art',
-                schemaType: 'artProject',
-                filter: '_type == "artProject" && coalesce(category, projectType) == "sculpture-art"',
+                category: 'sculpture-art',
               }),
             ]),
         ),

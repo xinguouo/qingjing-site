@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 
 export const artProject = defineType({
@@ -13,6 +14,7 @@ export const artProject = defineType({
     {name: 'admin', title: '后台管理 / Admin'},
   ],
   fields: [
+    orderRankField({type: 'artProject', hidden: true}),
     defineField({
       name: 'titleZh',
       title: '作品名称（中文） / Title (Chinese)',
@@ -210,6 +212,7 @@ export const artProject = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: '排序 / Order',
       name: 'orderAsc',

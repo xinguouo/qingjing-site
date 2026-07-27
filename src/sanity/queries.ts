@@ -858,7 +858,7 @@ export const offlineExperiencePageQuery = defineQuery(`*[
 export const artWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter}
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
@@ -866,7 +866,7 @@ export const artWorksByTypeQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == $workType
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
@@ -874,7 +874,7 @@ export const glassArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "glass-art"
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
@@ -882,7 +882,7 @@ export const installationArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "installation-art"
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
@@ -890,7 +890,7 @@ export const publicArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "public-art"
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
@@ -898,7 +898,7 @@ export const sculptureArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "sculpture-art"
-] | order(order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`)
 
