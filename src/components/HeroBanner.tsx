@@ -15,6 +15,7 @@ type HeroBannerProps = {
   actions?: HeroBannerAction[];
   eyebrow?: string | null;
   image?: SanityImage;
+  mobileHideText?: boolean;
   showIndicators?: boolean;
   subtitle?: string | null;
   title: string;
@@ -36,14 +37,25 @@ export function HeroBanner({
   actions = [],
   eyebrow,
   image,
+  mobileHideText = false,
   showIndicators = true,
   subtitle,
   title,
 }: HeroBannerProps) {
   const heroImage = imageUrl(image, 1800);
+  const mobileBottomLayout = mobileHideText
+    ? "items-end pb-14 pt-24 md:items-stretch md:pb-8 md:pt-24 lg:pt-[280px]"
+    : "pb-8 pt-24 lg:pt-[280px]";
+  const textVisibility = mobileHideText ? "hidden md:block" : "";
+  const actionLayout = mobileHideText
+    ? "mt-0 flex-nowrap justify-center gap-3 md:mt-5 md:flex-wrap md:justify-start"
+    : "mt-5 flex-wrap gap-3";
+  const actionSizing = mobileHideText
+    ? "px-4 py-2.5 text-[13px] sm:px-5 sm:text-sm"
+    : "px-5 py-2.5 text-sm";
 
   return (
-    <section className={`${glassStyle.banner} home-hero relative isolate flex min-h-[390px] overflow-hidden px-5 pb-8 pt-24 sm:px-8 lg:min-h-[510px] lg:px-[60px] lg:pb-8 lg:pt-[280px]`}>
+    <section className={`${glassStyle.banner} home-hero relative isolate flex min-h-[390px] overflow-hidden px-5 sm:px-8 lg:min-h-[510px] lg:px-[60px] lg:pb-8 ${mobileBottomLayout}`}>
       {heroImage ? (
         <img
           alt={title}
@@ -60,19 +72,19 @@ export function HeroBanner({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-title max-w-[720px] text-[40px] font-normal leading-[1.08] text-primary sm:text-[50px] lg:text-[64px]">
+        <h1 className={`${textVisibility} font-title max-w-[720px] text-[40px] font-normal leading-[1.08] text-primary sm:text-[50px] lg:text-[64px]`}>
           {title}
         </h1>
         {subtitle ? (
-          <p className="mt-4 max-w-xl text-sm leading-7 text-secondary lg:text-base">
+          <p className={`${textVisibility} mt-4 max-w-xl text-sm leading-7 text-secondary lg:text-base`}>
             {subtitle}
           </p>
         ) : null}
         {actions.length > 0 ? (
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className={`flex ${actionLayout}`}>
             {actions.map((action, index) => (
               <Link
-                className={`${glassStyle.button} rounded-full px-5 py-2.5 text-sm transition ${
+                className={`${glassStyle.button} rounded-full ${actionSizing} transition ${
                   index === 0
                     ? "glass-button-primary"
                     : "glass-button-secondary"

@@ -355,6 +355,7 @@ export async function HomePage({ locale }: HomePageProps) {
             },
           ]}
           image={homePage?.heroImage}
+          mobileHideText
           subtitle={subtitle}
           title={title}
         />
