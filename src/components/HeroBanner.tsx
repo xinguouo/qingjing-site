@@ -2,7 +2,7 @@
 
 import type {SanityImageSource} from "@sanity/image-url";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 
 import {urlForImage} from "@/sanity/image";
 import {glassStyle} from "../../styles/glassStyle";
@@ -47,24 +47,32 @@ export function HeroBanner({
   subtitle,
   title,
 }: HeroBannerProps) {
-  const heroImages = (images?.filter(Boolean) || (image ? [image] : []))
-    .map((item) => imageUrl(item, 1800))
-    .filter(Boolean) as string[];
-  const [activeIndex, setActiveIndex] = useState(0);
+  const heroImages = useMemo(
+    () =>
+      (images?.filter(Boolean) || (image ? [image] : []))
+        .map((item) => imageUrl(item, 1800))
+        .filter(Boolean) as string[],
+    [image, images],
+  );
+  const [currentIndex, setCurrentIndex] = useState(0);
   const hasCarousel = heroImages.length > 1;
 
   useEffect(() => {
+    setCurrentIndex(0);
+  }, [heroImages.length]);
+
+  useEffect(() => {
     if (!hasCarousel) {
-      setActiveIndex(0);
+      setCurrentIndex(0);
       return;
     }
 
     const timer = window.setInterval(() => {
-      setActiveIndex((index) => (index + 1) % heroImages.length);
+      setCurrentIndex((index) => (index + 1) % heroImages.length);
     }, 5000);
 
     return () => window.clearInterval(timer);
-  }, [hasCarousel, heroImages.length]);
+  }, [hasCarousel, heroImages]);
 
   const mobileBottomLayout = mobileHideText
     ? "items-end pb-14 pt-24 md:items-stretch md:pb-8 md:pt-24 lg:pt-[280px]"
@@ -83,7 +91,7 @@ export function HeroBanner({
         <img
           alt={title}
           className={`absolute inset-0 -z-10 h-full w-full object-cover transition-opacity duration-1000 ease-out ${
-            index === activeIndex ? "opacity-100" : "opacity-0"
+            index === currentIndex ? "opacity-100" : "opacity-0"
           }`}
           key={`${heroImage}-${index}`}
           src={heroImage}
@@ -131,7 +139,7 @@ export function HeroBanner({
             <span
               aria-hidden="true"
               className={`h-2 w-2 rounded-full transition ${
-                index === activeIndex
+                index === currentIndex
                   ? "bg-[var(--soft-foreground)]"
                   : "bg-[var(--glass-border)]"
               }`}
