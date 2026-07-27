@@ -56,23 +56,19 @@ function isColorTheme(value: string | null): value is ColorThemeId {
   return Boolean(value && colorThemeIds.has(value as ColorThemeId));
 }
 
-function getSystemMode(): ThemeMode {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function getStoredMode(): ThemeMode {
+function getStoredMode(): ThemeMode | null {
   const stored = window.localStorage.getItem(modeStorageKey);
 
   if (stored === "light" || stored === "dark") {
     return stored;
   }
 
-  return getSystemMode();
+  return null;
 }
 
 function getStoredColorTheme(): ColorThemeId {
   const stored = window.localStorage.getItem(colorStorageKey);
-  return isColorTheme(stored) ? stored : "mist";
+  return isColorTheme(stored) ? stored : "dark-glass";
 }
 
 function applyTheme(mode: ThemeMode, colorTheme: ColorThemeId) {
@@ -87,18 +83,23 @@ function applyTheme(mode: ThemeMode, colorTheme: ColorThemeId) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>("light");
-  const [colorTheme, setColorThemeState] = useState<ColorThemeId>("mist");
+  const [mode, setModeState] = useState<ThemeMode>("dark");
+  const [colorTheme, setColorThemeState] = useState<ColorThemeId>("dark-glass");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const initialColorTheme = getStoredColorTheme();
-    const initialMode =
-      initialColorTheme === "dark-glass" ? "dark" : getStoredMode();
+    const initialMode = getStoredMode() ?? "dark";
+    const normalizedColorTheme =
+      initialMode === "dark"
+        ? "dark-glass"
+        : initialColorTheme === "dark-glass"
+          ? "mist"
+          : initialColorTheme;
 
-    setColorThemeState(initialColorTheme);
+    setColorThemeState(normalizedColorTheme);
     setModeState(initialMode);
-    applyTheme(initialMode, initialColorTheme);
+    applyTheme(initialMode, normalizedColorTheme);
     setMounted(true);
   }, []);
 

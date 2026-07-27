@@ -206,9 +206,9 @@ export function ArtworkCard({
   locale: Locale;
 }) {
   const labels = copy[locale];
-  const title = compactText(artwork.title) || artCategoryConfigs[category].titleZh;
+  const title = compactText(artwork.title);
   const size = compactText(artwork.size || artwork.dimensions);
-  const description = compactText(artwork.description) || labels.fallbackDescription;
+  const description = compactText(artwork.description);
   const prefix = includeLocalePrefix ? `/${locale}` : "";
   const href = artwork.slug
     ? `${prefix}/art-projects/${category}/${artwork.slug}`
@@ -220,21 +220,24 @@ export function ArtworkCard({
       emptyLabel={labels.emptyImage}
       href={href}
       image={artwork.coverImage || artwork.images?.[0]}
-      imageAlt={title}
+      imageAlt={title || artCategoryConfigs[category].titleZh}
+      overlayClassName="h-[116px] overflow-hidden rounded-[14px] px-4 py-3"
     >
-      <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
+      <p className="text-[10px] leading-none text-[#444] dark:text-white/58">
         {number} ·
       </p>
-      <h3 className="mt-2 line-clamp-2 font-title text-[16px] font-normal leading-snug">
-        {title}
-      </h3>
+      {title ? (
+        <h3 className="mt-2 line-clamp-1 font-title text-[16px] font-normal leading-snug">
+          {title}
+        </h3>
+      ) : null}
       {size ? (
-        <p className="mt-2 line-clamp-1 text-[12px] leading-none text-[#555] dark:text-white/64">
+        <p className="mt-1.5 line-clamp-1 text-[11px] leading-none text-[#555] dark:text-white/64">
           {size}
         </p>
       ) : null}
       {description ? (
-        <p className="mt-2 line-clamp-2 text-[12px] leading-[1.45] text-[#555] dark:text-white/64">
+        <p className="mt-1.5 line-clamp-2 text-[11px] leading-[1.4] text-[#555] dark:text-white/64">
           {description}
         </p>
       ) : null}

@@ -234,7 +234,7 @@ function MissionContentSection({ text }: { text: string }) {
   return (
     <section className="mt-8 max-w-[800px] text-left sm:mt-9 lg:mt-10">
       <TextBlock
-        className="text-[16px] leading-[1.8] text-secondary"
+        className="text-[18px] leading-[1.8] text-secondary"
         text={text}
       />
     </section>

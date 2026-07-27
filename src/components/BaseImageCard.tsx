@@ -27,6 +27,7 @@ export function BaseImageCard({
   href,
   image,
   imageAlt,
+  overlayClassName = "",
 }: {
   aspectClassName?: string;
   children: ReactNode;
@@ -34,6 +35,7 @@ export function BaseImageCard({
   href: string | null;
   image: SanityImage;
   imageAlt: string;
+  overlayClassName?: string;
 }) {
   const src = imageUrl(image, 900);
 
@@ -54,7 +56,7 @@ export function BaseImageCard({
         )}
       </div>
 
-      <div className={`${glassStyle.overlay} absolute inset-x-2.5 bottom-2.5 rounded-[14px] border border-white/65 bg-white/68 px-3 py-2.5 text-[#222] shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.78)] dark:border-white/14 dark:bg-black/34 dark:text-white/88`}>
+      <div className={`${glassStyle.overlay} absolute inset-x-2.5 bottom-2.5 rounded-[14px] border border-white/65 bg-white/68 px-3 py-2.5 text-[#222] shadow-[0_12px_28px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.78)] dark:border-white/14 dark:bg-black/34 dark:text-white/88 ${overlayClassName}`}>
         {children}
       </div>
     </article>

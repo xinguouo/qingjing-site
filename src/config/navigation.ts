@@ -7,6 +7,7 @@ export type NavigationGroup =
   | "about"
   | "residency"
   | "study"
+  | "offlineExperience"
   | "events"
   | "artCreation"
   | "shop";
@@ -32,7 +33,11 @@ export const navigationGroupLabels: Record<
     labelEn: "Residency Program",
   },
   study: { labelZh: "\u7814\u5b66", labelEn: "Study" },
-  events: { labelZh: "\u6d3b\u52a8", labelEn: "Events" },
+  offlineExperience: {
+    labelZh: "\u7ebf\u4e0b\u4f53\u9a8c",
+    labelEn: "Offline Experience",
+  },
+  events: { labelZh: "\u827a\u672f\u6d3b\u52a8", labelEn: "Art Events" },
   artCreation: {
     labelZh: "\u827a\u672f\u521b\u4f5c",
     labelEn: "Art Creation",
@@ -45,6 +50,7 @@ export const navigationGroupOrder: NavigationGroup[] = [
   "about",
   "residency",
   "study",
+  "offlineExperience",
   "events",
   "artCreation",
   "shop",
@@ -121,7 +127,7 @@ export const navigationItems: NavigationItem[] = [
     labelEn: "Offline Experience",
     href: "/events/offline-experience",
     icon: "spark",
-    group: "events",
+    group: "offlineExperience",
     status: "live",
     activePathPrefixes: ["/events/offline-workshop/"],
   },
@@ -167,15 +173,6 @@ export const navigationItems: NavigationItem[] = [
     group: "artCreation",
     status: "live",
     activePathPrefixes: ["/art-projects/public-art"],
-  },
-  {
-    labelZh: "\u96d5\u5851\u827a\u672f",
-    labelEn: "Sculpture Art",
-    href: "/art-creation/sculpture-art",
-    icon: "sculpture",
-    group: "artCreation",
-    status: "live",
-    activePathPrefixes: ["/art-projects/sculpture-art"],
   },
   {
     labelZh: "\u5546\u5e97",

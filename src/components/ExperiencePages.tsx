@@ -11,7 +11,6 @@ import {
 } from "@/sanity/queries";
 
 import {AppShell} from "./AppShell";
-import {HeroBanner} from "./HeroBanner";
 import {PageContainer} from "./PageContainer";
 import {PageHeader} from "./PageHeader";
 import {CourseCard, type StudyProgram} from "./StudyPages";
@@ -180,14 +179,6 @@ function compactText(value: string | null | undefined) {
   return value?.trim() || "";
 }
 
-function localizedValue(
-  locale: Locale,
-  zh: string | null | undefined,
-  en: string | null | undefined,
-) {
-  return locale === "en" ? compactText(en) || compactText(zh) : compactText(zh);
-}
-
 function imageUrl(image: SanityImage, width: number) {
   if (!image) {
     return null;
@@ -244,53 +235,31 @@ export async function ExperienceCoursePage({locale}: ExperiencePageProps) {
     : courseDocuments.length
       ? courseDocuments
       : fallbackCourses[locale];
-  const bannerCourse = items[0];
-  const bannerTitle =
-    localizedValue(locale, pageData?.bannerTitleZh, pageData?.bannerTitleEn) ||
-    compactText(bannerCourse?.title) ||
-    labels.heroTitle;
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.pageTitle;
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.sectionEn;
-  const detailHref = bannerCourse?.slug
-    ? `/${locale}/events/offline-experience/${bannerCourse.slug}`
-    : `/${locale}/events/offline-experience`;
+  const featuredTitle = locale === "zh" ? "\u7cbe\u9009\u8bfe\u7a0b" : "Featured Courses";
 
   return (
     <AppShell locale={locale}>
-      <div className="page-surface">
-        <HeroBanner
-          actions={[
-            {
-              href: detailHref,
-              label: labels.detail,
-            },
-            {
-              href: `/${locale}/about/contact`,
-              label: labels.book,
-            },
-          ]}
-          eyebrow="GLASS MOSAIC EXPERIENCE"
-          image={pageData?.bannerImage || bannerCourse?.heroImage || bannerCourse?.coverImage}
-          title={bannerTitle}
-        />
+      <PageContainer>
+        <PageHeader titleEn={pageTitleEn} titleZh={pageTitleZh} />
 
-        <PageContainer className="pb-16 lg:pb-20" minHeight={false}>
-          <PageHeader titleEn={pageTitleEn} titleZh={pageTitleZh} />
-
-          <section className="mt-7 lg:mt-8">
-            <div className="grid max-w-[1280px] gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {items.map((course, index) => (
-                <CourseCard
-                  hrefPrefix="/events/offline-experience"
-                  key={course._id || course._key || course.slug || index}
-                  locale={locale}
-                  program={mapToCourseCard(course)}
-                />
-              ))}
-            </div>
-          </section>
-        </PageContainer>
-      </div>
+        <section className="mt-10 lg:mt-12">
+          <h2 className="font-title text-[26px] font-normal leading-tight text-primary lg:text-[32px]">
+            {featuredTitle}
+          </h2>
+          <div className="mt-5 grid max-w-[1280px] gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {items.map((course, index) => (
+              <CourseCard
+                hrefPrefix="/events/offline-experience"
+                key={course._id || course._key || course.slug || index}
+                locale={locale}
+                program={mapToCourseCard(course)}
+              />
+            ))}
+          </div>
+        </section>
+      </PageContainer>
     </AppShell>
   );
 }

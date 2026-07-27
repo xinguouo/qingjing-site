@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/config/navigation";
 
-import { useTheme, type ColorTheme } from "./ThemeProvider";
+import { useTheme, type ColorTheme } from "@/components/ThemeProvider";
 
 type FloatingThemeControlProps = {
   locale: Locale;

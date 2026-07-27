@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "@/components/ThemeProvider";
 
 function MoonIcon() {
   return (

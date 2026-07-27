@@ -48,7 +48,7 @@ export function HeroBanner({
     : "pb-8 pt-24 lg:pt-[280px]";
   const textVisibility = mobileHideText ? "hidden md:block" : "";
   const actionLayout = mobileHideText
-    ? "mt-0 flex-nowrap justify-center gap-3 md:mt-5 md:flex-wrap md:justify-start"
+    ? "mt-0 flex-nowrap justify-start gap-3 md:mt-5 md:flex-wrap"
     : "mt-5 flex-wrap gap-3";
   const actionSizing = mobileHideText
     ? "px-4 py-2.5 text-[13px] sm:px-5 sm:text-sm"

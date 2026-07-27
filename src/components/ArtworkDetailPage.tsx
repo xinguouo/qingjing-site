@@ -31,8 +31,6 @@ const copy = {
     artist: "作者",
     backPrefix: "返回",
     description: "作品描述",
-    emptyDescription: "作品描述待更新。",
-    emptyImage: "作品图片待上传",
     size: "尺寸",
     title: "作品名称",
     year: "创作年份",
@@ -41,8 +39,6 @@ const copy = {
     artist: "Artist",
     backPrefix: "Back to",
     description: "Artwork Description",
-    emptyDescription: "Artwork description pending.",
-    emptyImage: "Artwork image pending",
     size: "Size",
     title: "Artwork Title",
     year: "Year",
@@ -63,6 +59,51 @@ function imageUrl(image: SanityImage, width: number) {
   } catch {
     return null;
   }
+}
+
+function imageIdentity(image: SanityImage) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  const asset = "asset" in image ? image.asset : null;
+
+  if (!asset || typeof asset !== "object") {
+    return "";
+  }
+
+  return (
+    ("_ref" in asset && typeof asset._ref === "string" ? asset._ref : "") ||
+    ("_id" in asset && typeof asset._id === "string" ? asset._id : "")
+  );
+}
+
+function mergeArtworkImages(
+  coverImage: SanityImage,
+  artworkImages: SanityImage[] | null | undefined,
+) {
+  const seen = new Set<string>();
+  const merged: SanityImage[] = [];
+
+  [coverImage, ...(artworkImages || [])].forEach((image) => {
+    if (!image) {
+      return;
+    }
+
+    const identity = imageIdentity(image);
+
+    if (identity && seen.has(identity)) {
+      return;
+    }
+
+    if (identity) {
+      seen.add(identity);
+    }
+
+    merged.push(image);
+  });
+
+  return merged;
 }
 
 function normalizeCategory(value: string | null | undefined): ArtCategorySlug | null {
@@ -208,21 +249,13 @@ function ArtworkDescription({
 
 function ArtworkGallery({
   images,
-  label,
   title,
 }: {
   images: SanityImage[];
-  label: string;
   title: string;
 }) {
   if (!images.length) {
-    return (
-      <section className="mt-12 max-w-[980px]">
-        <div className="image-placeholder flex min-h-[420px] items-center justify-center rounded-[18px] border border-[var(--border)] text-xs text-muted-token">
-          {label}
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
@@ -242,11 +275,7 @@ function ArtworkGallery({
                 loading={index === 0 ? "eager" : "lazy"}
                 src={src}
               />
-            ) : (
-              <div className="image-placeholder flex min-h-[420px] w-full items-center justify-center text-xs text-muted-token">
-                {label}
-              </div>
-            )}
+            ) : null}
           </figure>
         );
       })}
@@ -260,7 +289,6 @@ export function ArtworkDetailLayout({
   categoryLabel,
   description,
   descriptionLabel,
-  emptyImageLabel,
   images,
   locale,
   metaItems,
@@ -272,7 +300,6 @@ export function ArtworkDetailLayout({
   categoryLabel?: string;
   description: string;
   descriptionLabel: string;
-  emptyImageLabel: string;
   images: SanityImage[];
   locale: Locale;
   metaItems: Array<{label: string; value?: string | number | null}>;
@@ -298,7 +325,6 @@ export function ArtworkDetailLayout({
         ) : null}
         <ArtworkGallery
           images={images}
-          label={emptyImageLabel}
           title={primaryTitle}
         />
       </PageContainer>
@@ -339,13 +365,8 @@ export async function ArtworkDetailPage({
   const secondaryTitle =
     locale === "en" ? titleZh || "" : titleEn || "";
   const size = compactText(artwork.size || artwork.dimensions);
-  const description = compactText(artwork.description) || labels.emptyDescription;
-  const images = (artwork.images || []).filter(Boolean);
-  const galleryImages = images.length
-    ? images
-    : artwork.coverImage
-      ? [artwork.coverImage]
-      : [];
+  const description = compactText(artwork.description);
+  const galleryImages = mergeArtworkImages(artwork.coverImage, artwork.images);
   const prefix = includeLocalePrefix ? `/${locale}` : "";
   const backHref = `${prefix}/art-projects/${categorySlug}`;
   const backLabel = `${labels.backPrefix} ${categoryLabel(categorySlug, locale)}`;
@@ -356,7 +377,6 @@ export async function ArtworkDetailPage({
       backLabel={backLabel}
       description={description}
       descriptionLabel={labels.description}
-      emptyImageLabel={labels.emptyImage}
       images={galleryImages}
       locale={locale}
       metaItems={[

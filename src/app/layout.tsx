@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html
       lang="zh-CN"
-      className="h-full antialiased light theme-mist"
+      className="h-full antialiased dark theme-dark-glass"
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>

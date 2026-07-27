@@ -267,10 +267,12 @@ function CourseCardPoster({
 }
 
 export function CourseCard({
+  href,
   locale,
   program,
   hrefPrefix = "/study/masterclass",
 }: {
+  href?: string | null;
   locale: Locale;
   program: StudyProgram;
   hrefPrefix?: string;
@@ -283,7 +285,12 @@ export function CourseCard({
   const academicSupport = firstTextLine(
     program.academicSupport || program.academicHost || program.faculty,
   );
-  const href = program.slug ? `/${locale}${hrefPrefix}/${program.slug}` : null;
+  const cardHref =
+    href === undefined
+      ? program.slug
+        ? `/${locale}${hrefPrefix}/${program.slug}`
+        : null
+      : href;
   const content = (
     <>
       <CourseCardPoster
@@ -316,8 +323,8 @@ export function CourseCard({
   const className =
     `${glassStyle.card} ${glassStyle.cardHover} group flex h-[210px] w-full overflow-hidden rounded-[20px] p-4 transition duration-200 sm:h-[220px] sm:p-5`;
 
-  return href ? (
-    <Link className={className} href={href}>
+  return cardHref ? (
+    <Link className={className} href={cardHref}>
       {content}
     </Link>
   ) : (

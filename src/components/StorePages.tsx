@@ -567,37 +567,22 @@ export function ProductCard({
   const price = compactText(item.price);
   const number = String(index + 1).padStart(2, "0");
 
-  if (item.category === "derivative") {
-    return (
-      <DerivativeProductCard
-        category={category}
-        emptyLabel={labels.emptyImage}
-        href={href}
-        image={item.image}
-        index={number}
-        price={price}
-        title={title}
-      />
-    );
-  }
-
   return (
     <BaseImageCard
       emptyLabel={labels.emptyImage}
       href={href}
       image={item.image}
       imageAlt={title}
+      overlayClassName="h-[104px] overflow-hidden"
     >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex h-full items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
                 {number} ·
               </p>
-              {category ? (
-                <p className="mt-3 line-clamp-1 text-[12px] leading-none text-[#555] dark:text-white/64">
-                  {category}
-                </p>
-              ) : null}
+              <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
+                {category || "\u00a0"}
+              </p>
               <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
                 {title}
               </h3>
@@ -608,54 +593,6 @@ export function ProductCard({
               </p>
             ) : null}
           </div>
-    </BaseImageCard>
-  );
-}
-
-function DerivativeProductCard({
-  category,
-  emptyLabel,
-  href,
-  image,
-  index,
-  price,
-  title,
-}: {
-  category: string;
-  emptyLabel: string;
-  href: string | null;
-  image: SanityImage;
-  index: string;
-  price: string;
-  title: string;
-}) {
-  return (
-    <BaseImageCard
-      emptyLabel={emptyLabel}
-      href={href}
-      image={image}
-      imageAlt={title}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
-            {index}
-          </p>
-          {category ? (
-            <p className="mt-3 line-clamp-1 text-[12px] leading-none text-[#555] dark:text-white/64">
-              {category}
-            </p>
-          ) : null}
-          <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
-            {title}
-          </h3>
-        </div>
-        {price ? (
-          <p className="shrink-0 text-[13px] leading-none text-[#333] dark:text-white/78">
-            {price}
-          </p>
-        ) : null}
-      </div>
     </BaseImageCard>
   );
 }
@@ -1527,7 +1464,6 @@ export async function DerivativeProductDetailPage({
       categoryLabel={labels.derivatives}
       description={description}
       descriptionLabel={descriptionLabel}
-      emptyImageLabel={labels.emptyImage}
       images={images}
       locale={locale}
       metaItems={[

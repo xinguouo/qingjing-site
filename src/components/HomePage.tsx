@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
-import { urlForImage } from "@/sanity/image";
 import {
   homePageQuery,
   internationalMasterclassProgramsQuery,
@@ -14,6 +13,7 @@ import {
 import { AppShell } from "./AppShell";
 import { HeroBanner } from "./HeroBanner";
 import { PageContainer } from "./PageContainer";
+import { CourseCard, type StudyProgram } from "./StudyPages";
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -81,18 +81,6 @@ const copy = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
-function imageUrl(image: SanityImage, width: number) {
-  if (!image) {
-    return null;
-  }
-
-  try {
-    return urlForImage(image).width(width).auto("format").url();
-  } catch {
-    return null;
-  }
-}
-
 function compactText(value: string | null | undefined) {
   return value?.trim() || "";
 }
@@ -143,101 +131,6 @@ function ArrowIcon() {
   );
 }
 
-function ImageFrame({
-  alt,
-  image,
-  locale,
-}: {
-  alt: string;
-  image: SanityImage;
-  locale: Locale;
-}) {
-  const src = imageUrl(image, 520);
-
-  return (
-    <div className="image-placeholder flex aspect-[3/4] w-full shrink-0 items-center justify-center overflow-hidden rounded-[10px] lg:w-[118px]">
-      {src ? (
-        <img
-          alt={alt}
-          className="h-full w-full object-cover"
-          loading="lazy"
-          src={src}
-        />
-      ) : (
-        <span className="px-4 text-center text-xs text-muted-token">
-          {copy[locale].imagePending}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function FeaturedCard({
-  href,
-  item,
-  locale,
-}: {
-  href: string | null;
-  item: HomeCardItem;
-  locale: Locale;
-}) {
-  const title = compactText(item.title) || copy[locale].dataPending;
-  const excerpt =
-    compactText(item.courseIntro) ||
-    compactText(item.content) ||
-    copy[locale].offlineExperienceEntryText;
-  const faculty = compactText(item.faculty);
-  const content = (
-    <>
-      <ImageFrame
-        alt={title}
-        image={item.posterImage || item.coverImage}
-        locale={locale}
-      />
-      <div className="flex min-w-0 flex-1 flex-col pt-0.5">
-        <h3 className="font-title text-lg font-normal leading-snug text-primary">
-          {title}
-        </h3>
-        <p className="mt-2 overflow-hidden text-xs leading-5 text-secondary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
-          {excerpt}
-        </p>
-        {faculty ? (
-          <div className="mt-auto pt-5 text-xs leading-5 text-muted-token">
-            <p>{copy[locale].faculty}</p>
-            <p className="text-secondary">{faculty}</p>
-          </div>
-        ) : null}
-      </div>
-    </>
-  );
-  const className =
-    "glass-card glass-card-hover group flex min-h-[174px] flex-col gap-4 rounded-[14px] p-4 lg:flex-row";
-
-  return href ? (
-    <Link className={className} href={href}>
-      {content}
-    </Link>
-  ) : (
-    <article className={className}>{content}</article>
-  );
-}
-
-function PlaceholderCard({ locale }: { locale: Locale }) {
-  return (
-    <article className="glass-card flex min-h-[174px] flex-col gap-4 rounded-[14px] border-dashed p-4 lg:flex-row">
-      <ImageFrame alt={copy[locale].imagePending} image={null} locale={locale} />
-      <div className="flex flex-1 flex-col pt-0.5">
-        <h3 className="font-title text-lg font-normal leading-snug text-primary">
-          {copy[locale].dataPending}
-        </h3>
-        <p className="mt-2 text-xs leading-5 text-muted-token">
-          {copy[locale].offlineExperienceEntryText}
-        </p>
-      </div>
-    </article>
-  );
-}
-
 function EntryCard({
   description,
   href,
@@ -249,17 +142,47 @@ function EntryCard({
 }) {
   return (
     <Link
-      className="glass-card glass-card-hover group min-h-[148px] rounded-[14px] p-6 lg:p-7"
+      className="glass-card glass-card-hover group min-h-[112px] rounded-[14px] p-4 sm:min-h-[128px] sm:p-5 lg:min-h-[148px] lg:p-7"
       href={href}
     >
-      <h2 className="font-title text-xl font-normal leading-tight text-primary lg:text-[24px]">
+      <h2 className="font-title text-[17px] font-normal leading-tight text-primary sm:text-xl lg:text-[24px]">
         {title}
       </h2>
-      <p className="mt-3 max-w-2xl text-xs leading-6 text-secondary lg:text-[13px]">
+      <p className="mt-2 line-clamp-3 max-w-2xl text-[11px] leading-[1.65] text-secondary sm:text-xs sm:leading-6 lg:mt-3 lg:text-[13px]">
         {description}
       </p>
     </Link>
   );
+}
+
+function mapHomeItemToCourseCard(item: HomeCardItem): StudyProgram {
+  const description =
+    compactText(item.courseIntro) || compactText(item.content) || null;
+  const academicSupport = compactText(item.faculty) || null;
+
+  return {
+    _id: item._id || item.slug || "home-featured-card",
+    academicHost: academicSupport,
+    academicSupport,
+    coverImage: item.coverImage,
+    courseIntro: description,
+    description,
+    posterImage: item.posterImage || item.coverImage,
+    shortDescription: description,
+    slug: item.slug,
+    title: compactText(item.title) || null,
+  };
+}
+
+function placeholderProgram(locale: Locale, key: string): StudyProgram {
+  return {
+    _id: `placeholder-${key}`,
+    academicSupport: null,
+    courseIntro: copy[locale].offlineExperienceEntryText,
+    description: copy[locale].offlineExperienceEntryText,
+    shortDescription: copy[locale].offlineExperienceEntryText,
+    title: copy[locale].dataPending,
+  };
 }
 
 function FeaturedSection({
@@ -292,21 +215,26 @@ function FeaturedSection({
           <ArrowIcon />
         </Link>
       </div>
-      <div className="grid gap-5 xl:grid-cols-3">
+      <div className="grid max-w-[1280px] gap-5 md:grid-cols-2 xl:grid-cols-3">
         {visibleItems.map((item, index) => (
-          <FeaturedCard
+          <CourseCard
             href={
               type === "program"
                 ? programHref(item, locale)
                 : eventHref(item, locale)
             }
-            item={item}
             key={item._id || `${title}-${index}`}
             locale={locale}
+            program={mapHomeItemToCourseCard(item)}
           />
         ))}
         {Array.from({ length: placeholderCount }).map((_, index) => (
-          <PlaceholderCard key={`placeholder-${title}-${index}`} locale={locale} />
+          <CourseCard
+            href={null}
+            key={`placeholder-${title}-${index}`}
+            locale={locale}
+            program={placeholderProgram(locale, `${title}-${index}`)}
+          />
         ))}
       </div>
     </section>
@@ -361,7 +289,7 @@ export async function HomePage({ locale }: HomePageProps) {
         />
 
         <PageContainer minHeight={false} className="py-9 lg:py-10">
-          <section className="grid gap-5 lg:grid-cols-2">
+          <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
             <EntryCard
               description={labels.offlineExperienceEntryText}
               href={`/${locale}/events/offline-experience`}
