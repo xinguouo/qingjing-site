@@ -60,7 +60,40 @@ export const artProject = defineType({
       title: '作品图片 / Artwork Images',
       type: 'array',
       group: 'media',
-      of: [{type: 'image', options: {hotspot: true}}],
+      of: [
+        defineField({
+          name: 'artworkImage',
+          title: '作品图片 / Artwork Image',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'image',
+              title: '图片 / Image',
+              type: 'image',
+              options: {hotspot: true},
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'description',
+              title: '图片说明 / Description',
+              type: 'text',
+              rows: 3,
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'description',
+              media: 'image',
+            },
+            prepare({title, media}) {
+              return {
+                title: title || 'Artwork image',
+                media,
+              }
+            },
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'artist',

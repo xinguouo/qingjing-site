@@ -10,14 +10,24 @@ import {artWorkBySlugQuery} from "@/sanity/queries";
 import {
   artCategoryConfigs,
   fallbackArtworks,
+  getArtworkImageSource,
   isArtCategorySlug,
   type ArtCategorySlug,
   type Artwork,
+  type ArtworkImageEntry,
 } from "./ArtCategoryPage";
 import {AppShell} from "./AppShell";
 import {PageContainer} from "./PageContainer";
 
 type SanityImage = SanityImageSource | null | undefined;
+
+type ArtworkGalleryItem = {
+  description?: string | null;
+  image: SanityImage;
+  key?: string;
+};
+
+type ArtworkGalleryInput = ArtworkGalleryItem | SanityImage;
 
 type ArtworkDetailPageProps = {
   category?: string;
@@ -78,14 +88,42 @@ function imageIdentity(image: SanityImage) {
   );
 }
 
+function artworkImageDescription(entry: ArtworkImageEntry) {
+  if (!entry || typeof entry !== "object" || !("description" in entry)) {
+    return "";
+  }
+
+  return compactText(entry.description);
+}
+
+function artworkImageKey(entry: ArtworkImageEntry) {
+  if (!entry || typeof entry !== "object" || !("_key" in entry)) {
+    return "";
+  }
+
+  return compactText(entry._key);
+}
+
 function mergeArtworkImages(
   coverImage: SanityImage,
-  artworkImages: SanityImage[] | null | undefined,
+  artworkImages: ArtworkImageEntry[] | null | undefined,
 ) {
   const seen = new Set<string>();
-  const merged: SanityImage[] = [];
+  const merged: ArtworkGalleryItem[] = [];
 
-  [coverImage, ...(artworkImages || [])].forEach((image) => {
+  if (coverImage) {
+    const identity = imageIdentity(coverImage);
+
+    if (identity) {
+      seen.add(identity);
+    }
+
+    merged.push({image: coverImage, key: identity || "cover-image"});
+  }
+
+  (artworkImages || []).forEach((entry) => {
+    const image = getArtworkImageSource(entry);
+
     if (!image) {
       return;
     }
@@ -100,7 +138,11 @@ function mergeArtworkImages(
       seen.add(identity);
     }
 
-    merged.push(image);
+    merged.push({
+      description: artworkImageDescription(entry),
+      image,
+      key: artworkImageKey(entry) || identity,
+    });
   });
 
   return merged;
@@ -251,22 +293,37 @@ function ArtworkGallery({
   images,
   title,
 }: {
-  images: SanityImage[];
+  images: ArtworkGalleryInput[];
   title: string;
 }) {
-  if (!images.length) {
+  const visibleImages = images
+    .map((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+
+      if ("image" in item) {
+        return item;
+      }
+
+      return {image: item as SanityImage};
+    })
+    .filter((item): item is ArtworkGalleryItem => Boolean(item?.image));
+
+  if (!visibleImages.length) {
     return null;
   }
 
   return (
     <section className="mt-12 max-w-[980px] space-y-10 lg:space-y-12">
-      {images.map((image, index) => {
-        const src = imageUrl(image, 1800);
+      {visibleImages.map((item, index) => {
+        const src = imageUrl(item.image, 1800);
+        const description = compactText(item.description);
 
         return (
           <figure
             className="w-full"
-            key={index}
+            key={item.key || index}
           >
             {src ? (
               <img
@@ -275,6 +332,11 @@ function ArtworkGallery({
                 loading={index === 0 ? "eager" : "lazy"}
                 src={src}
               />
+            ) : null}
+            {description ? (
+              <figcaption className="mt-4 max-w-[760px] whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
+                {description}
+              </figcaption>
             ) : null}
           </figure>
         );
@@ -300,7 +362,7 @@ export function ArtworkDetailLayout({
   categoryLabel?: string;
   description: string;
   descriptionLabel: string;
-  images: SanityImage[];
+  images: ArtworkGalleryInput[];
   locale: Locale;
   metaItems: Array<{label: string; value?: string | number | null}>;
   primaryTitle: string;

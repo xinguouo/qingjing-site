@@ -11,6 +11,15 @@ import {PageHeader} from "./PageHeader";
 
 type SanityImage = SanityImageSource | null | undefined;
 
+export type ArtworkImageItem = {
+  _key?: string;
+  _type?: string;
+  description?: string | null;
+  image?: SanityImage;
+};
+
+export type ArtworkImageEntry = SanityImage | ArtworkImageItem | null | undefined;
+
 export type ArtCategorySlug =
   | "glass-art"
   | "installation-art"
@@ -25,7 +34,7 @@ export type Artwork = {
   coverImage?: SanityImage;
   description?: string | null;
   dimensions?: string | null;
-  images?: SanityImage[] | null;
+  images?: ArtworkImageEntry[] | null;
   price?: string | null;
   quantity?: string | null;
   size?: string | null;
@@ -188,6 +197,18 @@ export function isArtCategorySlug(value: string): value is ArtCategorySlug {
   return value in artCategoryConfigs;
 }
 
+export function getArtworkImageSource(image: ArtworkImageEntry): SanityImage {
+  if (!image || typeof image !== "object") {
+    return null;
+  }
+
+  if ("image" in image) {
+    return image.image;
+  }
+
+  return image as SanityImage;
+}
+
 function compactText(value: string | null | undefined) {
   return value?.trim() || "";
 }
@@ -219,7 +240,7 @@ export function ArtworkCard({
     <BaseImageCard
       emptyLabel={labels.emptyImage}
       href={href}
-      image={artwork.coverImage || artwork.images?.[0]}
+      image={artwork.coverImage || getArtworkImageSource(artwork.images?.[0])}
       imageAlt={title || artCategoryConfigs[category].titleZh}
       overlayClassName="h-[116px] overflow-hidden rounded-[14px] px-4 py-3"
     >

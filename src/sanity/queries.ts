@@ -6,6 +6,20 @@ const imageFields = `
   hotspot
 `
 
+const artworkImageItemFields = `
+  _key,
+  _type,
+  description,
+  "image": select(
+    defined(image.asset) => image{${imageFields}},
+    defined(asset) => {
+      asset,
+      crop,
+      hotspot
+    }
+  )
+`
+
 const localizedText = (enField: string, zhField: string) =>
   `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`
 
@@ -153,8 +167,8 @@ const artWorkCardFields = `
   "slug": slug.current,
   "category": coalesce(category, workType, projectType),
   "workType": coalesce(category, workType, projectType),
-  "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0]{${imageFields}}, images[0]{${imageFields}}),
-  "images": coalesce(galleryImages[]{${imageFields}}, images[]{${imageFields}}),
+  "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0].image{${imageFields}}, galleryImages[0]{${imageFields}}, images[0].image{${imageFields}}, images[0]{${imageFields}}),
+  "images": coalesce(galleryImages[]{${artworkImageItemFields}}, images[]{${artworkImageItemFields}}),
   galleryImages[]{${imageFields}},
   artist,
   year,
