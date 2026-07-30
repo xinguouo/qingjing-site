@@ -31,7 +31,6 @@ const localizedText = (enField: string, zhField: string) =>
 
 const artworkVideoItemFields = `
   _key,
-  sourceType,
   videoFile{
     asset->{
       _id,
@@ -40,8 +39,6 @@ const artworkVideoItemFields = `
       originalFilename
     }
   },
-  videoUrl,
-  posterImage{${imageFields}},
   captionZh,
   captionEn,
   "caption": ${localizedText('captionEn', 'captionZh')},

@@ -118,38 +118,19 @@ export const artWork = defineType({
           type: 'object',
           fields: [
             defineField({
-              name: 'sourceType',
-              title: '视频来源类型 / Source Type',
-              type: 'string',
-              initialValue: 'upload',
-              options: {
-                list: [
-                  {title: '上传本地视频 / Upload', value: 'upload'},
-                  {title: '外部视频链接 / External', value: 'external'},
-                ],
-                layout: 'radio',
-              },
-            }),
-            defineField({
               name: 'videoFile',
               title: '上传视频文件 / Video File',
               type: 'file',
-              hidden: ({parent}) => parent?.sourceType === 'external',
               options: {
                 accept: 'video/mp4,video/webm',
               },
-            }),
-            defineField({
-              name: 'videoUrl',
-              title: '外部视频链接 / External Video URL',
-              type: 'url',
-              hidden: ({parent}) => parent?.sourceType !== 'external',
             }),
             defineField({
               name: 'posterImage',
               title: '视频封面图 / Poster Image',
               type: 'image',
               options: {hotspot: true},
+              hidden: true,
             }),
             defineField({
               name: 'captionZh',
@@ -186,14 +167,11 @@ export const artWork = defineType({
             select: {
               captionZh: 'captionZh',
               captionEn: 'captionEn',
-              media: 'posterImage',
-              sourceType: 'sourceType',
             },
-            prepare({captionZh, captionEn, media, sourceType}) {
+            prepare({captionZh, captionEn}) {
               return {
                 title: captionZh || captionEn || 'Artwork video',
-                subtitle: sourceType === 'external' ? 'External video' : 'Uploaded video',
-                media,
+                subtitle: 'Uploaded video',
               }
             },
           },

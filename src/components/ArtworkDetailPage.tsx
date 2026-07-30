@@ -1,4 +1,4 @@
-import type {SanityImageSource} from "@sanity/image-url";
+﻿import type {SanityImageSource} from "@sanity/image-url";
 import Link from "next/link";
 import {notFound} from "next/navigation";
 
@@ -29,16 +29,6 @@ type ArtworkGalleryItem = {
 };
 
 type ArtworkGalleryInput = ArtworkGalleryItem | SanityImage;
-
-type ExternalVideoEmbed =
-  | {
-      type: "iframe";
-      url: string;
-    }
-  | {
-      type: "link";
-      url: string;
-    };
 
 type ArtworkDetailPageProps = {
   category?: string;
@@ -82,100 +72,8 @@ function imageUrl(image: SanityImage, width: number) {
   }
 }
 
-function videoPosterUrl(image: SanityImage) {
-  return imageUrl(image, 1600);
-}
-
 function uploadedVideoSource(video: ArtworkVideo) {
   return compactText(video.videoFile?.asset?.url);
-}
-
-function getYouTubeId(url: URL) {
-  const host = url.hostname.replace(/^www\./, "").toLowerCase();
-
-  if (host === "youtu.be") {
-    return compactText(url.pathname.split("/").filter(Boolean)[0]);
-  }
-
-  if (!host.endsWith("youtube.com")) {
-    return "";
-  }
-
-  if (url.pathname.startsWith("/embed/")) {
-    return compactText(url.pathname.split("/").filter(Boolean)[1]);
-  }
-
-  if (url.pathname.startsWith("/shorts/")) {
-    return compactText(url.pathname.split("/").filter(Boolean)[1]);
-  }
-
-  return compactText(url.searchParams.get("v"));
-}
-
-function getBilibiliEmbedUrl(url: URL) {
-  const bvid =
-    compactText(url.searchParams.get("bvid")) ||
-    compactText(url.pathname.match(/BV[a-zA-Z0-9]+/)?.[0]);
-  const aid =
-    compactText(url.searchParams.get("aid")) ||
-    compactText(url.pathname.match(/av(\d+)/i)?.[1]);
-
-  if (bvid) {
-    return `https://player.bilibili.com/player.html?bvid=${encodeURIComponent(bvid)}`;
-  }
-
-  if (aid) {
-    return `https://player.bilibili.com/player.html?aid=${encodeURIComponent(aid)}`;
-  }
-
-  return "";
-}
-
-function getExternalVideoEmbed(rawUrl: string): ExternalVideoEmbed | null {
-  let url: URL;
-
-  try {
-    url = new URL(rawUrl);
-  } catch {
-    return null;
-  }
-
-  const host = url.hostname.replace(/^www\./, "").toLowerCase();
-  const youtubeId = getYouTubeId(url);
-
-  if (youtubeId) {
-    return {
-      type: "iframe",
-      url: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}`,
-    };
-  }
-
-  if (host.endsWith("vimeo.com")) {
-    const videoId = compactText(url.pathname.split("/").filter(Boolean).find((part) => /^\d+$/.test(part)));
-
-    if (videoId) {
-      return {
-        type: "iframe",
-        url: `https://player.vimeo.com/video/${encodeURIComponent(videoId)}`,
-      };
-    }
-  }
-
-  if (host.endsWith("bilibili.com")) {
-    const bilibiliEmbedUrl = getBilibiliEmbedUrl(url);
-
-    if (bilibiliEmbedUrl) {
-      return {
-        type: "iframe",
-        url: bilibiliEmbedUrl,
-      };
-    }
-  }
-
-  return {
-    type: "link",
-    url: url.href,
-  };
 }
 
 function videoCaption(video: ArtworkVideo, locale: Locale) {
@@ -188,7 +86,7 @@ function videoCaption(video: ArtworkVideo, locale: Locale) {
 }
 
 function hasRenderableVideo(video: ArtworkVideo) {
-  return Boolean(uploadedVideoSource(video) || compactText(video.videoUrl));
+  return Boolean(uploadedVideoSource(video));
 }
 
 function imageIdentity(image: SanityImage) {
@@ -322,7 +220,7 @@ function ArtworkHeader({
         className="inline-flex items-center text-[14px] leading-none text-muted-token transition hover:text-primary"
         href={backHref}
       >
-        ← {backLabel}
+        鈫?{backLabel}
       </Link>
       {categoryLabel ? (
         <p className="detail-meta mt-8 uppercase">
@@ -481,16 +379,9 @@ function ArtworkVideos({
   return (
     <section className="mt-12 max-w-[980px] space-y-10 lg:space-y-12">
       {visibleVideos.map((video, index) => {
-        const key = video._key || `${video.sourceType || "video"}-${index}`;
-        const poster = videoPosterUrl(video.posterImage);
+        const key = video._key || `video-${index}`;
         const caption = videoCaption(video, locale);
         const uploadSrc = uploadedVideoSource(video);
-        const externalUrl = compactText(video.videoUrl);
-        const isExternalVideo = video.sourceType === "external" || (!uploadSrc && externalUrl);
-        const externalVideo =
-          isExternalVideo && externalUrl
-            ? getExternalVideoEmbed(externalUrl)
-            : null;
         const shouldAutoplay = Boolean(video.autoplay);
         const shouldMute = shouldAutoplay || Boolean(video.muted);
 
@@ -499,43 +390,20 @@ function ArtworkVideos({
             className="w-full"
             key={key}
           >
-            {externalVideo?.type === "iframe" ? (
-              <div className="aspect-video w-full overflow-hidden rounded-[12px] border border-[var(--border)]">
-                <iframe
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="h-full w-full"
-                  loading="lazy"
-                  src={externalVideo.url}
-                  title={caption || `Artwork video ${index + 1}`}
-                />
-              </div>
-            ) : externalVideo?.type === "link" ? (
-              <a
-                className="inline-flex rounded-full border border-[var(--border)] px-5 py-3 text-[14px] text-primary transition hover:border-[var(--text-secondary)]"
-                href={externalVideo.url}
-                rel="noreferrer"
-                target="_blank"
-              >
-                {locale === "en" ? "Open video" : "打开视频"}
-              </a>
-            ) : uploadSrc ? (
-              <video
-                autoPlay={shouldAutoplay}
-                className="block h-auto w-full rounded-[12px] border border-[var(--border)] object-contain"
-                controls
-                loop={Boolean(video.loop)}
-                muted={shouldMute}
-                playsInline
-                poster={poster || undefined}
-                preload="metadata"
-              >
-                <source
-                  src={uploadSrc}
-                  type={video.videoFile?.asset?.mimeType || undefined}
-                />
-              </video>
-            ) : null}
+            <video
+              autoPlay={shouldAutoplay}
+              className="block h-auto w-full rounded-[12px] border border-[var(--border)] object-contain"
+              controls
+              loop={Boolean(video.loop)}
+              muted={shouldMute}
+              playsInline
+              preload="metadata"
+            >
+              <source
+                src={uploadSrc}
+                type={video.videoFile?.asset?.mimeType || undefined}
+              />
+            </video>
             {caption ? (
               <figcaption className="mt-4 max-w-[760px] whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
                 {caption}

@@ -31,8 +31,6 @@ export type ArtworkVideo = {
   captionZh?: string | null;
   loop?: boolean | null;
   muted?: boolean | null;
-  posterImage?: SanityImage;
-  sourceType?: "upload" | "external" | string | null;
   videoFile?: {
     asset?: {
       _id?: string;
@@ -41,7 +39,6 @@ export type ArtworkVideo = {
       url?: string | null;
     } | null;
   } | null;
-  videoUrl?: string | null;
 };
 
 export type ArtCategorySlug =
