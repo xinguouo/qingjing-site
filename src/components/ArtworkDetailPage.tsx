@@ -387,12 +387,12 @@ function ArtworkVideos({
 
         return (
           <figure
-            className="w-full"
+            className="artwork-video-frame w-full"
             key={key}
           >
             <video
               autoPlay={shouldAutoplay}
-              className="block h-auto w-full rounded-[12px] border border-[var(--border)] object-contain"
+              className="artwork-video"
               controls
               loop={Boolean(video.loop)}
               muted={shouldMute}

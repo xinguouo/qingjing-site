@@ -921,6 +921,27 @@ body {
   opacity: 1;
 }
 
+.artwork-video-frame {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.artwork-video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none;
+  aspect-ratio: auto !important;
+  object-fit: contain;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
 @keyframes page-glass-reveal {
   from {
     opacity: 0;
