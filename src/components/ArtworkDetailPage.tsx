@@ -590,13 +590,13 @@ export function ArtworkDetailLayout({
             label={descriptionLabel}
           />
         ) : null}
-        <ArtworkGallery
-          images={images}
-          title={primaryTitle}
-        />
         <ArtworkVideos
           locale={locale}
           videos={videos}
+        />
+        <ArtworkGallery
+          images={images}
+          title={primaryTitle}
         />
       </PageContainer>
     </AppShell>
