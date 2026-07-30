@@ -18,6 +18,7 @@ import {
   type ArtworkVideo,
 } from "./ArtCategoryPage";
 import {AppShell} from "./AppShell";
+import {ArtworkVideoPlayer} from "./ArtworkVideoPlayer";
 import {PageContainer} from "./PageContainer";
 
 type SanityImage = SanityImageSource | null | undefined;
@@ -217,10 +218,11 @@ function ArtworkHeader({
   return (
     <header className="max-w-[940px] border-b border-[var(--border)] pb-7">
       <Link
-        className="inline-flex items-center text-[14px] leading-none text-muted-token transition hover:text-primary"
+        className="inline-flex items-center gap-2 text-[14px] leading-none text-muted-token transition hover:text-primary"
         href={backHref}
       >
-        鈫?{backLabel}
+        <span aria-hidden="true">&larr;</span>
+        <span>{backLabel}</span>
       </Link>
       {categoryLabel ? (
         <p className="detail-meta mt-8 uppercase">
@@ -382,28 +384,19 @@ function ArtworkVideos({
         const key = video._key || `video-${index}`;
         const caption = videoCaption(video, locale);
         const uploadSrc = uploadedVideoSource(video);
-        const shouldAutoplay = Boolean(video.autoplay);
-        const shouldMute = shouldAutoplay || Boolean(video.muted);
 
         return (
           <figure
-            className="artwork-video-frame w-full"
+            className="w-full"
             key={key}
           >
-            <video
-              autoPlay={shouldAutoplay}
-              className="artwork-video"
-              controls
-              loop={Boolean(video.loop)}
-              muted={shouldMute}
-              playsInline
-              preload="metadata"
-            >
-              <source
-                src={uploadSrc}
-                type={video.videoFile?.asset?.mimeType || undefined}
-              />
-            </video>
+            <ArtworkVideoPlayer
+              autoplay={video.autoplay}
+              loop={video.loop}
+              mimeType={video.videoFile?.asset?.mimeType}
+              muted={video.muted}
+              src={uploadSrc}
+            />
             {caption ? (
               <figcaption className="mt-4 max-w-[760px] whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
                 {caption}

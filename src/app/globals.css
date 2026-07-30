@@ -922,10 +922,24 @@ body {
 }
 
 .artwork-video-frame {
+  position: relative;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
   border-radius: 12px;
+}
+
+.artwork-video-loading {
+  display: flex;
+  min-height: 96px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
 .artwork-video {
@@ -940,6 +954,16 @@ body {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 12px;
+}
+
+.artwork-video--preload {
+  position: absolute;
+  inset: 0;
+  width: 1px;
+  height: 1px !important;
+  min-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes page-glass-reveal {
