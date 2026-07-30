@@ -16,10 +16,33 @@ export type ArtworkImageItem = {
   _key?: string;
   _type?: string;
   description?: string | null;
+  descriptionEn?: string | null;
+  descriptionZh?: string | null;
   image?: SanityImage;
 };
 
 export type ArtworkImageEntry = SanityImage | ArtworkImageItem | null | undefined;
+
+export type ArtworkVideo = {
+  _key?: string;
+  autoplay?: boolean | null;
+  caption?: string | null;
+  captionEn?: string | null;
+  captionZh?: string | null;
+  loop?: boolean | null;
+  muted?: boolean | null;
+  posterImage?: SanityImage;
+  sourceType?: "upload" | "external" | string | null;
+  videoFile?: {
+    asset?: {
+      _id?: string;
+      mimeType?: string | null;
+      originalFilename?: string | null;
+      url?: string | null;
+    } | null;
+  } | null;
+  videoUrl?: string | null;
+};
 
 export type ArtCategorySlug =
   | "glass-art"
@@ -36,6 +59,7 @@ export type Artwork = {
   description?: string | null;
   dimensions?: string | null;
   images?: ArtworkImageEntry[] | null;
+  artworkVideos?: ArtworkVideo[] | null;
   price?: string | null;
   quantity?: string | null;
   size?: string | null;

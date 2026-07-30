@@ -9,7 +9,13 @@ const imageFields = `
 const artworkImageItemFields = `
   _key,
   _type,
-  description,
+  descriptionZh,
+  descriptionEn,
+  "description": select(
+    $locale == "en" && defined(descriptionEn) && descriptionEn != "" => descriptionEn,
+    defined(descriptionZh) && descriptionZh != "" => descriptionZh,
+    description
+  ),
   "image": select(
     defined(image.asset) => image{${imageFields}},
     defined(asset) => {
@@ -22,6 +28,27 @@ const artworkImageItemFields = `
 
 const localizedText = (enField: string, zhField: string) =>
   `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`
+
+const artworkVideoItemFields = `
+  _key,
+  sourceType,
+  videoFile{
+    asset->{
+      _id,
+      url,
+      mimeType,
+      originalFilename
+    }
+  },
+  videoUrl,
+  posterImage{${imageFields}},
+  captionZh,
+  captionEn,
+  "caption": ${localizedText('captionEn', 'captionZh')},
+  autoplay,
+  muted,
+  loop
+`
 
 const siteSettingsFields = `
   siteNameZh,
@@ -169,6 +196,7 @@ const artWorkCardFields = `
   "workType": coalesce(category, workType, projectType),
   "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0].image{${imageFields}}, galleryImages[0]{${imageFields}}, images[0].image{${imageFields}}, images[0]{${imageFields}}),
   "images": coalesce(galleryImages[]{${artworkImageItemFields}}, images[]{${artworkImageItemFields}}),
+  "artworkVideos": artworkVideos[]{${artworkVideoItemFields}},
   galleryImages[]{${imageFields}},
   artist,
   year,
