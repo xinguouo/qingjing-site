@@ -571,7 +571,14 @@ export const homePageQuery = defineQuery(`*[_type == "homePage"][0]{
   heroSubtitleEn,
   "heroSubtitle": ${localizedText('heroSubtitleEn', 'heroSubtitleZh')},
   heroImage{${imageFields}},
-  heroImages[]{${imageFields}, alt},
+  heroImages[]{
+    ${imageFields},
+    alt,
+    titleLogoWhite{${imageFields}},
+    titleLogoBlack{${imageFields}},
+    titleLogo{${imageFields}},
+    titleColorMode
+  },
   introTitleZh,
   introTitleEn,
   "introTitle": ${localizedText('introTitleEn', 'introTitleZh')},

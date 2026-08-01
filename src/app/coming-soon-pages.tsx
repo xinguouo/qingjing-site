@@ -36,6 +36,24 @@ export function InternationalStudyComingSoon() {
   );
 }
 
+export function MasterWorkshopComingSoon() {
+  return (
+    <ComingSoonPage
+      pageTitleZh="\u5927\u5e08\u7814\u4fee\u73ed"
+      pageTitleEn="Master Workshop"
+    />
+  );
+}
+
+export function AdvancedStudyComingSoon() {
+  return (
+    <ComingSoonPage
+      pageTitleZh="\u9ad8\u7ea7\u7814\u5b66"
+      pageTitleEn="Advanced Study"
+    />
+  );
+}
+
 export function OpenClassComingSoon() {
   return (
     <ComingSoonPage

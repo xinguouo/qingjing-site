@@ -1,6 +1,6 @@
 "use client";
 
-import {useRef, useState} from "react";
+import {useState, type SyntheticEvent} from "react";
 
 type ArtworkVideoPlayerProps = {
   autoplay?: boolean | null;
@@ -17,47 +17,29 @@ export function ArtworkVideoPlayer({
   muted,
   src,
 }: ArtworkVideoPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hasRequestedPreview = useRef(false);
-  const [isReady, setIsReady] = useState(false);
+  const [videoRatio, setVideoRatio] = useState("16 / 9");
   const shouldAutoplay = Boolean(autoplay);
   const shouldMute = shouldAutoplay || Boolean(muted);
 
-  function handleLoadedMetadata() {
-    const video = videoRef.current;
+  function handleLoadedMetadata(event: SyntheticEvent<HTMLVideoElement>) {
+    const video = event.currentTarget;
+    const {currentSrc, duration, videoHeight, videoWidth} = video;
 
-    if (
-      video &&
-      !shouldAutoplay &&
-      !hasRequestedPreview.current &&
-      Number.isFinite(video.duration) &&
-      video.duration > 0.1
-    ) {
-      hasRequestedPreview.current = true;
-
-      try {
-        video.currentTime = 0.1;
-      } catch {
-        setIsReady(true);
-      }
-    }
-  }
-
-  function handleLoadedData() {
-    setIsReady(true);
-  }
-
-  function handleSeeked() {
-    if (!shouldAutoplay) {
-      videoRef.current?.pause();
+    if (process.env.NODE_ENV === "development") {
+      console.log({
+        currentSrc,
+        duration,
+        videoHeight,
+        videoWidth,
+      });
     }
 
-    setIsReady(true);
+    if (videoWidth > 0 && videoHeight > 0) {
+      setVideoRatio(`${videoWidth} / ${videoHeight}`);
+    }
   }
 
   function handleError() {
-    setIsReady(true);
-
     if (process.env.NODE_ENV === "development") {
       console.error("Artwork video failed to load", {
         mimeType,
@@ -67,30 +49,24 @@ export function ArtworkVideoPlayer({
   }
 
   return (
-    <div className="artwork-video-frame w-full">
-      {!isReady ? (
-        <div className="artwork-video-loading">
-          <span>视频加载中</span>
-        </div>
-      ) : null}
+    <div
+      className="artwork-video-frame w-full"
+      style={{aspectRatio: videoRatio}}
+    >
       <video
         autoPlay={shouldAutoplay}
-        className={`artwork-video ${isReady ? "" : "artwork-video--preload"}`}
+        className="artwork-video"
         controls
         loop={Boolean(loop)}
         muted={shouldMute}
-        onCanPlay={handleLoadedData}
         onError={handleError}
-        onLoadedData={handleLoadedData}
         onLoadedMetadata={handleLoadedMetadata}
-        onSeeked={handleSeeked}
         playsInline
-        preload="auto"
-        ref={videoRef}
+        preload="metadata"
       >
         <source
           src={src}
-          type={mimeType || "video/mp4"}
+          type={mimeType || undefined}
         />
       </video>
     </div>

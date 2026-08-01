@@ -37,7 +37,7 @@ export const navigationGroupLabels: Record<
     labelZh: "\u7ebf\u4e0b\u4f53\u9a8c",
     labelEn: "Offline Experience",
   },
-  events: { labelZh: "\u827a\u672f\u6d3b\u52a8", labelEn: "Art Events" },
+  events: { labelZh: "\u827a\u672f\u6d3b\u52a8", labelEn: "Art Activity" },
   artCreation: {
     labelZh: "\u827a\u672f\u521b\u4f5c",
     labelEn: "Art Creation",
@@ -107,12 +107,28 @@ export const navigationItems: NavigationItem[] = [
     status: "comingSoon",
   },
   {
+    labelZh: "\u5927\u5e08\u7814\u4fee\u73ed",
+    labelEn: "Master Workshop",
+    href: "/study/master-workshop",
+    icon: "study",
+    group: "study",
+    status: "comingSoon",
+  },
+  {
     labelZh: "\u56fd\u9645\u5927\u5e08\u73ed",
     labelEn: "International Masterclass",
     href: "/study/masterclass",
     icon: "study",
     group: "study",
     status: "live",
+  },
+  {
+    labelZh: "\u9ad8\u7ea7\u7814\u5b66",
+    labelEn: "Advanced Study",
+    href: "/study/advanced-study",
+    icon: "globe",
+    group: "study",
+    status: "comingSoon",
   },
   {
     labelZh: "\u56fd\u9645\u7814\u5b66",
@@ -140,8 +156,8 @@ export const navigationItems: NavigationItem[] = [
     status: "comingSoon",
   },
   {
-    labelZh: "\u6d3b\u52a8",
-    labelEn: "Activity",
+    labelZh: "\u827a\u672f\u6d3b\u52a8",
+    labelEn: "Art Activity",
     href: "/events/activity",
     icon: "calendar",
     group: "events",

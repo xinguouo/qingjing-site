@@ -11,7 +11,7 @@ import {
 } from "@/sanity/queries";
 
 import { AppShell } from "./AppShell";
-import { HeroBanner } from "./HeroBanner";
+import { HeroBanner, type HeroBannerSlide } from "./HeroBanner";
 import { PageContainer } from "./PageContainer";
 import { CourseCard, type StudyProgram } from "./StudyPages";
 
@@ -34,7 +34,7 @@ type HomePageData = {
   featuredEvents?: HomeCardItem[] | null;
   featuredStudyPrograms?: HomeCardItem[] | null;
   heroImage?: SanityImage;
-  heroImages?: SanityImage[] | null;
+  heroImages?: HeroBannerSlide[] | null;
   heroSubtitle?: string | null;
   heroTitle?: string | null;
 };
@@ -259,8 +259,8 @@ export async function HomePage({ locale }: HomePageProps) {
     compactText(siteSettings?.siteName) ||
     labels.fallbackHeroTitle;
   const subtitle = compactText(homePage?.heroSubtitle);
-  const heroImages = homePage?.heroImages?.filter(Boolean) || [];
-  const heroImage = heroImages[0] || homePage?.heroImage;
+  const heroSlides = homePage?.heroImages?.filter((slide) => Boolean(slide?.image)) || [];
+  const heroImage = heroSlides[0]?.image || homePage?.heroImage;
   const featuredStudyPrograms =
     homePage?.featuredStudyPrograms?.filter(Boolean) || [];
   const featuredEvents = homePage?.featuredEvents?.filter(Boolean) || [];
@@ -286,8 +286,8 @@ export async function HomePage({ locale }: HomePageProps) {
             },
           ]}
           image={heroImage}
-          images={heroImages.length ? heroImages : null}
           mobileHideText
+          slides={heroSlides.length ? heroSlides : null}
           subtitle={subtitle}
           title={title}
         />
