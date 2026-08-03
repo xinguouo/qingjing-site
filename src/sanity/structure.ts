@@ -178,6 +178,18 @@ export const structure: StructureResolver = (S, context) => {
             .id('residencyPageEntries')
             .title('驻地计划 / Residency')
             .items([
+              S.listItem()
+                .id('studyMasterclassPage')
+                .title('国际大师班页面 / International Masterclass Page')
+                .schemaType('studyMasterclassPage')
+                .child(
+                  singleton({
+                    id: 'studyMasterclassPageDocument',
+                    title: '国际大师班页面 / International Masterclass Page',
+                    schemaType: 'studyMasterclassPage',
+                    documentId: 'studyMasterclassPage',
+                  }),
+                ),
               typedListItem({
                 id: 'residencyResidentArtists',
                 title: '驻地艺术家（暂不上线） / Resident Artists (Not Launched)',

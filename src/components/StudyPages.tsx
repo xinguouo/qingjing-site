@@ -6,6 +6,7 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
   internationalMasterclassProgramsQuery,
+  studyMasterclassPageQuery,
   studyProgramBySlugQuery,
 } from "@/sanity/queries";
 
@@ -13,6 +14,10 @@ import { AppShell } from "./AppShell";
 import { HeroBanner } from "./HeroBanner";
 import { PageContainer } from "./PageContainer";
 import { PageHeader } from "./PageHeader";
+import {
+  PastReviewCarousel,
+  type PastReviewItem,
+} from "./PastReviewCarousel";
 import { glassStyle } from "../../styles/glassStyle";
 
 type SanityImage = SanityImageSource | null | undefined;
@@ -109,6 +114,11 @@ type StudyPageProps = {
   locale: Locale;
 };
 
+type StudyMasterclassPageData = {
+  pastReviewItems?: PastReviewItem[] | null;
+  pastReviewTitle?: string | null;
+};
+
 const copy = {
   zh: {
     academicHost: "\u5b66\u672f\u4e3b\u6301",
@@ -135,6 +145,7 @@ const copy = {
     masterclassEyebrow: "INTERNATIONAL MASTERCLASS",
     masterclassTitle: "\u56fd\u9645\u5927\u5e08\u73ed",
     pastCourses: "\u5f80\u671f\u8bfe\u7a0b",
+    pastReview: "\u5f80\u671f\u56de\u987e",
     price: "\u8bfe\u7a0b\u8d39\u7528",
     registrationMethod: "\u62a5\u540d\u65b9\u5f0f",
     registrationPayment: "\u62a5\u540d\u53ca\u7f34\u8d39\u65b9\u5f0f",
@@ -171,6 +182,7 @@ const copy = {
     masterclassEyebrow: "INTERNATIONAL MASTERCLASS",
     masterclassTitle: "International Masterclass",
     pastCourses: "Past Courses",
+    pastReview: "Past Review",
     price: "Price",
     registrationMethod: "Registration Method",
     registrationPayment: "Registration and Payment",
@@ -1130,13 +1142,22 @@ function ContactInfoSection({
 }
 
 export async function MasterclassPage({ locale }: StudyPageProps) {
-  const programs = await client
-    .withConfig({ useCdn: false })
-    .fetch<StudyProgram[]>(
-      internationalMasterclassProgramsQuery,
-      { locale },
-      { cache: "no-store" },
-    );
+  const [programs, pageData] = await Promise.all([
+    client
+      .withConfig({ useCdn: false })
+      .fetch<StudyProgram[]>(
+        internationalMasterclassProgramsQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<StudyMasterclassPageData | null>(
+        studyMasterclassPageQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+  ]);
   const labels = copy[locale];
   const featuredPrograms = programs.filter(
     (program) => program.courseSection !== "past",
@@ -1171,6 +1192,15 @@ export async function MasterclassPage({ locale }: StudyPageProps) {
             {labels.empty}
           </div>
         )}
+
+        <PastReviewCarousel
+          className="mt-10 lg:mt-12"
+          items={pageData?.pastReviewItems?.filter(Boolean) || []}
+          itemsPerViewDesktop={3}
+          itemsPerViewMobile={1}
+          locale={locale}
+          title={compactText(pageData?.pastReviewTitle) || labels.pastReview}
+        />
       </PageContainer>
     </AppShell>
   );

@@ -179,6 +179,17 @@ const offlineExperiencePageFields = `
     supportTeacher,
     "academicHost": supportTeacher,
     "academicSupport": supportTeacher
+  },
+  pastReviewItems[]{
+    _key,
+    image{${imageFields}},
+    titleZh,
+    titleEn,
+    "title": ${localizedText('titleEn', 'titleZh')},
+    year,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText('descriptionEn', 'descriptionZh')}
   }
 `
 
@@ -803,6 +814,26 @@ export const internationalMasterclassProgramsQuery = defineQuery(`*[
   programType == "international-masterclass"
 ] | order(order asc) {
   ${studyProgramCardFields}
+}`)
+
+export const studyMasterclassPageQuery = defineQuery(`*[
+  _type == "studyMasterclassPage" &&
+  _id == "studyMasterclassPage"
+][0]{
+  pastReviewTitleZh,
+  pastReviewTitleEn,
+  "pastReviewTitle": ${localizedText('pastReviewTitleEn', 'pastReviewTitleZh')},
+  pastReviewItems[]{
+    _key,
+    image{${imageFields}},
+    titleZh,
+    titleEn,
+    "title": ${localizedText('titleEn', 'titleZh')},
+    year,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+  }
 }`)
 
 export const internationalStudyProgramsQuery = defineQuery(`*[

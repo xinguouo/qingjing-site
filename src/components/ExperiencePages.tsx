@@ -13,6 +13,10 @@ import {
 import {AppShell} from "./AppShell";
 import {PageContainer} from "./PageContainer";
 import {PageHeader} from "./PageHeader";
+import {
+  PastReviewCarousel,
+  type PastReviewItem,
+} from "./PastReviewCarousel";
 import {CourseCard, type StudyProgram} from "./StudyPages";
 
 type SanityImage = SanityImageSource | null | undefined;
@@ -45,6 +49,7 @@ type OfflineExperiencePageData = {
   courses?: ExperienceCourse[] | null;
   pageTitleEn?: string | null;
   pageTitleZh?: string | null;
+  pastReviewItems?: PastReviewItem[] | null;
 };
 
 type ExperiencePageProps = {
@@ -259,6 +264,15 @@ export async function ExperienceCoursePage({locale}: ExperiencePageProps) {
             ))}
           </div>
         </section>
+
+        <PastReviewCarousel
+          className="mt-10 lg:mt-12"
+          items={pageData?.pastReviewItems?.filter(Boolean) || []}
+          itemsPerViewDesktop={3}
+          itemsPerViewMobile={1}
+          locale={locale}
+          title={locale === "zh" ? "往期回顾" : "Past Review"}
+        />
       </PageContainer>
     </AppShell>
   );

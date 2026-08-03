@@ -15,6 +15,10 @@ import {
 import {HeroBanner, type HeroBannerSlide} from "./HeroBanner";
 import {HomeCarouselSection} from "./HomeCarouselSection";
 import {PageContainer} from "./PageContainer";
+import {
+  PastReviewCarousel,
+  type PastReviewItem,
+} from "./PastReviewCarousel";
 import {CourseCard, type StudyProgram} from "./StudyPages";
 import {glassStyle} from "../../styles/glassStyle";
 
@@ -50,14 +54,6 @@ type QuickEntry = {
   description?: string | null;
   href?: string | null;
   title?: string | null;
-};
-
-type PastReviewItem = {
-  _key?: string;
-  description?: string | null;
-  image?: SanityImage;
-  title?: string | null;
-  year?: string | null;
 };
 
 type HomePageData = {
@@ -511,91 +507,6 @@ function ProductCarousel({
   );
 }
 
-function PastReviewCard({
-  item,
-  locale,
-}: {
-  item: PastReviewItem;
-  locale: Locale;
-}) {
-  const labels = homeCopy[locale];
-  const title = compactText(item.title);
-  const year = compactText(item.year);
-  const description = compactText(item.description);
-  const src = imageUrl(item.image, 900);
-  const hasText = title || year || description;
-
-  return (
-    <article className="group relative h-[220px] overflow-hidden rounded-[18px] bg-[rgba(255,255,255,0.08)] sm:h-[250px] lg:h-[280px]">
-      {src ? (
-        <img
-          alt={title || labels.pastReview}
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
-          loading="lazy"
-          src={src}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-xs text-muted-token">
-          {labels.emptyImage}
-        </div>
-      )}
-      {hasText ? (
-        <div className="absolute inset-x-3 bottom-3 rounded-[14px] border border-white/15 bg-black/32 px-4 py-3 text-white shadow-[0_18px_42px_rgba(0,0,0,0.22)] backdrop-blur-md">
-          {year ? (
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/62">
-              {year}
-            </p>
-          ) : null}
-          {title ? (
-            <h3 className="mt-1 line-clamp-1 font-title text-[17px] font-normal leading-snug">
-              {title}
-            </h3>
-          ) : null}
-          {description ? (
-            <p className="mt-1 line-clamp-2 text-[12px] leading-[1.55] text-white/72">
-              {description}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-    </article>
-  );
-}
-
-function PastReviewCarousel({
-  items,
-  locale,
-  title,
-}: {
-  items: PastReviewItem[];
-  locale: Locale;
-  title: string;
-}) {
-  const cards = items
-    .filter((item) => item?.image)
-    .slice(0, 12)
-    .map((item, index) => (
-      <PastReviewCard
-        item={item}
-        key={item._key || `home-past-review-${index}`}
-        locale={locale}
-      />
-    ));
-
-  return (
-    <HomeCarouselSection
-      autoPlay
-      cardVariant="artwork"
-      className="mt-8 lg:mt-9"
-      items={cards}
-      itemsPerViewDesktop={4}
-      itemsPerViewMobile={1}
-      sectionTitle={title}
-      viewAllLabel={homeCopy[locale].all}
-    />
-  );
-}
-
 export async function HomePage({locale}: HomePageProps) {
   let homePage: HomePageData | null = null;
 
@@ -677,7 +588,10 @@ export async function HomePage({locale}: HomePageProps) {
           </section>
 
           <PastReviewCarousel
+            className="mt-8 lg:mt-9"
             items={homePage?.pastReviewItems?.filter(Boolean) || []}
+            itemsPerViewDesktop={4}
+            itemsPerViewMobile={1}
             locale={locale}
             title={sectionTitle(
               homePage?.featuredPastEventsTitle,

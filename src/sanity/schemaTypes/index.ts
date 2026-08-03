@@ -19,6 +19,7 @@ import {productCollection} from './productCollection'
 import {productDetail} from './productDetail'
 import {residencyPage} from './residencyPage'
 import {siteSettings} from './siteSettings'
+import {studyMasterclassPage} from './studyMasterclassPage'
 import {studyProgram} from './studyProgram'
 import {teamPage} from './teamPage'
 import {teamMember} from './teamMember'
@@ -33,6 +34,7 @@ export const schemaTypes = [
   teamMember,
   artist,
   residencyPage,
+  studyMasterclassPage,
   studyProgram,
   event,
   offlineExperiencePage,
