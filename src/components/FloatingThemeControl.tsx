@@ -27,24 +27,23 @@ function PaletteOrbIcon() {
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="8"
+      <path
+        d="M12.1 4.2c-4.9 0-8.5 3.4-8.5 7.9 0 4.3 3.2 7.7 7.5 7.7h1.2c1.1 0 1.8-.7 1.8-1.6 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-.9.7-1.6 1.7-1.6h1.5c2.6 0 4.1-1.6 4.1-4 0-3.4-3.4-6.1-8.3-6.1Z"
         stroke="currentColor"
+        strokeLinejoin="round"
         strokeWidth="1.35"
       />
       <path
-        d="M7.9 10.7c1.5-3.1 5.4-4.3 8.4-2.5M16.5 13.4c-1.3 3-5.1 4.4-8.2 2.8"
+        d="M8.1 10.2h.01M10.6 7.8h.01M14.1 8.1h.01M16.4 10.6h.01"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="1.35"
+        strokeWidth="2.45"
       />
       <path
-        d="M9.2 8.8h.01M14.9 9.4h.01M16 15.4h.01M8.6 14.6h.01"
+        d="M8.6 14.5h.01"
         stroke="currentColor"
         strokeLinecap="round"
-        strokeWidth="2.4"
+        strokeWidth="2.2"
       />
     </svg>
   );
