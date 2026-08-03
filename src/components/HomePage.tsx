@@ -248,14 +248,14 @@ function QuickEntryCard({entry, locale}: {entry: QuickEntry; locale: Locale}) {
 
   return (
     <Link
-      className="glass-card glass-card-hover group min-h-[112px] rounded-[14px] p-4 sm:min-h-[128px] sm:p-5 lg:min-h-[148px] lg:p-7"
+      className="glass-card glass-card-hover group min-h-[96px] rounded-[12px] p-3.5 sm:min-h-[104px] sm:p-4 lg:min-h-[106px] lg:p-5"
       href={href}
     >
-      <h2 className="font-title text-[17px] font-normal leading-tight text-primary sm:text-xl lg:text-[24px]">
+      <h2 className="font-title text-[16px] font-normal leading-tight text-primary sm:text-lg lg:text-[21px]">
         {title}
       </h2>
       {description ? (
-        <p className="mt-2 line-clamp-3 max-w-2xl text-[11px] leading-[1.65] text-secondary sm:text-xs sm:leading-6 lg:mt-3 lg:text-[13px]">
+        <p className="mt-1.5 line-clamp-2 max-w-2xl text-[11px] leading-[1.55] text-secondary sm:text-xs sm:leading-5 lg:mt-2 lg:text-[12px]">
           {description}
         </p>
       ) : null}
@@ -279,7 +279,7 @@ function QuickEntriesSection({
   ).slice(0, 2);
 
   return (
-    <section className="mt-8 lg:mt-10">
+    <section className="mt-5 lg:mt-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
         {visibleEntries.map((entry, index) => (
           <QuickEntryCard
@@ -586,7 +586,7 @@ function PastReviewCarousel({
     <HomeCarouselSection
       autoPlay
       cardVariant="artwork"
-      className="mt-12 lg:mt-14"
+      className="mt-8 lg:mt-9"
       items={cards}
       itemsPerViewDesktop={4}
       itemsPerViewMobile={1}
@@ -621,6 +621,7 @@ export async function HomePage({locale}: HomePageProps) {
     <AppShell locale={locale}>
       <div className="page-surface">
         <HeroBanner
+          compactDesktop
           image={heroImage}
           logoTitleOnly
           mobileHideText
@@ -629,13 +630,13 @@ export async function HomePage({locale}: HomePageProps) {
           title={title}
         />
 
-        <PageContainer minHeight={false} className="py-9 lg:py-10">
+        <PageContainer minHeight={false} className="py-6 lg:py-6">
           <QuickEntriesSection
             entries={homePage?.quickEntries?.filter(Boolean) || []}
             locale={locale}
           />
 
-          <section className="mt-10 grid gap-7 lg:mt-12 lg:grid-cols-2">
+          <section className="mt-7 grid gap-6 lg:mt-8 lg:grid-cols-2">
             <CourseCarousel
               cardVariant="masterclass"
               hrefForItem={programHref}

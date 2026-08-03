@@ -25,6 +25,7 @@ type HeroBannerAction = {
 
 type HeroBannerProps = {
   actions?: HeroBannerAction[];
+  compactDesktop?: boolean;
   eyebrow?: string | null;
   image?: SanityImage;
   images?: SanityImage[] | null;
@@ -115,6 +116,7 @@ function getTitleLogo(
 
 export function HeroBanner({
   actions = [],
+  compactDesktop = false,
   eyebrow,
   image,
   images,
@@ -169,9 +171,13 @@ export function HeroBanner({
     return () => window.clearInterval(timer);
   }, [hasCarousel, heroSlides]);
 
+  const desktopTopPadding = compactDesktop ? "lg:pt-[220px]" : "lg:pt-[280px]";
+  const desktopHeight = compactDesktop
+    ? "lg:min-h-[450px] lg:pb-6"
+    : "lg:min-h-[510px] lg:pb-8";
   const mobileBottomLayout = mobileHideText
-    ? "items-end pb-14 pt-24 md:items-stretch md:pb-8 md:pt-24 lg:pt-[280px]"
-    : "pb-8 pt-24 lg:pt-[280px]";
+    ? `items-end pb-14 pt-24 md:items-stretch md:pb-8 md:pt-24 ${desktopTopPadding}`
+    : `pb-8 pt-24 ${desktopTopPadding}`;
   const textVisibility = mobileHideText ? "hidden md:block" : "";
   const actionLayout = mobileHideText
     ? "mt-0 flex-nowrap justify-start gap-3 md:mt-5 md:flex-wrap"
@@ -181,7 +187,7 @@ export function HeroBanner({
     : "px-5 py-2.5 text-sm";
 
   return (
-    <section className={`${glassStyle.banner} home-hero relative isolate flex min-h-[390px] overflow-hidden px-5 sm:px-8 lg:min-h-[510px] lg:px-[60px] lg:pb-8 ${mobileBottomLayout}`}>
+    <section className={`${glassStyle.banner} home-hero relative isolate flex min-h-[390px] overflow-hidden px-5 sm:px-8 lg:px-[60px] ${desktopHeight} ${mobileBottomLayout}`}>
       {heroSlides.map((heroSlide, index) => (
         <img
           alt={heroSlide.alt || title}

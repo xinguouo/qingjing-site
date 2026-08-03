@@ -81,7 +81,7 @@ export function HomeCarouselSection({
 
   return (
     <section className={className}>
-      <div className="mb-5 flex items-center justify-between gap-4 lg:mb-6">
+      <div className="mb-4 flex items-center justify-between gap-4 lg:mb-4">
         <h2 className="font-title text-2xl font-normal leading-tight text-primary lg:text-[28px]">
           {sectionTitle}
         </h2>
