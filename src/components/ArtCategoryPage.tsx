@@ -64,6 +64,7 @@ export type Artwork = {
   title?: string | null;
   titleEn?: string | null;
   titleZh?: string | null;
+  workType?: string | null;
   year?: number | string | null;
 };
 

@@ -28,6 +28,7 @@ type HeroBannerProps = {
   eyebrow?: string | null;
   image?: SanityImage;
   images?: SanityImage[] | null;
+  logoTitleOnly?: boolean;
   mobileHideText?: boolean;
   showIndicators?: boolean;
   slides?: HeroBannerSlide[] | null;
@@ -65,12 +66,25 @@ function hasSlideImageUrl(
   return Boolean(slide.imageUrl);
 }
 
-function getTitleLogo(slide: HeroBannerSlideWithUrls | undefined) {
+function getTitleLogo(
+  slide: HeroBannerSlideWithUrls | undefined,
+  logoTitleOnly = false,
+) {
   if (!slide) {
     return {className: "", url: null};
   }
 
   const colorMode = slide.titleColorMode === "white" ? "white" : "black";
+
+  if (logoTitleOnly) {
+    return {
+      className: "",
+      url:
+        colorMode === "white"
+          ? slide.titleLogoWhiteUrl
+          : slide.titleLogoBlackUrl,
+    };
+  }
 
   if (colorMode === "white") {
     if (slide.titleLogoWhiteUrl) {
@@ -104,6 +118,7 @@ export function HeroBanner({
   eyebrow,
   image,
   images,
+  logoTitleOnly = false,
   mobileHideText = false,
   showIndicators = true,
   slides,
@@ -113,7 +128,10 @@ export function HeroBanner({
   const heroSlides = useMemo(
     () => {
       const sourceSlides: HeroBannerSlide[] =
-        slides?.filter((slide) => Boolean(slide?.image)) ||
+        slides?.filter(Boolean).map((slide) => ({
+          ...slide,
+          image: slide.image || (slide as SanityImage),
+        })) ||
         images?.filter(Boolean).map((item) => ({image: item} satisfies HeroBannerSlide)) ||
         (image ? [{image} satisfies HeroBannerSlide] : []);
 
@@ -132,7 +150,7 @@ export function HeroBanner({
   const [currentIndex, setCurrentIndex] = useState(0);
   const hasCarousel = heroSlides.length > 1;
   const currentSlide = heroSlides[currentIndex];
-  const titleLogo = getTitleLogo(currentSlide);
+  const titleLogo = getTitleLogo(currentSlide, logoTitleOnly);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -186,10 +204,10 @@ export function HeroBanner({
         {titleLogo.url ? (
           <img
             alt={title}
-            className={`${textVisibility} hero-logo block h-auto max-h-[120px] w-auto max-w-[min(78vw,560px)] object-contain ${titleLogo.className}`}
+            className={`hero-logo block h-auto max-h-[82px] w-auto max-w-[min(72vw,420px)] object-contain md:max-h-[120px] md:max-w-[min(78vw,560px)] ${titleLogo.className}`}
             src={titleLogo.url}
           />
-        ) : (
+        ) : logoTitleOnly ? null : (
           <h1 className={`${textVisibility} font-title max-w-[720px] text-[40px] font-normal leading-[1.08] text-primary sm:text-[50px] lg:text-[64px]`}>
             {title}
           </h1>
@@ -221,14 +239,16 @@ export function HeroBanner({
       {showIndicators && hasCarousel ? (
         <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex">
           {heroSlides.map((heroSlide, index) => (
-            <span
-              aria-hidden="true"
+            <button
+              aria-label={`Show banner ${index + 1}`}
               className={`h-2 w-2 rounded-full transition ${
                 index === currentIndex
                   ? "bg-[var(--soft-foreground)]"
-                  : "bg-[var(--glass-border)]"
+                  : "bg-[var(--glass-border)] hover:bg-[var(--muted-foreground)]"
               }`}
               key={`indicator-${heroSlide.imageUrl}-${index}`}
+              onClick={() => setCurrentIndex(index)}
+              type="button"
             />
           ))}
         </div>

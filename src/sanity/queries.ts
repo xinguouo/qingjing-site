@@ -241,6 +241,20 @@ const artCategoryFields = `
   order
 `
 
+const homeArtWorkCardFields = `
+  _id,
+  "_type": _type,
+  titleZh,
+  titleEn,
+  "title": ${localizedText('titleEn', 'titleZh')},
+  "slug": slug.current,
+  "category": coalesce(category, workType, projectType),
+  "workType": coalesce(category, workType, projectType),
+  "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0].image{${imageFields}}, galleryImages[0]{${imageFields}}, images[0].image{${imageFields}}, images[0]{${imageFields}}),
+  "size": coalesce(size, dimensions),
+  dimensions
+`
+
 const productCardFields = `
   _id,
   titleZh,
@@ -563,7 +577,11 @@ export const siteSettingsQuery = defineQuery(`*[
   ${siteSettingsFields}
 }`)
 
-export const homePageQuery = defineQuery(`*[_type == "homePage"][0]{
+export const homePageQuery = defineQuery(`*[
+  _type == "homePage" &&
+  _id == "homePage" &&
+  !(_id in path("drafts.**"))
+][0]{
   heroTitleZh,
   heroTitleEn,
   "heroTitle": ${localizedText('heroTitleEn', 'heroTitleZh')},
@@ -585,11 +603,32 @@ export const homePageQuery = defineQuery(`*[_type == "homePage"][0]{
   introTextZh,
   introTextEn,
   "introText": ${localizedText('introTextEn', 'introTextZh')},
+  quickEntries[]{
+    _key,
+    titleZh,
+    titleEn,
+    "title": ${localizedText('titleEn', 'titleZh')},
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText('descriptionEn', 'descriptionZh')},
+    href
+  },
+  featuredStudyProgramsTitleZh,
+  featuredStudyProgramsTitleEn,
+  "featuredStudyProgramsTitle": ${localizedText('featuredStudyProgramsTitleEn', 'featuredStudyProgramsTitleZh')},
   featuredStudyPrograms[]->{${studyProgramCardFields}},
+  featuredEventsTitleZh,
+  featuredEventsTitleEn,
+  "featuredEventsTitle": ${localizedText('featuredEventsTitleEn', 'featuredEventsTitleZh')},
   featuredEvents[]->{${eventCardFields}},
-  featuredArtWorks[]->{${artWorkCardFields}},
-  featuredProducts[]->{${productCardFields}},
-  featuredArtProjects[]->{${artWorkCardFields}}
+  featuredPastEventsTitleZh,
+  featuredPastEventsTitleEn,
+  "featuredPastEventsTitle": ${localizedText('featuredPastEventsTitleEn', 'featuredPastEventsTitleZh')},
+  featuredPastEvents[]->{${eventCardFields}},
+  featuredArtWorksTitleZh,
+  featuredArtWorksTitleEn,
+  "featuredArtWorksTitle": ${localizedText('featuredArtWorksTitleEn', 'featuredArtWorksTitleZh')},
+  featuredArtWorks[]->{${homeArtWorkCardFields}}
 }`)
 
 export const aboutMissionPageQuery = defineQuery(`{

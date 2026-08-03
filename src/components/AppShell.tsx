@@ -30,7 +30,12 @@ export function AppShell({ children, locale }: AppShellProps) {
     let isMounted = true;
 
     client
-      .fetch<AppShellSiteSettings | null>(siteSettingsQuery, { locale })
+      .withConfig({ useCdn: false })
+      .fetch<AppShellSiteSettings | null>(
+        siteSettingsQuery,
+        { locale },
+        { cache: "no-store" },
+      )
       .then((settings) => {
         if (isMounted) {
           setSiteSettings(settings);
