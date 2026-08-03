@@ -14,10 +14,7 @@ import { AppShell } from "./AppShell";
 import { HeroBanner } from "./HeroBanner";
 import { PageContainer } from "./PageContainer";
 import { PageHeader } from "./PageHeader";
-import {
-  PastReviewCarousel,
-  type PastReviewItem,
-} from "./PastReviewCarousel";
+import { PastReviewCarousel, type PastReviewItem } from "./PastReviewCarousel";
 import { glassStyle } from "../../styles/glassStyle";
 
 type SanityImage = SanityImageSource | null | undefined;
@@ -119,6 +116,27 @@ type StudyMasterclassPageData = {
   pastReviewTitle?: string | null;
 };
 
+function masterclassPastReviewFallback(
+  programs: StudyProgram[],
+): PastReviewItem[] {
+  return programs
+    .map((program, index) => {
+      const image = program.coverImage || program.posterImage;
+
+      if (!image) {
+        return null;
+      }
+
+      return {
+        _key: `masterclass-review-${program._id || program.slug || index}`,
+        description: program.shortDescription || program.description || null,
+        image,
+        title: program.title || null,
+      } satisfies PastReviewItem;
+    })
+    .filter(Boolean) as PastReviewItem[];
+}
+
 const copy = {
   zh: {
     academicHost: "\u5b66\u672f\u4e3b\u6301",
@@ -130,7 +148,8 @@ const copy = {
     courseName: "\u8bfe\u7a0b\u540d\u79f0",
     educationInfo: "\u6559\u80b2\u4fe1\u606f",
     featuredCourses: "\u7cbe\u9009\u8bfe\u7a0b",
-    instructorLabel: "\u5b66\u672f\u4e3b\u6301 / \u6388\u8bfe\u6559\u5e08\u56e2\u961f",
+    instructorLabel:
+      "\u5b66\u672f\u4e3b\u6301 / \u6388\u8bfe\u6559\u5e08\u56e2\u961f",
     location: "\u6388\u8bfe\u5730\u70b9",
     contact: "\u8054\u7cfb\u65b9\u5f0f",
     courseModules: "\u8bfe\u7a0b\u8bbe\u7f6e",
@@ -224,10 +243,12 @@ function portableChildrenText(block: PortableTextBlock) {
 }
 
 function firstTextLine(value: string | null | undefined) {
-  return compactText(value)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .find(Boolean) || "";
+  return (
+    compactText(value)
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find(Boolean) || ""
+  );
 }
 
 function preferRichText(
@@ -261,7 +282,9 @@ function CourseCardPoster({
   const src = imageUrl(image, 680);
 
   return (
-    <div className={`${glassStyle.imageFrame} image-placeholder flex h-[168px] w-[118px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-[rgba(255,255,255,0.56)] sm:h-[184px] sm:w-[130px] dark:bg-[rgba(255,255,255,0.06)]`}>
+    <div
+      className={`${glassStyle.imageFrame} image-placeholder flex h-[168px] w-[118px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-[rgba(255,255,255,0.56)] sm:h-[184px] sm:w-[130px] dark:bg-[rgba(255,255,255,0.06)]`}
+    >
       {src ? (
         <img
           alt={title}
@@ -332,8 +355,7 @@ export function CourseCard({
       </div>
     </>
   );
-  const className =
-    `${glassStyle.card} ${glassStyle.cardHover} group flex h-[210px] w-full overflow-hidden rounded-[20px] p-4 transition duration-200 sm:h-[220px] sm:p-5`;
+  const className = `${glassStyle.card} ${glassStyle.cardHover} group flex h-[210px] w-full overflow-hidden rounded-[20px] p-4 transition duration-200 sm:h-[220px] sm:p-5`;
 
   return cardHref ? (
     <Link className={className} href={cardHref}>
@@ -415,13 +437,18 @@ function DetailText({
     }
 
     return (
-      <div className={`space-y-3 text-[15px] leading-[1.85] text-secondary ${className}`}>
+      <div
+        className={`space-y-3 text-[15px] leading-[1.85] text-secondary ${className}`}
+      >
         {blocks.map((block, index) => {
           const value = portableChildrenText(block);
 
           if (block.listItem) {
             return (
-              <p className="pl-5 [text-indent:-1.25rem]" key={block._key || index}>
+              <p
+                className="pl-5 [text-indent:-1.25rem]"
+                key={block._key || index}
+              >
                 <span className="pr-2">·</span>
                 {value}
               </p>
@@ -456,7 +483,9 @@ function DetailText({
   }
 
   return (
-    <p className={`whitespace-pre-line text-[15px] leading-[1.85] text-secondary ${className}`}>
+    <p
+      className={`whitespace-pre-line text-[15px] leading-[1.85] text-secondary ${className}`}
+    >
       {value}
     </p>
   );
@@ -524,9 +553,15 @@ function TeacherCard({
     <article className="glass-card glass-card-hover flex flex-col gap-5 rounded-[22px] p-5 sm:flex-row sm:items-start lg:p-6">
       <div className="image-placeholder flex aspect-[4/5] w-full max-w-[160px] shrink-0 items-center justify-center overflow-hidden rounded-[16px]">
         {portrait ? (
-          <img alt={name || label} className="h-full w-full object-cover" src={portrait} />
+          <img
+            alt={name || label}
+            className="h-full w-full object-cover"
+            src={portrait}
+          />
         ) : (
-          <span className="px-3 text-center text-xs text-muted-token">{label}</span>
+          <span className="px-3 text-center text-xs text-muted-token">
+            {label}
+          </span>
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -540,7 +575,10 @@ function TeacherCard({
           <p className="mt-2 text-[14px] leading-6 text-muted-token">{role}</p>
         ) : null}
         {bio || (!name && facultyText) ? (
-          <DetailText className="mt-4 max-w-[760px]" text={bio || facultyText} />
+          <DetailText
+            className="mt-4 max-w-[760px]"
+            text={bio || facultyText}
+          />
         ) : null}
       </div>
     </article>
@@ -602,7 +640,10 @@ function RegistrationInfo({
   return (
     <section className="mt-10 grid gap-5 lg:mt-12 lg:grid-cols-3">
       {items.map((item) => (
-        <article className="glass-card rounded-[18px] p-5 lg:p-6" key={item.label}>
+        <article
+          className="glass-card rounded-[18px] p-5 lg:p-6"
+          key={item.label}
+        >
           <p className="text-[11px] uppercase tracking-[0.22em] text-muted-token">
             {item.label}
           </p>
@@ -622,7 +663,7 @@ function MasterclassHero({
   titleZh,
 }: {
   image: SanityImage;
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   titleEn: string;
   titleZh: string;
 }) {
@@ -676,7 +717,7 @@ function RelatedPrograms({
   programs,
 }: {
   includeLocalePrefix?: boolean;
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   locale: Locale;
   programs?: StudyProgram[] | null;
 }) {
@@ -742,7 +783,11 @@ function DetailSection({
   title: string;
   value: DetailValue;
 }) {
-  const text = Array.isArray(value) ? (hasPortableText(value) ? value : null) : compactText(value);
+  const text = Array.isArray(value)
+    ? hasPortableText(value)
+      ? value
+      : null
+    : compactText(value);
 
   if (!text) {
     return null;
@@ -763,11 +808,16 @@ function CourseIntroduction({
   title,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   title?: string | null;
   value: DetailValue;
 }) {
-  return <DetailSection title={compactText(title) || labels.courseIntro} value={value} />;
+  return (
+    <DetailSection
+      title={compactText(title) || labels.courseIntro}
+      value={value}
+    />
+  );
 }
 
 function AcademicSupport({
@@ -776,14 +826,18 @@ function AcademicSupport({
   profile,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   name: string | null | undefined;
   profile?: CourseTeacher | null;
   value: DetailValue;
 }) {
   const supportName = compactText(name);
   const role = compactText(profile?.role);
-  const bio = Array.isArray(value) ? (hasPortableText(value) ? value : null) : compactText(value);
+  const bio = Array.isArray(value)
+    ? hasPortableText(value)
+      ? value
+      : null
+    : compactText(value);
   const portrait = imageUrl(profile?.portrait, 420);
 
   if (!supportName && !bio && !portrait) {
@@ -830,7 +884,7 @@ function TeacherTeam({
   teachers,
 }: {
   fallbackText?: string | null;
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   teachers?: CourseTeacherItem[] | null;
 }) {
   const items = (teachers || []).filter(
@@ -1003,7 +1057,7 @@ function CourseModulesSection({
   labels,
   modules,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   modules: Array<CourseScheduleItem | CourseModule>;
 }) {
   if (!modules.length) {
@@ -1035,7 +1089,11 @@ function CourseDetailTextSection({
   title: string;
   value: DetailValue;
 }) {
-  const text = Array.isArray(value) ? (hasPortableText(value) ? value : null) : compactText(value);
+  const text = Array.isArray(value)
+    ? hasPortableText(value)
+      ? value
+      : null
+    : compactText(value);
 
   if (!text) {
     return null;
@@ -1046,7 +1104,10 @@ function CourseDetailTextSection({
       <h2 className="font-title text-[24px] font-normal leading-tight text-primary">
         {title}
       </h2>
-      <DetailText className="mt-4 max-w-[780px] text-[16px] leading-[1.95]" text={text} />
+      <DetailText
+        className="mt-4 max-w-[780px] text-[16px] leading-[1.95]"
+        text={text}
+      />
     </section>
   );
 }
@@ -1055,7 +1116,7 @@ function CourseIntroSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.courseIntro} value={value} />;
@@ -1065,7 +1126,7 @@ function AcademicHostSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.academicHost} value={value} />;
@@ -1075,7 +1136,7 @@ function TeacherTeamSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.teacherTeam} value={value} />;
@@ -1085,27 +1146,31 @@ function TargetAudienceSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
-  return <CourseDetailTextSection title={labels.targetAudience} value={value} />;
+  return (
+    <CourseDetailTextSection title={labels.targetAudience} value={value} />
+  );
 }
 
 function AcademicAffairsSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
-  return <CourseDetailTextSection title={labels.academicAffairs} value={value} />;
+  return (
+    <CourseDetailTextSection title={labels.academicAffairs} value={value} />
+  );
 }
 
 function AccommodationSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.accommodation} value={value} />;
@@ -1115,7 +1180,7 @@ function CertificateSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.certificate} value={value} />;
@@ -1125,17 +1190,19 @@ function RegistrationPaymentSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
-  return <CourseDetailTextSection title={labels.registrationPayment} value={value} />;
+  return (
+    <CourseDetailTextSection title={labels.registrationPayment} value={value} />
+  );
 }
 
 function ContactInfoSection({
   labels,
   value,
 }: {
-  labels: typeof copy[Locale];
+  labels: (typeof copy)[Locale];
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.contact} value={value} />;
@@ -1165,6 +1232,11 @@ export async function MasterclassPage({ locale }: StudyPageProps) {
   const pastPrograms = programs.filter(
     (program) => program.courseSection === "past",
   );
+  const configuredPastReviews =
+    pageData?.pastReviewItems?.filter(Boolean) || [];
+  const pastReviewItems = configuredPastReviews.length
+    ? configuredPastReviews
+    : masterclassPastReviewFallback(programs);
 
   return (
     <AppShell locale={locale}>
@@ -1195,7 +1267,7 @@ export async function MasterclassPage({ locale }: StudyPageProps) {
 
         <PastReviewCarousel
           className="mt-10 lg:mt-12"
-          items={pageData?.pastReviewItems?.filter(Boolean) || []}
+          items={pastReviewItems}
           itemsPerViewDesktop={3}
           itemsPerViewMobile={1}
           locale={locale}
@@ -1256,10 +1328,7 @@ export async function MasterclassDetailPage({
               <CourseIntroSection labels={labels} value={intro} />
               <AcademicHostSection labels={labels} value={item?.academicHost} />
               <TeacherTeamSection labels={labels} value={item?.teacherTeam} />
-              <CourseModulesSection
-                labels={labels}
-                modules={courseModules}
-              />
+              <CourseModulesSection labels={labels} modules={courseModules} />
               <div className="space-y-9">
                 <TargetAudienceSection
                   labels={labels}
@@ -1273,10 +1342,7 @@ export async function MasterclassDetailPage({
                   labels={labels}
                   value={item?.accommodation}
                 />
-                <CertificateSection
-                  labels={labels}
-                  value={item?.certificate}
-                />
+                <CertificateSection labels={labels} value={item?.certificate} />
                 <RegistrationPaymentSection
                   labels={labels}
                   value={registrationPayment}

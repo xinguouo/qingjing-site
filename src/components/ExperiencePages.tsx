@@ -1,23 +1,20 @@
-import type {SanityImageSource} from "@sanity/image-url";
-import type {ReactNode} from "react";
+import type { SanityImageSource } from "@sanity/image-url";
+import type { ReactNode } from "react";
 
-import type {Locale} from "@/config/navigation";
-import {client} from "@/sanity/client";
-import {urlForImage} from "@/sanity/image";
+import type { Locale } from "@/config/navigation";
+import { client } from "@/sanity/client";
+import { urlForImage } from "@/sanity/image";
 import {
   experienceCourseBySlugQuery,
   experienceCoursesQuery,
   offlineExperiencePageQuery,
 } from "@/sanity/queries";
 
-import {AppShell} from "./AppShell";
-import {PageContainer} from "./PageContainer";
-import {PageHeader} from "./PageHeader";
-import {
-  PastReviewCarousel,
-  type PastReviewItem,
-} from "./PastReviewCarousel";
-import {CourseCard, type StudyProgram} from "./StudyPages";
+import { AppShell } from "./AppShell";
+import { PageContainer } from "./PageContainer";
+import { PageHeader } from "./PageHeader";
+import { PastReviewCarousel, type PastReviewItem } from "./PastReviewCarousel";
+import { CourseCard, type StudyProgram } from "./StudyPages";
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -74,6 +71,7 @@ const copy = {
     imagePending: "图片待上传",
     location: "授课地点",
     pageTitle: "线下体验",
+    pastReview: "往期回顾",
     schedule: "教学内容",
     sectionEn: "ON-SITE EXPERIENCE EVENT",
     teacherTeam: "授课教师团队",
@@ -91,6 +89,7 @@ const copy = {
     imagePending: "Image pending",
     location: "Location",
     pageTitle: "Offline Experience",
+    pastReview: "Past Review",
     schedule: "Teaching Content",
     sectionEn: "ON-SITE EXPERIENCE EVENT",
     teacherTeam: "Teaching Team",
@@ -120,8 +119,9 @@ const fallbackCourses: Record<Locale, ExperienceCourse[]> = {
     {
       _id: "experience-lampworking",
       category: "lampworking",
-      description: "认识火焰与玻璃的关系，在专业指导下完成小型灯工作品。",
-      schedule: "周一至周日开放",
+      description:
+        "通过火焰与玻璃棒材完成小型玻璃造型，感受材料在温度中的变化。",
+      schedule: "预约开放",
       slug: "lampworking",
       teacher: "郑闻卿",
       title: "玻璃灯工",
@@ -129,8 +129,8 @@ const fallbackCourses: Record<Locale, ExperienceCourse[]> = {
     {
       _id: "experience-glass-blowing",
       category: "glass-blowing",
-      description: "观察并体验热玻璃吹制流程，感受玻璃从熔融到成型的过程。",
-      schedule: "周一至周日开放",
+      description: "观察并体验热玻璃吹制过程，从熔融玻璃到成型作品。",
+      schedule: "预约开放",
       slug: "glass-blowing",
       teacher: "郑闻卿",
       title: "玻璃吹制",
@@ -141,7 +141,7 @@ const fallbackCourses: Record<Locale, ExperienceCourse[]> = {
       _id: "experience-glass-mosaic",
       category: "glass-mosaic",
       description:
-        "Start with glass materials and complete a personal work through collage and composition.",
+        "Learn the material language of glass and complete a personal work through collage and composition.",
       schedule: "Open Monday to Sunday",
       slug: "glass-mosaic",
       teacher: "Zheng Wenqing",
@@ -151,7 +151,7 @@ const fallbackCourses: Record<Locale, ExperienceCourse[]> = {
       _id: "experience-glass-painting",
       category: "glass-painting",
       description:
-        "Paint patterns on transparent glass and experience the delicate changes of color and light.",
+        "Paint on transparent glass surfaces and observe how color changes with light.",
       schedule: "Open Monday to Sunday",
       slug: "glass-painting",
       teacher: "Zheng Wenqing",
@@ -161,18 +161,18 @@ const fallbackCourses: Record<Locale, ExperienceCourse[]> = {
       _id: "experience-lampworking",
       category: "lampworking",
       description:
-        "Learn the relationship between flame and glass with guided small-scale lampworking.",
-      schedule: "Open Monday to Sunday",
+        "Shape small glass forms with flame and glass rods, experiencing the material through temperature.",
+      schedule: "Reservation required",
       slug: "lampworking",
       teacher: "Zheng Wenqing",
-      title: "Lampworking",
+      title: "Lampworking Experience",
     },
     {
       _id: "experience-glass-blowing",
       category: "glass-blowing",
       description:
         "Observe and experience hot glass blowing from molten glass to final form.",
-      schedule: "Open Monday to Sunday",
+      schedule: "Reservation required",
       slug: "glass-blowing",
       teacher: "Zheng Wenqing",
       title: "Glass Blowing",
@@ -204,7 +204,8 @@ function mapToCourseCard(course: ExperienceCourse): StudyProgram {
     course.academicHost;
 
   return {
-    _id: course._id || course._key || course.slug || "offline-experience-course",
+    _id:
+      course._id || course._key || course.slug || "offline-experience-course",
     academicHost: teacher,
     academicSupport: teacher,
     coverImage: course.coverImage,
@@ -216,21 +217,43 @@ function mapToCourseCard(course: ExperienceCourse): StudyProgram {
   };
 }
 
-export async function ExperienceCoursePage({locale}: ExperiencePageProps) {
+function experiencePastReviewFallback(
+  courses: ExperienceCourse[],
+): PastReviewItem[] {
+  return courses.flatMap((course, courseIndex) => {
+    const title = compactText(course.title);
+    const description = compactText(
+      course.shortDescription || course.description,
+    );
+    const images = [
+      course.coverImage,
+      ...(course.galleryImages?.filter(Boolean) || []),
+    ].filter(Boolean);
+
+    return images.map((image, imageIndex) => ({
+      _key: `experience-review-${course._id || course._key || course.slug || courseIndex}-${imageIndex}`,
+      description: description || null,
+      image,
+      title: title || null,
+    }));
+  });
+}
+
+export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
   const [pageData, courseDocuments] = await Promise.all([
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<OfflineExperiencePageData | null>(
         offlineExperiencePageQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
       ),
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<ExperienceCourse[]>(
         experienceCoursesQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
       ),
   ]);
   const labels = copy[locale];
@@ -242,7 +265,13 @@ export async function ExperienceCoursePage({locale}: ExperiencePageProps) {
       : fallbackCourses[locale];
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.pageTitle;
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.sectionEn;
-  const featuredTitle = locale === "zh" ? "\u7cbe\u9009\u8bfe\u7a0b" : "Featured Courses";
+  const featuredTitle =
+    locale === "zh" ? "\u7cbe\u9009\u8bfe\u7a0b" : "Featured Courses";
+  const configuredPastReviews =
+    pageData?.pastReviewItems?.filter(Boolean) || [];
+  const pastReviewItems = configuredPastReviews.length
+    ? configuredPastReviews
+    : experiencePastReviewFallback(items);
 
   return (
     <AppShell locale={locale}>
@@ -267,11 +296,11 @@ export async function ExperienceCoursePage({locale}: ExperiencePageProps) {
 
         <PastReviewCarousel
           className="mt-10 lg:mt-12"
-          items={pageData?.pastReviewItems?.filter(Boolean) || []}
+          items={pastReviewItems}
           itemsPerViewDesktop={3}
           itemsPerViewMobile={1}
           locale={locale}
-          title={locale === "zh" ? "往期回顾" : "Past Review"}
+          title={labels.pastReview}
         />
       </PageContainer>
     </AppShell>
@@ -359,11 +388,11 @@ export async function ExperienceCourseDetailPage({
   slug,
 }: ExperienceDetailPageProps) {
   const course = await client
-    .withConfig({useCdn: false})
+    .withConfig({ useCdn: false })
     .fetch<ExperienceCourse | null>(
       experienceCourseBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
+      { locale, slug },
+      { cache: "no-store" },
     );
   const labels = copy[locale];
   const item = course || detailFallback(locale, slug);
