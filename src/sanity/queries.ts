@@ -625,10 +625,22 @@ export const homePageQuery = defineQuery(`*[
   featuredPastEventsTitleEn,
   "featuredPastEventsTitle": ${localizedText('featuredPastEventsTitleEn', 'featuredPastEventsTitleZh')},
   featuredPastEvents[]->{${eventCardFields}},
+  pastReviewItems[]{
+    _key,
+    image{${imageFields}},
+    titleZh,
+    titleEn,
+    "title": ${localizedText('titleEn', 'titleZh')},
+    year,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+  },
   featuredArtWorksTitleZh,
   featuredArtWorksTitleEn,
   "featuredArtWorksTitle": ${localizedText('featuredArtWorksTitleEn', 'featuredArtWorksTitleZh')},
-  featuredArtWorks[]->{${homeArtWorkCardFields}}
+  featuredArtWorks[]->{${homeArtWorkCardFields}},
+  featuredProducts[]->{${productCardFields}}
 }`)
 
 export const aboutMissionPageQuery = defineQuery(`{
