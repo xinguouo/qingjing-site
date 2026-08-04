@@ -241,20 +241,16 @@ function experiencePastReviewFallback(
 
 export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
   const [pageData, courseDocuments] = await Promise.all([
-    client
-      .withConfig({ useCdn: false })
-      .fetch<OfflineExperiencePageData | null>(
-        offlineExperiencePageQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ExperienceCourse[]>(
-        experienceCoursesQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
+    client.fetch<OfflineExperiencePageData | null>(
+      offlineExperiencePageQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
+    client.fetch<ExperienceCourse[]>(
+      experienceCoursesQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
   ]);
   const labels = copy[locale];
   const pageCourses = pageData?.courses?.filter(Boolean) || [];
@@ -387,13 +383,11 @@ export async function ExperienceCourseDetailPage({
   locale,
   slug,
 }: ExperienceDetailPageProps) {
-  const course = await client
-    .withConfig({ useCdn: false })
-    .fetch<ExperienceCourse | null>(
-      experienceCourseBySlugQuery,
-      { locale, slug },
-      { cache: "no-store" },
-    );
+  const course = await client.fetch<ExperienceCourse | null>(
+    experienceCourseBySlugQuery,
+    { locale, slug },
+    { cache: "no-store" },
+  );
   const labels = copy[locale];
   const item = course || detailFallback(locale, slug);
   const title = compactText(item.title) || labels.pageTitle;

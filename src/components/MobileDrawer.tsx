@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
   getNavigationHref,
@@ -28,10 +27,16 @@ const labels = {
 
 export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavigate = (href: string) => {
+    router.push(href);
+    onClose();
+  };
 
   return (
     <div
-      className={`fixed inset-0 isolate z-50 lg:hidden ${
+      className={`fixed inset-0 isolate z-[90] lg:hidden ${
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       }`}
       aria-hidden={!isOpen}
@@ -45,7 +50,7 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
         type="button"
       />
       <aside
-        className={`sidebar-shell pointer-events-auto absolute right-0 top-0 z-20 h-full w-[min(88vw,360px)] overflow-y-auto border-l px-6 py-6 shadow-2xl transition-transform duration-300 ${
+        className={`sidebar-shell pointer-events-auto absolute right-0 top-0 z-20 h-full w-[min(88vw,360px)] touch-pan-y overflow-y-auto border-l px-6 py-6 shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -87,19 +92,20 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
                   {items.map((item) => {
                     const isActive = isNavigationItemActive(item, pathname);
                     const isComingSoon = item.status === "comingSoon";
+                    const href = getNavigationHref(item, locale);
 
                     return (
-                      <Link
-                        className={`group relative z-30 flex min-h-11 items-center gap-3 rounded-full px-5 text-base shadow-[0_6px_18px_rgba(0,0,0,0.04)] transition-colors ${
+                      <button
+                        className={`group relative z-30 flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-full px-5 text-left text-base shadow-[0_6px_18px_rgba(0,0,0,0.04)] transition-colors ${
                           isActive
                             ? "sidebar-nav-item-active"
                             : isComingSoon
                               ? "glass-button"
                               : "glass-button"
                         }`}
-                        href={getNavigationHref(item, locale)}
                         key={item.href}
-                        onClick={onClose}
+                        onClick={() => handleNavigate(href)}
+                        type="button"
                       >
                         <span
                           className={`sidebar-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
@@ -124,7 +130,7 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
                             {locale === "zh" ? labels.preparingZh : "Soon"}
                           </span>
                         ) : null}
-                      </Link>
+                      </button>
                     );
                   })}
                 </div>

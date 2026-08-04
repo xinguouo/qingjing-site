@@ -242,13 +242,11 @@ function MissionContentSection({ text }: { text: string }) {
 }
 
 export async function MissionVisionPage({ locale }: PageProps) {
-  const missionPage = await client
-    .withConfig({ useCdn: false })
-    .fetch<AboutMissionPageData | null>(
-      aboutMissionPageQuery,
-      { locale },
-      { cache: "no-store" },
-    );
+  const missionPage = await client.fetch<AboutMissionPageData | null>(
+    aboutMissionPageQuery,
+    { locale },
+    { cache: "no-store" },
+  );
   const labels = copy[locale];
   const titleZh = compactText(missionPage?.pageTitleZh) || labels.empty;
   const titleEn = compactText(missionPage?.pageTitleEn);
@@ -330,12 +328,8 @@ function TeamMemberCard({
 
 export async function TeamPage({ locale }: PageProps) {
   const [teamPage, teamMembers] = await Promise.all([
-    client
-      .withConfig({ useCdn: false })
-      .fetch<PageTitleData | null>(teamPageQuery, {}, { cache: "no-store" }),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<TeamMember[]>(teamMembersQuery, { locale }, { cache: "no-store" }),
+    client.fetch<PageTitleData | null>(teamPageQuery, {}, { cache: "no-store" }),
+    client.fetch<TeamMember[]>(teamMembersQuery, { locale }, { cache: "no-store" }),
   ]);
   const labels = copy[locale];
   const titleZh = compactText(teamPage?.pageTitleZh) || labels.empty;
@@ -405,13 +399,11 @@ export async function ArtistProfilePage({
 }: PageProps & {
   slug: string;
 }) {
-  const teamMember = await client
-    .withConfig({ useCdn: false })
-    .fetch<TeamProfile | null>(
-      teamMemberBySlugQuery,
-      { locale, slug },
-      { cache: "no-store" },
-    );
+  const teamMember = await client.fetch<TeamProfile | null>(
+    teamMemberBySlugQuery,
+    { locale, slug },
+    { cache: "no-store" },
+  );
   const artist =
     teamMember ||
     (await client.fetch<TeamProfile | null>(artistBySlugQuery, {
@@ -631,9 +623,11 @@ function ContactAddressCard({
 }
 
 export async function ContactPage({ locale }: PageProps) {
-  const contactPage = await client
-    .withConfig({ useCdn: false })
-    .fetch<ContactPageData | null>(contactPageQuery, { locale }, { cache: "no-store" });
+  const contactPage = await client.fetch<ContactPageData | null>(
+    contactPageQuery,
+    { locale },
+    { cache: "no-store" },
+  );
   const labels =
     locale === "zh"
       ? {

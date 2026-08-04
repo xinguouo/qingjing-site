@@ -1210,20 +1210,16 @@ function ContactInfoSection({
 
 export async function MasterclassPage({ locale }: StudyPageProps) {
   const [programs, pageData] = await Promise.all([
-    client
-      .withConfig({ useCdn: false })
-      .fetch<StudyProgram[]>(
-        internationalMasterclassProgramsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<StudyMasterclassPageData | null>(
-        studyMasterclassPageQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
+    client.fetch<StudyProgram[]>(
+      internationalMasterclassProgramsQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
+    client.fetch<StudyMasterclassPageData | null>(
+      studyMasterclassPageQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
   ]);
   const labels = copy[locale];
   const featuredPrograms = programs.filter(
@@ -1284,13 +1280,11 @@ export async function MasterclassDetailPage({
 }: StudyPageProps & {
   slug: string;
 }) {
-  const program = await client
-    .withConfig({ useCdn: false })
-    .fetch<StudyProgramDetail | null>(
-      studyProgramBySlugQuery,
-      { locale, slug },
-      { cache: "no-store" },
-    );
+  const program = await client.fetch<StudyProgramDetail | null>(
+    studyProgramBySlugQuery,
+    { locale, slug },
+    { cache: "no-store" },
+  );
   const labels = copy[locale];
   const isMasterclass = program?.programType === "international-masterclass";
   const item = isMasterclass ? program : null;
