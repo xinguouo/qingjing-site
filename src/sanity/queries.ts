@@ -1,10 +1,10 @@
-import {defineQuery} from 'next-sanity'
+import { defineQuery } from "next-sanity";
 
 const imageFields = `
   asset,
   crop,
   hotspot
-`
+`;
 
 const artworkImageItemFields = `
   _key,
@@ -24,10 +24,10 @@ const artworkImageItemFields = `
       hotspot
     }
   )
-`
+`;
 
 const localizedText = (enField: string, zhField: string) =>
-  `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`
+  `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`;
 
 const artworkVideoItemFields = `
   _key,
@@ -41,112 +41,112 @@ const artworkVideoItemFields = `
   },
   captionZh,
   captionEn,
-  "caption": ${localizedText('captionEn', 'captionZh')},
+  "caption": ${localizedText("captionEn", "captionZh")},
   autoplay,
   muted,
   loop
-`
+`;
 
 const siteSettingsFields = `
   siteNameZh,
   siteNameEn,
-  "siteName": ${localizedText('siteNameEn', 'siteNameZh')},
+  "siteName": ${localizedText("siteNameEn", "siteNameZh")},
   logo{${imageFields}},
   email,
   phone,
   addressZh,
   addressEn,
-  "address": ${localizedText('addressEn', 'addressZh')},
+  "address": ${localizedText("addressEn", "addressZh")},
   footerTextZh,
   footerTextEn,
-  "footerText": ${localizedText('footerTextEn', 'footerTextZh')},
+  "footerText": ${localizedText("footerTextEn", "footerTextZh")},
   socialLinks[]{
     _key,
     platform,
     label,
     url
   }
-`
+`;
 
 const studyProgramCardFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   programType,
   courseSection,
   "coverImage": select(defined(heroImage.asset) => heroImage{${imageFields}}, coverImage{${imageFields}}),
-  "courseIntro": ${localizedText('courseIntroEn', 'courseIntroZh')},
-  "description": ${localizedText('courseIntroEn', 'courseIntroZh')},
+  "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
+  "description": ${localizedText("courseIntroEn", "courseIntroZh")},
   "shortDescription": select(
     $locale == "en" && defined(courseIntroEn) && courseIntroEn != "" => courseIntroEn,
     courseIntroZh
   ),
-  "academicHost": ${localizedText('academicHostEn', 'academicHostZh')},
-  "academicSupport": ${localizedText('academicHostEn', 'academicHostZh')},
+  "academicHost": ${localizedText("academicHostEn", "academicHostZh")},
+  "academicSupport": ${localizedText("academicHostEn", "academicHostZh")},
   order
-`
+`;
 
 const eventCardFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   "eventType": select(eventType == "event" => "activity", eventType),
   coverImage{${imageFields}},
   posterImage{${imageFields}},
   courseIntroZh,
   courseIntroEn,
-  "courseIntro": ${localizedText('courseIntroEn', 'courseIntroZh')},
+  "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
   facultyZh,
   facultyEn,
-  "faculty": ${localizedText('facultyEn', 'facultyZh')},
+  "faculty": ${localizedText("facultyEn", "facultyZh")},
   contentZh,
   contentEn,
-  "content": ${localizedText('contentEn', 'contentZh')},
+  "content": ${localizedText("contentEn", "contentZh")},
   order
-`
+`;
 
 const offlineWorkshopCardFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   coverImage{${imageFields}},
   shortDescriptionZh,
   shortDescriptionEn,
-  "shortDescription": ${localizedText('shortDescriptionEn', 'shortDescriptionZh')},
+  "shortDescription": ${localizedText("shortDescriptionEn", "shortDescriptionZh")},
   category,
   tagZh,
   tagEn,
-  "tag": ${localizedText('tagEn', 'tagZh')},
+  "tag": ${localizedText("tagEn", "tagZh")},
   suitableAudienceZh,
   suitableAudienceEn,
-  "suitableAudience": ${localizedText('suitableAudienceEn', 'suitableAudienceZh')},
+  "suitableAudience": ${localizedText("suitableAudienceEn", "suitableAudienceZh")},
   scheduleZh,
   scheduleEn,
-  "schedule": ${localizedText('scheduleEn', 'scheduleZh')},
+  "schedule": ${localizedText("scheduleEn", "scheduleZh")},
   price,
   contact,
   order
-`
+`;
 
 const experienceCourseFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   heroImage{${imageFields}},
   coverImage{${imageFields}},
   galleryImages[]{${imageFields}},
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
-  "shortDescription": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
+  "shortDescription": ${localizedText("descriptionEn", "descriptionZh")},
   teacher,
   academicSupport,
   "academicHost": coalesce(academicSupport, teacher),
@@ -156,26 +156,26 @@ const experienceCourseFields = `
   location,
   contact,
   order
-`
+`;
 
 const offlineExperiencePageFields = `
   pageTitleZh,
   pageTitleEn,
-  "pageTitle": ${localizedText('pageTitleEn', 'pageTitleZh')},
+  "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
   bannerTitleZh,
   bannerTitleEn,
-  "bannerTitle": ${localizedText('bannerTitleEn', 'bannerTitleZh')},
+  "bannerTitle": ${localizedText("bannerTitleEn", "bannerTitleZh")},
   bannerImage{${imageFields}},
   courses[]{
     _key,
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     coverImage{${imageFields}},
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')},
-    "shortDescription": ${localizedText('descriptionEn', 'descriptionZh')},
+    "description": ${localizedText("descriptionEn", "descriptionZh")},
+    "shortDescription": ${localizedText("descriptionEn", "descriptionZh")},
     supportTeacher,
     "academicHost": supportTeacher,
     "academicSupport": supportTeacher
@@ -185,20 +185,20 @@ const offlineExperiencePageFields = `
     image{${imageFields}},
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     year,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   }
-`
+`;
 
 const artWorkCardFields = `
   _id,
   "_type": _type,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   "category": coalesce(category, workType, projectType),
   "workType": coalesce(category, workType, projectType),
@@ -210,7 +210,7 @@ const artWorkCardFields = `
   year,
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   "size": coalesce(size, dimensions),
   dimensions,
   quantity,
@@ -220,7 +220,7 @@ const artWorkCardFields = `
   needsReview,
   importNotes,
   order
-`
+`;
 
 const publishedArtWorkFilter = `
   !(
@@ -228,49 +228,49 @@ const publishedArtWorkFilter = `
     importSource == "old-qingjing-site" &&
     defined(sourceUrl)
   )
-`
+`;
 
 const artCategoryFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   categoryType,
   artworks[]{
     _key,
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     "slug": slug.current,
     images[]{${imageFields}},
     "coverImage": images[0]{${imageFields}},
     dimensions,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   },
   order
-`
+`;
 
 const homeArtWorkCardFields = `
   _id,
   "_type": _type,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   "category": coalesce(category, workType, projectType),
   "workType": coalesce(category, workType, projectType),
   "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0].image{${imageFields}}, galleryImages[0]{${imageFields}}, images[0].image{${imageFields}}, images[0]{${imageFields}}),
   "size": coalesce(size, dimensions),
   dimensions
-`
+`;
 
 const productCardFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   "productType": select(
     productType in ["available-artworks", "artworks"] => "artworks",
@@ -289,20 +289,96 @@ const productCardFields = `
   material,
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   stockStatus,
   sourceUrl,
   importSource,
   needsReview,
   importNotes,
   order
-`
+`;
+
+const homeProductReferenceFields = `
+  _id,
+  "_type": _type,
+  "titleZh": select(
+    _type == "productDetail" => basicInfo.titleZh,
+    titleZh
+  ),
+  "titleEn": select(
+    _type == "productDetail" => basicInfo.titleEn,
+    titleEn
+  ),
+  "title": select(
+    _type == "productDetail" => ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
+    ${localizedText("titleEn", "titleZh")}
+  ),
+  "slug": slug.current,
+  "productType": select(
+    _type == "productDetail" => "artworks",
+    _type == "artworkProduct" => "artworks",
+    _type == "artDerivativeDetail" => "derivatives",
+    _type == "derivativeProduct" => "derivatives",
+    _type == "culturalProduct" => "cultural",
+    _type == "productCollection" && category == "artwork" => "artworks",
+    _type == "productCollection" && category == "derivative" => "derivatives",
+    _type == "productCollection" && category == "cultural" => "cultural",
+    productType in ["available-artworks", "artworks"] => "artworks",
+    productType in ["derivatives", "art-derivatives", "art-merchandise"] => "derivatives",
+    productType in ["cultural", "cultural-products"] => "cultural",
+    productType
+  ),
+  "derivativeCategory": select(
+    _type == "productCollection" => subcategory,
+    derivativeCategory
+  ),
+  "subcategory": select(
+    _type == "productCollection" => subcategory,
+    derivativeCategory
+  ),
+  "coverImage": select(
+    _type == "productDetail" => coalesce(media.mainImage{${imageFields}}, media.galleryImages[0]{${imageFields}}),
+    _type == "artDerivativeDetail" => coalesce(mainImage{${imageFields}}, galleryImages[0]{${imageFields}}),
+    _type == "artworkProduct" => images[0]{${imageFields}},
+    _type == "culturalProduct" => image{${imageFields}},
+    coverImage{${imageFields}}
+  ),
+  "images": select(
+    _type == "artworkProduct" => images[]{${imageFields}},
+    images[]{${imageFields}}
+  ),
+  "galleryImages": select(
+    _type == "productDetail" => media.galleryImages[]{${imageFields}},
+    _type == "derivativeProduct" => gallery[]{${imageFields}},
+    galleryImages[]{${imageFields}}
+  ),
+  "price": select(
+    _type == "productDetail" => commerce.price,
+    price
+  ),
+  "size": coalesce(size, dimensions, productInfo.dimensions),
+  dimensions,
+  material,
+  descriptionZh,
+  descriptionEn,
+  "description": select(
+    _type == "productDetail" => ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")},
+    _type == "derivativeProduct" => ${localizedText("descriptionEn", "descriptionZh")},
+    ${localizedText("descriptionEn", "descriptionZh")}
+  ),
+  stockStatus,
+  sourceUrl,
+  importSource,
+  needsReview,
+  importNotes,
+  order
+`;
 
 const artworkProductFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   images[]{${imageFields}},
   "coverImage": images[0]{${imageFields}},
@@ -310,48 +386,48 @@ const artworkProductFields = `
   quantity,
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   order
-`
+`;
 
 const derivativeProductFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   coverImage{${imageFields}},
   gallery[]{${imageFields}},
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   specificationZh,
   specificationEn,
-  "specification": ${localizedText('specificationEn', 'specificationZh')},
+  "specification": ${localizedText("specificationEn", "specificationZh")},
   price,
   sourceUrl,
   importSource,
   needsReview,
   importNotes,
   order
-`
+`;
 
 const culturalProductFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   image{${imageFields}},
   category,
   order
-`
+`;
 
 const productCollectionFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   category,
   "productType": select(
@@ -364,12 +440,12 @@ const productCollectionFields = `
   galleryImages[]{${imageFields}},
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   price,
   status,
   needsReview,
   order
-`
+`;
 
 const productDetailFields = `
   _id,
@@ -379,14 +455,14 @@ const productDetailFields = `
     productNumber,
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')}
+    "title": ${localizedText("titleEn", "titleZh")}
   },
   productInfo{
     dimensions,
     material,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   },
   commerce{
     price
@@ -403,7 +479,7 @@ const productDetailFields = `
       productNumber,
       titleZh,
       titleEn,
-      "title": ${localizedText('titleEn', 'titleZh')}
+      "title": ${localizedText("titleEn", "titleZh")}
     },
     commerce{
       price
@@ -414,29 +490,29 @@ const productDetailFields = `
     }
   },
   order
-`
+`;
 
 const artDerivativeDetailFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   category,
   dimensions,
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   mainImage{${imageFields}},
   galleryImages[]{${imageFields}},
   order
-`
+`;
 
 const artDerivativeDetailCardFields = `
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   "productType": "derivatives",
   "category": "derivative",
@@ -464,15 +540,15 @@ const artDerivativeDetailCardFields = `
   "size": dimensions,
   descriptionZh,
   descriptionEn,
-  "description": ${localizedText('descriptionEn', 'descriptionZh')},
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
   order
-`
+`;
 
 const artistFields = `
   _id,
   nameZh,
   nameEn,
-  "name": ${localizedText('nameEn', 'nameZh')},
+  "name": ${localizedText("nameEn", "nameZh")},
   "slug": slug.current,
   detailTitleZh,
   detailTitleEn,
@@ -480,49 +556,49 @@ const artistFields = `
   "detailPageTitleEn": detailTitleEn,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
-  "profileTitle": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
+  "profileTitle": ${localizedText("titleEn", "titleZh")},
   bioZh,
   bioEn,
-  "bio": ${localizedText('bioEn', 'bioZh')},
+  "bio": ${localizedText("bioEn", "bioZh")},
   portrait{${imageFields}},
   educationExperienceZh,
   educationExperienceEn,
-  "educationExperience": ${localizedText('educationExperienceEn', 'educationExperienceZh')},
+  "educationExperience": ${localizedText("educationExperienceEn", "educationExperienceZh")},
   honorsZh,
   honorsEn,
-  "honors": ${localizedText('honorsEn', 'honorsZh')},
-  "honorsCollections": ${localizedText('honorsEn', 'honorsZh')},
+  "honors": ${localizedText("honorsEn", "honorsZh")},
+  "honorsCollections": ${localizedText("honorsEn", "honorsZh")},
   publicationsZh,
   publicationsEn,
-  "publications": ${localizedText('publicationsEn', 'publicationsZh')},
+  "publications": ${localizedText("publicationsEn", "publicationsZh")},
   exhibitionsZh,
   exhibitionsEn,
-  "exhibitions": ${localizedText('exhibitionsEn', 'exhibitionsZh')},
+  "exhibitions": ${localizedText("exhibitionsEn", "exhibitionsZh")},
   "isTeamArtist": coalesce(isTeamArtist, isTeamMember, false),
   isResidentArtist,
   order
-`
+`;
 
 const teamMemberDetailFields = `
   _id,
   nameZh,
   nameEn,
-  "name": ${localizedText('nameEn', 'nameZh')},
+  "name": ${localizedText("nameEn", "nameZh")},
   "slug": slug.current,
   detailPageTitleZh,
   detailPageTitleEn,
   roleZh,
   roleEn,
-  "role": ${localizedText('roleEn', 'roleZh')},
-  "profileTitle": ${localizedText('roleEn', 'roleZh')},
+  "role": ${localizedText("roleEn", "roleZh")},
+  "profileTitle": ${localizedText("roleEn", "roleZh")},
   genderZh,
   genderEn,
-  "gender": ${localizedText('genderEn', 'genderZh')},
+  "gender": ${localizedText("genderEn", "genderZh")},
   birthDateTextZh,
   birthDateTextEn,
-  "birthDateText": ${localizedText('birthDateTextEn', 'birthDateTextZh')},
-  "title": ${localizedText('roleEn', 'roleZh')},
+  "birthDateText": ${localizedText("birthDateTextEn", "birthDateTextZh")},
+  "title": ${localizedText("roleEn", "roleZh")},
   shortBioZh,
   shortBioEn,
   detailBioZh,
@@ -540,7 +616,7 @@ const teamMemberDetailFields = `
   portrait{${imageFields}},
   educationExperienceZh,
   educationExperienceEn,
-  "educationExperience": ${localizedText('educationExperienceEn', 'educationExperienceZh')},
+  "educationExperience": ${localizedText("educationExperienceEn", "educationExperienceZh")},
   honorsCollectionsZh,
   honorsCollectionsEn,
   "honorsCollections": select(
@@ -559,34 +635,40 @@ const teamMemberDetailFields = `
   ),
   researchProjectsZh,
   researchProjectsEn,
-  "researchProjects": ${localizedText('researchProjectsEn', 'researchProjectsZh')},
+  "researchProjects": ${localizedText("researchProjectsEn", "researchProjectsZh")},
   writingsZh,
   writingsEn,
-  "writings": ${localizedText('writingsEn', 'writingsZh')},
+  "writings": ${localizedText("writingsEn", "writingsZh")},
   publicationsZh,
   publicationsEn,
-  "publications": ${localizedText('publicationsEn', 'publicationsZh')},
+  "publications": ${localizedText("publicationsEn", "publicationsZh")},
   exhibitionsZh,
   exhibitionsEn,
-  "exhibitions": ${localizedText('exhibitionsEn', 'exhibitionsZh')},
+  "exhibitions": ${localizedText("exhibitionsEn", "exhibitionsZh")},
   galleryImages[]{${imageFields}},
   isFeatured,
   order
-`
+`;
 
-const aboutMissionPageTitleZh = 'coalesce(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].pageTitleZh, *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].titleZh)'
-const aboutMissionPageTitleEn = 'coalesce(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].pageTitleEn, *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].titleEn)'
-const aboutMissionBodyZh = '*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].bodyZh'
-const aboutMissionBodyEn = '*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].bodyEn'
-const teamPageTitleZh = 'coalesce(*[_type == "teamPage" && _id == "teamPage"][0].pageTitleZh, *[_type == "teamPage" && _id == "teamPage"][0].titleZh)'
-const teamPageTitleEn = 'coalesce(*[_type == "teamPage" && _id == "teamPage"][0].pageTitleEn, *[_type == "teamPage" && _id == "teamPage"][0].titleEn)'
+const aboutMissionPageTitleZh =
+  'coalesce(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].pageTitleZh, *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].titleZh)';
+const aboutMissionPageTitleEn =
+  'coalesce(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].pageTitleEn, *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].titleEn)';
+const aboutMissionBodyZh =
+  '*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].bodyZh';
+const aboutMissionBodyEn =
+  '*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].bodyEn';
+const teamPageTitleZh =
+  'coalesce(*[_type == "teamPage" && _id == "teamPage"][0].pageTitleZh, *[_type == "teamPage" && _id == "teamPage"][0].titleZh)';
+const teamPageTitleEn =
+  'coalesce(*[_type == "teamPage" && _id == "teamPage"][0].pageTitleEn, *[_type == "teamPage" && _id == "teamPage"][0].titleEn)';
 
 export const siteSettingsQuery = defineQuery(`*[
   _type == "siteSettings" &&
   _id == "siteSettings"
 ][0]{
   ${siteSettingsFields}
-}`)
+}`);
 
 export const homePageQuery = defineQuery(`*[
   _type == "homePage" &&
@@ -595,10 +677,10 @@ export const homePageQuery = defineQuery(`*[
 ][0]{
   heroTitleZh,
   heroTitleEn,
-  "heroTitle": ${localizedText('heroTitleEn', 'heroTitleZh')},
+  "heroTitle": ${localizedText("heroTitleEn", "heroTitleZh")},
   heroSubtitleZh,
   heroSubtitleEn,
-  "heroSubtitle": ${localizedText('heroSubtitleEn', 'heroSubtitleZh')},
+  "heroSubtitle": ${localizedText("heroSubtitleEn", "heroSubtitleZh")},
   heroImage{${imageFields}},
   heroImages[]{
     ${imageFields},
@@ -610,49 +692,49 @@ export const homePageQuery = defineQuery(`*[
   },
   introTitleZh,
   introTitleEn,
-  "introTitle": ${localizedText('introTitleEn', 'introTitleZh')},
+  "introTitle": ${localizedText("introTitleEn", "introTitleZh")},
   introTextZh,
   introTextEn,
-  "introText": ${localizedText('introTextEn', 'introTextZh')},
+  "introText": ${localizedText("introTextEn", "introTextZh")},
   quickEntries[]{
     _key,
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')},
+    "description": ${localizedText("descriptionEn", "descriptionZh")},
     href
   },
   featuredStudyProgramsTitleZh,
   featuredStudyProgramsTitleEn,
-  "featuredStudyProgramsTitle": ${localizedText('featuredStudyProgramsTitleEn', 'featuredStudyProgramsTitleZh')},
+  "featuredStudyProgramsTitle": ${localizedText("featuredStudyProgramsTitleEn", "featuredStudyProgramsTitleZh")},
   featuredStudyPrograms[]->{${studyProgramCardFields}},
   featuredEventsTitleZh,
   featuredEventsTitleEn,
-  "featuredEventsTitle": ${localizedText('featuredEventsTitleEn', 'featuredEventsTitleZh')},
+  "featuredEventsTitle": ${localizedText("featuredEventsTitleEn", "featuredEventsTitleZh")},
   featuredEvents[]->{${eventCardFields}},
   featuredPastEventsTitleZh,
   featuredPastEventsTitleEn,
-  "featuredPastEventsTitle": ${localizedText('featuredPastEventsTitleEn', 'featuredPastEventsTitleZh')},
+  "featuredPastEventsTitle": ${localizedText("featuredPastEventsTitleEn", "featuredPastEventsTitleZh")},
   featuredPastEvents[]->{${eventCardFields}},
   pastReviewItems[]{
     _key,
     image{${imageFields}},
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     year,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   },
   featuredArtWorksTitleZh,
   featuredArtWorksTitleEn,
-  "featuredArtWorksTitle": ${localizedText('featuredArtWorksTitleEn', 'featuredArtWorksTitleZh')},
+  "featuredArtWorksTitle": ${localizedText("featuredArtWorksTitleEn", "featuredArtWorksTitleZh")},
   featuredArtWorks[]->{${homeArtWorkCardFields}},
-  featuredProducts[]->{${productCardFields}}
-}`)
+  featuredProducts[]->{${homeProductReferenceFields}}
+}`);
 
 export const aboutMissionPageQuery = defineQuery(`{
   "pageTitleZh": ${aboutMissionPageTitleZh},
@@ -664,7 +746,7 @@ export const aboutMissionPageQuery = defineQuery(`{
     ${aboutMissionBodyZh}
   ),
   "image": *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].image{${imageFields}}
-}`)
+}`);
 
 export const contactPageQuery = defineQuery(`{
   "pageTitleZh": coalesce(*[_type == "contactPage" && _id == "contactPage"][0].pageTitleZh, *[_type == "contactPage" && _id == "contactPage"][0].titleZh),
@@ -674,10 +756,10 @@ export const contactPageQuery = defineQuery(`{
       *[_type == "contactPage" && _id == "contactPage"][0].address{
         titleZh,
         titleEn,
-        "title": ${localizedText('titleEn', 'titleZh')},
+        "title": ${localizedText("titleEn", "titleZh")},
         contentZh,
         contentEn,
-        "content": ${localizedText('contentEn', 'contentZh')},
+        "content": ${localizedText("contentEn", "contentZh")},
         mapImage{${imageFields}}
       },
     null
@@ -688,7 +770,7 @@ export const contactPageQuery = defineQuery(`{
         _key,
         numberZh,
         numberEn,
-        "number": ${localizedText('numberEn', 'numberZh')}
+        "number": ${localizedText("numberEn", "numberZh")}
       },
     []
   ),
@@ -709,22 +791,23 @@ export const contactPageQuery = defineQuery(`{
         *[_type == "contactPage" && _id == "contactPage"][0].openingHoursEn,
     *[_type == "contactPage" && _id == "contactPage"][0].openingHoursZh
   )
-}`)
+}`);
 
 export const teamPageQuery = defineQuery(`{
   "pageTitleZh": ${teamPageTitleZh},
   "pageTitleEn": ${teamPageTitleEn}
-}`)
+}`);
 
-export const teamMembersQuery = defineQuery(`*[_type == "teamMember"] | order(order asc) {
+export const teamMembersQuery =
+  defineQuery(`*[_type == "teamMember"] | order(order asc) {
   _id,
   nameZh,
   nameEn,
-  "name": ${localizedText('nameEn', 'nameZh')},
+  "name": ${localizedText("nameEn", "nameZh")},
   "slug": slug.current,
   roleZh,
   roleEn,
-  "role": ${localizedText('roleEn', 'roleZh')},
+  "role": ${localizedText("roleEn", "roleZh")},
   shortBioZh,
   shortBioEn,
   bioZh,
@@ -736,85 +819,87 @@ export const teamMembersQuery = defineQuery(`*[_type == "teamMember"] | order(or
     bioZh
   ),
   portrait{${imageFields}},
-  linkedArtist->{_id, nameZh, nameEn, "name": ${localizedText('nameEn', 'nameZh')}, "slug": slug.current},
+  linkedArtist->{_id, nameZh, nameEn, "name": ${localizedText("nameEn", "nameZh")}, "slug": slug.current},
   order
-}`)
+}`);
 
 export const teamMemberBySlugQuery = defineQuery(`*[
   _type == "teamMember" &&
   slug.current == $slug
 ][0]{
   ${teamMemberDetailFields}
-}`)
+}`);
 
-export const artistsQuery = defineQuery(`*[_type == "artist"] | order(order asc) {
+export const artistsQuery =
+  defineQuery(`*[_type == "artist"] | order(order asc) {
   ${artistFields}
-}`)
+}`);
 
 export const teamArtistsQuery = defineQuery(`*[
   _type == "artist" &&
   coalesce(isTeamArtist, isTeamMember, false) == true
 ] | order(order asc) {
   ${artistFields}
-}`)
+}`);
 
 export const residentArtistsQuery = defineQuery(`*[
   _type == "artist" &&
   isResidentArtist == true
 ] | order(order asc) {
   ${artistFields}
-}`)
+}`);
 
 export const artistBySlugQuery = defineQuery(`*[
   _type == "artist" &&
   slug.current == $slug
 ][0]{
   ${artistFields}
-}`)
+}`);
 
 export const residencyPageQuery = defineQuery(`*[_type == "residencyPage"][0]{
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   introZh,
   introEn,
-  "intro": ${localizedText('introEn', 'introZh')},
+  "intro": ${localizedText("introEn", "introZh")},
   coverImage{${imageFields}},
   spaceTitleZh,
   spaceTitleEn,
-  "spaceTitle": ${localizedText('spaceTitleEn', 'spaceTitleZh')},
+  "spaceTitle": ${localizedText("spaceTitleEn", "spaceTitleZh")},
   spaceDescriptionZh,
   spaceDescriptionEn,
-  "spaceDescription": ${localizedText('spaceDescriptionEn', 'spaceDescriptionZh')},
+  "spaceDescription": ${localizedText("spaceDescriptionEn", "spaceDescriptionZh")},
   spaceImages[]{${imageFields}},
   applicationRequirementsZh,
   applicationRequirementsEn,
-  "applicationRequirements": ${localizedText('applicationRequirementsEn', 'applicationRequirementsZh')},
+  "applicationRequirements": ${localizedText("applicationRequirementsEn", "applicationRequirementsZh")},
   feesAndRulesZh,
   feesAndRulesEn,
-  "feesAndRules": ${localizedText('feesAndRulesEn', 'feesAndRulesZh')},
+  "feesAndRules": ${localizedText("feesAndRulesEn", "feesAndRulesZh")},
   additionalServicesZh,
   additionalServicesEn,
-  "additionalServices": ${localizedText('additionalServicesEn', 'additionalServicesZh')}
-}`)
+  "additionalServices": ${localizedText("additionalServicesEn", "additionalServicesZh")}
+}`);
 
-export const studyProgramsQuery = defineQuery(`*[_type == "studyProgram"] | order(order asc) {
+export const studyProgramsQuery =
+  defineQuery(`*[_type == "studyProgram"] | order(order asc) {
   ${studyProgramCardFields}
-}`)
+}`);
 
 export const studyProgramsByTypeQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == $programType
 ] | order(order asc) {
   ${studyProgramCardFields}
-}`)
+}`);
 
 export const internationalMasterclassProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == "international-masterclass"
 ] | order(order asc) {
   ${studyProgramCardFields}
-}`)
+}`);
 
 export const studyMasterclassPageQuery = defineQuery(`*[
   _type == "studyMasterclassPage" &&
@@ -822,26 +907,26 @@ export const studyMasterclassPageQuery = defineQuery(`*[
 ][0]{
   pastReviewTitleZh,
   pastReviewTitleEn,
-  "pastReviewTitle": ${localizedText('pastReviewTitleEn', 'pastReviewTitleZh')},
+  "pastReviewTitle": ${localizedText("pastReviewTitleEn", "pastReviewTitleZh")},
   pastReviewItems[]{
     _key,
     image{${imageFields}},
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     year,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   }
-}`)
+}`);
 
 export const internationalStudyProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == "international-study"
 ] | order(order asc) {
   ${studyProgramCardFields}
-}`)
+}`);
 
 export const studyProgramBySlugQuery = defineQuery(`*[
   _type == "studyProgram" &&
@@ -849,31 +934,31 @@ export const studyProgramBySlugQuery = defineQuery(`*[
 ][0]{
   ${studyProgramCardFields},
   heroImage{${imageFields}},
-  "courseIntro": ${localizedText('courseIntroEn', 'courseIntroZh')},
-  "targetAudience": ${localizedText('targetAudienceEn', 'targetAudienceZh')},
-  "academicAffairs": ${localizedText('academicAffairsEn', 'academicAffairsZh')},
-  "accommodation": ${localizedText('accommodationEn', 'accommodationZh')},
+  "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
+  "targetAudience": ${localizedText("targetAudienceEn", "targetAudienceZh")},
+  "academicAffairs": ${localizedText("academicAffairsEn", "academicAffairsZh")},
+  "accommodation": ${localizedText("accommodationEn", "accommodationZh")},
   courseModules[]{
     _key,
     "number": moduleNumber,
-    "title": ${localizedText('moduleTitleEn', 'moduleTitleZh')},
-    "description": ${localizedText('moduleContentEn', 'moduleContentZh')},
+    "title": ${localizedText("moduleTitleEn", "moduleTitleZh")},
+    "description": ${localizedText("moduleContentEn", "moduleContentZh")},
     "images": moduleImages[]{${imageFields}}
   },
-  "academicHost": ${localizedText('academicHostEn', 'academicHostZh')},
-  "academicSupport": ${localizedText('academicHostEn', 'academicHostZh')},
-  "teacherTeam": ${localizedText('teacherTeamEn', 'teacherTeamZh')},
-  "certificate": ${localizedText('certificateEn', 'certificateZh')},
-  "registrationPayment": ${localizedText('registrationPaymentEn', 'registrationPaymentZh')},
-  "contactInfo": ${localizedText('contactInfoEn', 'contactInfoZh')},
+  "academicHost": ${localizedText("academicHostEn", "academicHostZh")},
+  "academicSupport": ${localizedText("academicHostEn", "academicHostZh")},
+  "teacherTeam": ${localizedText("teacherTeamEn", "teacherTeamZh")},
+  "certificate": ${localizedText("certificateEn", "certificateZh")},
+  "registrationPayment": ${localizedText("registrationPaymentEn", "registrationPaymentZh")},
+  "contactInfo": ${localizedText("contactInfoEn", "contactInfoZh")},
   "relatedCourses": relatedCourses[]->{
     ${studyProgramCardFields}
   }
-}`)
+}`);
 
 export const eventsQuery = defineQuery(`*[_type == "event"] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const eventsByTypeQuery = defineQuery(`*[
   _type == "event" &&
@@ -883,35 +968,35 @@ export const eventsByTypeQuery = defineQuery(`*[
   )
 ] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const offlineExperienceEventsQuery = defineQuery(`*[
   _type == "event" &&
   eventType == "offline-experience"
 ] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const openClassEventsQuery = defineQuery(`*[
   _type == "event" &&
   eventType == "open-class"
 ] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const activityEventsQuery = defineQuery(`*[
   _type == "event" &&
   (eventType == "activity" || eventType == "event")
 ] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const featuredEventsQuery = defineQuery(`*[
   _type == "event" &&
   isFeatured == true
 ] | order(order asc) {
   ${eventCardFields}
-}`)
+}`);
 
 export const eventBySlugQuery = defineQuery(`*[
   _type == "event" &&
@@ -920,61 +1005,61 @@ export const eventBySlugQuery = defineQuery(`*[
   ${eventCardFields},
   teachingSpaceZh,
   teachingSpaceEn,
-  "teachingSpace": ${localizedText('teachingSpaceEn', 'teachingSpaceZh')},
+  "teachingSpace": ${localizedText("teachingSpaceEn", "teachingSpaceZh")},
   courseIntroZh,
   courseIntroEn,
-  "courseIntro": ${localizedText('courseIntroEn', 'courseIntroZh')},
+  "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
   feesZh,
   feesEn,
-  "fees": ${localizedText('feesEn', 'feesZh')},
+  "fees": ${localizedText("feesEn", "feesZh")},
   facultyZh,
   facultyEn,
-  "faculty": ${localizedText('facultyEn', 'facultyZh')},
+  "faculty": ${localizedText("facultyEn", "facultyZh")},
   outcomesZh,
   outcomesEn,
-  "outcomes": ${localizedText('outcomesEn', 'outcomesZh')},
+  "outcomes": ${localizedText("outcomesEn", "outcomesZh")},
   galleryImages[]{${imageFields}}
-}`)
+}`);
 
 export const offlineWorkshopsQuery = defineQuery(`*[
   _type == "offlineWorkshop"
 ] | order(order asc) {
   ${offlineWorkshopCardFields}
-}`)
+}`);
 
 export const offlineWorkshopBySlugQuery = defineQuery(`*[
   _type == "offlineWorkshop" &&
   slug.current == $slug
 ][0]{
   ${offlineWorkshopCardFields}
-}`)
+}`);
 
 export const experienceCoursesQuery = defineQuery(`*[
   _type == "experienceCourse"
 ] | order(order asc) {
   ${experienceCourseFields}
-}`)
+}`);
 
 export const experienceCourseBySlugQuery = defineQuery(`*[
   _type == "experienceCourse" &&
   slug.current == $slug
 ][0]{
   ${experienceCourseFields}
-}`)
+}`);
 
 export const offlineExperiencePageQuery = defineQuery(`*[
   _type == "offlineExperiencePage" &&
   _id == "offlineExperiencePage"
 ][0]{
   ${offlineExperiencePageFields}
-}`)
+}`);
 
 export const artWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter}
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const artWorksByTypeQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -982,7 +1067,7 @@ export const artWorksByTypeQuery = defineQuery(`*[
   coalesce(category, workType, projectType) == $workType
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const glassArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -990,7 +1075,7 @@ export const glassArtWorksQuery = defineQuery(`*[
   coalesce(category, workType, projectType) == "glass-art"
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const installationArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -998,7 +1083,7 @@ export const installationArtWorksQuery = defineQuery(`*[
   coalesce(category, workType, projectType) == "installation-art"
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const publicArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -1006,7 +1091,7 @@ export const publicArtWorksQuery = defineQuery(`*[
   coalesce(category, workType, projectType) == "public-art"
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const sculptureArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -1014,7 +1099,7 @@ export const sculptureArtWorksQuery = defineQuery(`*[
   coalesce(category, workType, projectType) == "sculpture-art"
 ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
-}`)
+}`);
 
 export const artWorkBySlugQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
@@ -1022,14 +1107,14 @@ export const artWorkBySlugQuery = defineQuery(`*[
   slug.current == $slug
 ][0]{
   ${artWorkCardFields}
-}`)
+}`);
 
 export const artCategoryByTypeQuery = defineQuery(`*[
   _type == "artCategory" &&
   categoryType == $categoryType
 ][0]{
   ${artCategoryFields}
-}`)
+}`);
 
 export const artCategoryArtworkBySlugQuery = defineQuery(`*[
   _type == "artCategory" &&
@@ -1038,29 +1123,29 @@ export const artCategoryArtworkBySlugQuery = defineQuery(`*[
   _id,
   titleZh,
   titleEn,
-  "title": ${localizedText('titleEn', 'titleZh')},
+  "title": ${localizedText("titleEn", "titleZh")},
   categoryType,
   "artwork": artworks[slug.current == $slug][0]{
     _key,
     titleZh,
     titleEn,
-    "title": ${localizedText('titleEn', 'titleZh')},
+    "title": ${localizedText("titleEn", "titleZh")},
     "slug": slug.current,
     images[]{${imageFields}},
     "coverImage": images[0]{${imageFields}},
     dimensions,
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText('descriptionEn', 'descriptionZh')}
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   }
-}`)
+}`);
 
 export const productsQuery = defineQuery(`*[
   _type == "product" &&
   coalesce(needsReview, false) != true
 ] | order(order asc) {
   ${productCardFields}
-}`)
+}`);
 
 export const productsByTypeQuery = defineQuery(`*[
   _type == "product" &&
@@ -1074,7 +1159,7 @@ export const productsByTypeQuery = defineQuery(`*[
   )
 ] | order(order asc) {
   ${productCardFields}
-}`)
+}`);
 
 export const productsByDerivativeCategoryQuery = defineQuery(`*[
   _type == "product" &&
@@ -1083,7 +1168,7 @@ export const productsByDerivativeCategoryQuery = defineQuery(`*[
   derivativeCategory == $derivativeCategory
 ] | order(order asc) {
   ${productCardFields}
-}`)
+}`);
 
 export const productBySlugQuery = defineQuery(`*[
   _type == "product" &&
@@ -1093,8 +1178,8 @@ export const productBySlugQuery = defineQuery(`*[
   ${productCardFields},
   detailZh,
   detailEn,
-  "detail": ${localizedText('detailEn', 'detailZh')}
-}`)
+  "detail": ${localizedText("detailEn", "detailZh")}
+}`);
 
 export const derivativeProductSlugsQuery = defineQuery(`*[
   _type == "product" &&
@@ -1103,7 +1188,7 @@ export const derivativeProductSlugsQuery = defineQuery(`*[
   defined(slug.current)
 ]{
   "slug": slug.current
-}`)
+}`);
 
 export const artDerivativeDetailsForCardsQuery = defineQuery(`*[
   _type == "artDerivativeDetail" &&
@@ -1111,27 +1196,27 @@ export const artDerivativeDetailsForCardsQuery = defineQuery(`*[
   defined(slug.current)
 ] | order(order asc) {
   ${artDerivativeDetailCardFields}
-}`)
+}`);
 
 export const artworkProductsQuery = defineQuery(`*[
   _type == "artworkProduct"
 ] | order(order asc) {
   ${artworkProductFields}
-}`)
+}`);
 
 export const artworkProductBySlugQuery = defineQuery(`*[
   _type == "artworkProduct" &&
   slug.current == $slug
 ][0]{
   ${artworkProductFields}
-}`)
+}`);
 
 export const derivativeProductsQuery = defineQuery(`*[
   _type == "derivativeProduct" &&
   coalesce(needsReview, false) != true
 ] | order(order asc) {
   ${derivativeProductFields}
-}`)
+}`);
 
 export const derivativeProductBySlugQuery = defineQuery(`*[
   _type == "derivativeProduct" &&
@@ -1139,13 +1224,13 @@ export const derivativeProductBySlugQuery = defineQuery(`*[
   slug.current == $slug
 ][0]{
   ${derivativeProductFields}
-}`)
+}`);
 
 export const culturalProductsQuery = defineQuery(`*[
   _type == "culturalProduct"
 ] | order(order asc) {
   ${culturalProductFields}
-}`)
+}`);
 
 export const productCollectionsQuery = defineQuery(`*[
   _type == "productCollection" &&
@@ -1153,14 +1238,14 @@ export const productCollectionsQuery = defineQuery(`*[
   coalesce(status, "visible") != "hidden"
 ] | order(order asc) {
   ${productCollectionFields}
-}`)
+}`);
 
 export const productDetailBySlugQuery = defineQuery(`*[
   _type == "productDetail" &&
   slug.current == $slug
 ][0]{
   ${productDetailFields}
-}`)
+}`);
 
 export const productDetailsForCardsQuery = defineQuery(`*[
   _type == "productDetail" &&
@@ -1171,7 +1256,7 @@ export const productDetailsForCardsQuery = defineQuery(`*[
   "productType": "artworks",
   "description": select(
     defined(basicInfo.category) && basicInfo.category != "" => basicInfo.category,
-    ${localizedText('productInfo.descriptionEn', 'productInfo.descriptionZh')}
+    ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")}
   ),
   "slug": slug.current,
   "coverImage": select(
@@ -1180,44 +1265,44 @@ export const productDetailsForCardsQuery = defineQuery(`*[
   ),
   "galleryImages": media.galleryImages[]{${imageFields}},
   "price": commerce.price,
-  "title": ${localizedText('basicInfo.titleEn', 'basicInfo.titleZh')},
+  "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
   order
-}`)
+}`);
 
 export const productDetailSlugsQuery = defineQuery(`*[
   _type == "productDetail" &&
   defined(slug.current)
 ]{
   "slug": slug.current
-}`)
+}`);
 
 export const artDerivativeDetailBySlugQuery = defineQuery(`*[
   _type == "artDerivativeDetail" &&
   slug.current == $slug
 ][0]{
   ${artDerivativeDetailFields}
-}`)
+}`);
 
 export const artDerivativeDetailSlugsQuery = defineQuery(`*[
   _type == "artDerivativeDetail" &&
   defined(slug.current)
 ]{
   "slug": slug.current
-}`)
+}`);
 
 export const culturalProductSlugsQuery = defineQuery(`*[
   _type == "culturalProduct" &&
   defined(slug.current)
 ]{
   "slug": slug.current
-}`)
+}`);
 
-export const artProjectsQuery = artWorksQuery
+export const artProjectsQuery = artWorksQuery;
 export const featuredArtProjectsQuery = defineQuery(`*[
   _type == "artProject" &&
   coalesce(needsReview, false) != true &&
   isFeatured == true
 ] | order(order asc) {
   ${artWorkCardFields}
-}`)
-export const artProjectBySlugQuery = artWorkBySlugQuery
+}`);
+export const artProjectBySlugQuery = artWorkBySlugQuery;

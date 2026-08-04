@@ -178,6 +178,10 @@ function productHref(item: HomeProduct, locale: Locale) {
     return `/${locale}/shop/derivatives/${item.slug}`;
   }
 
+  if (item.productType === "cultural") {
+    return `/${locale}/shop?category=cultural`;
+  }
+
   return `/${locale}/shop/artworks/${item.slug}`;
 }
 
