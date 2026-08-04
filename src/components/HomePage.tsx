@@ -1,26 +1,23 @@
-import type {SanityImageSource} from "@sanity/image-url";
+import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
 
-import type {Locale} from "@/config/navigation";
-import {client} from "@/sanity/client";
-import {urlForImage} from "@/sanity/image";
-import {homePageQuery} from "@/sanity/queries";
+import type { Locale } from "@/config/navigation";
+import { client } from "@/sanity/client";
+import { urlForImage } from "@/sanity/image";
+import { homePageQuery } from "@/sanity/queries";
 
-import {AppShell} from "./AppShell";
+import { AppShell } from "./AppShell";
 import {
   getArtworkImageSource,
   isArtCategorySlug,
   type Artwork,
 } from "./ArtCategoryPage";
-import {HeroBanner, type HeroBannerSlide} from "./HeroBanner";
-import {HomeCarouselSection} from "./HomeCarouselSection";
-import {PageContainer} from "./PageContainer";
-import {
-  PastReviewCarousel,
-  type PastReviewItem,
-} from "./PastReviewCarousel";
-import {CourseCard, type StudyProgram} from "./StudyPages";
-import {glassStyle} from "../../styles/glassStyle";
+import { HeroBanner, type HeroBannerSlide } from "./HeroBanner";
+import { HomeCarouselSection } from "./HomeCarouselSection";
+import { PageContainer } from "./PageContainer";
+import { PastReviewCarousel, type PastReviewItem } from "./PastReviewCarousel";
+import { CourseCard, type StudyProgram } from "./StudyPages";
+import { glassStyle } from "../../styles/glassStyle";
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -233,7 +230,13 @@ function defaultQuickEntries(locale: Locale): QuickEntry[] {
   ];
 }
 
-function QuickEntryCard({entry, locale}: {entry: QuickEntry; locale: Locale}) {
+function QuickEntryCard({
+  entry,
+  locale,
+}: {
+  entry: QuickEntry;
+  locale: Locale;
+}) {
   const title = compactText(entry.title);
   const description = compactText(entry.description);
   const href = normalizeHref(entry.href, locale);
@@ -269,9 +272,8 @@ function QuickEntriesSection({
   const cmsEntries = entries.filter(
     (entry) => compactText(entry.title) && normalizeHref(entry.href, locale),
   );
-  const visibleEntries = (cmsEntries.length > 0
-    ? cmsEntries
-    : defaultQuickEntries(locale)
+  const visibleEntries = (
+    cmsEntries.length > 0 ? cmsEntries : defaultQuickEntries(locale)
   ).slice(0, 2);
 
   return (
@@ -310,7 +312,9 @@ function HomeFeatureCard({
     <article
       className={`${glassStyle.card} ${glassStyle.cardHover} group flex h-[210px] w-full overflow-hidden rounded-[20px] p-4 transition duration-200 sm:h-[220px] sm:p-5`}
     >
-      <div className={`${glassStyle.imageFrame} image-placeholder flex h-[168px] w-[118px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-[rgba(255,255,255,0.56)] sm:h-[184px] sm:w-[130px] dark:bg-[rgba(255,255,255,0.06)]`}>
+      <div
+        className={`${glassStyle.imageFrame} image-placeholder flex h-[168px] w-[118px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-[rgba(255,255,255,0.56)] sm:h-[184px] sm:w-[130px] dark:bg-[rgba(255,255,255,0.06)]`}
+      >
         {src ? (
           <img
             alt={cardTitle || labels.emptyImage}
@@ -507,24 +511,27 @@ function ProductCarousel({
   );
 }
 
-export async function HomePage({locale}: HomePageProps) {
+export async function HomePage({ locale }: HomePageProps) {
   let homePage: HomePageData | null = null;
 
   try {
-    homePage = await client
-      .withConfig({useCdn: false})
-      .fetch<HomePageData | null>(
-        homePageQuery,
-        {locale},
-        {cache: "no-store"},
-      );
+    homePage = await client.fetch<HomePageData | null>(
+      homePageQuery,
+      { locale },
+      { cache: "no-store" },
+    );
   } catch (error) {
-    console.error("Failed to fetch published home page data from Sanity", error);
+    console.error(
+      "Failed to fetch published home page data from Sanity",
+      error,
+    );
   }
 
   const heroSlides = homePage?.heroImages?.filter(Boolean) || [];
   const heroImage =
-    heroSlides[0]?.image || (heroSlides[0] as SanityImage) || homePage?.heroImage;
+    heroSlides[0]?.image ||
+    (heroSlides[0] as SanityImage) ||
+    homePage?.heroImage;
   const title = compactText(homePage?.heroTitle);
   const subtitle = compactText(homePage?.heroSubtitle);
 

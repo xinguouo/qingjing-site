@@ -31,27 +31,29 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 lg:hidden ${
+      className={`fixed inset-0 isolate z-50 lg:hidden ${
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       }`}
       aria-hidden={!isOpen}
     >
       <button
         aria-label={locale === "zh" ? labels.closeZh : "Close menu"}
-        className={`absolute inset-0 bg-black/45 transition-opacity ${
+        className={`absolute inset-0 z-0 bg-black/45 transition-opacity ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
         type="button"
       />
       <aside
-        className={`sidebar-shell absolute right-0 top-0 h-full w-[min(88vw,360px)] overflow-y-auto border-l px-6 py-6 shadow-2xl transition-transform duration-300 ${
+        className={`sidebar-shell pointer-events-auto absolute right-0 top-0 z-20 h-full w-[min(88vw,360px)] overflow-y-auto border-l px-6 py-6 shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between border-b border-[var(--border)] pb-5">
           <div>
-            <p className="text-lg font-semibold text-primary">{labels.brandZh}</p>
+            <p className="text-lg font-semibold text-primary">
+              {labels.brandZh}
+            </p>
             <p className="mt-1 text-xs uppercase tracking-[0.22em] text-muted-token">
               Qingjing
             </p>
@@ -64,9 +66,11 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
             x
           </button>
         </div>
-        <nav className="mt-8 flex flex-col gap-7">
+        <nav className="relative z-30 mt-8 flex flex-col gap-7">
           {navigationGroupOrder.map((group) => {
-            const items = navigationItems.filter((item) => item.group === group);
+            const items = navigationItems.filter(
+              (item) => item.group === group,
+            );
 
             if (items.length === 0) {
               return null;
@@ -86,7 +90,7 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
 
                     return (
                       <Link
-                        className={`group flex min-h-11 items-center gap-3 rounded-full px-5 text-base shadow-[0_6px_18px_rgba(0,0,0,0.04)] transition-colors ${
+                        className={`group relative z-30 flex min-h-11 items-center gap-3 rounded-full px-5 text-base shadow-[0_6px_18px_rgba(0,0,0,0.04)] transition-colors ${
                           isActive
                             ? "sidebar-nav-item-active"
                             : isComingSoon
