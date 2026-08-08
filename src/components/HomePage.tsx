@@ -410,6 +410,7 @@ function CourseCarousel({
   cardVariant,
   items,
   locale,
+  syncLeader = false,
   title,
   viewAllHref,
   hrefForItem,
@@ -418,6 +419,7 @@ function CourseCarousel({
   hrefForItem: (item: HomeCardItem, locale: Locale) => string | null;
   items: HomeCardItem[];
   locale: Locale;
+  syncLeader?: boolean;
   title: string;
   viewAllHref: string;
 }) {
@@ -441,6 +443,8 @@ function CourseCarousel({
       itemsPerViewDesktop={2}
       itemsPerViewMobile={1}
       sectionTitle={title}
+      syncGroup="home-feature-carousels"
+      syncLeader={syncLeader}
       viewAllHref={viewAllHref}
       viewAllLabel={homeCopy[locale].all}
     />
@@ -477,6 +481,7 @@ function ArtworkCarousel({
       itemsPerViewDesktop={2}
       itemsPerViewMobile={1}
       sectionTitle={title}
+      syncGroup="home-feature-carousels"
       viewAllHref={`/${locale}/art-creation/glass-art`}
       viewAllLabel={homeCopy[locale].all}
     />
@@ -509,6 +514,7 @@ function ProductCarousel({
       itemsPerViewDesktop={2}
       itemsPerViewMobile={1}
       sectionTitle={homeCopy[locale].featuredProducts}
+      syncGroup="home-feature-carousels"
       viewAllHref={`/${locale}/shop`}
       viewAllLabel={homeCopy[locale].all}
     />
@@ -564,6 +570,7 @@ export async function HomePage({ locale }: HomePageProps) {
               hrefForItem={programHref}
               items={homePage?.featuredStudyPrograms?.filter(Boolean) || []}
               locale={locale}
+              syncLeader
               title={sectionTitle(
                 homePage?.featuredStudyProgramsTitle,
                 homeCopy[locale].featuredStudyPrograms,

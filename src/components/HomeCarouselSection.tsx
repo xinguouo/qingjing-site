@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import {type ReactNode, useEffect, useState} from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 type HomeCarouselSectionProps = {
   autoPlay?: boolean;
@@ -11,6 +17,8 @@ type HomeCarouselSectionProps = {
   itemsPerViewDesktop?: number;
   itemsPerViewMobile?: number;
   sectionTitle: string;
+  syncGroup?: string;
+  syncLeader?: boolean;
   viewAllHref?: string | null;
   viewAllLabel: string;
 };
@@ -22,6 +30,22 @@ const variantSpacing = {
   product: "gap-5",
 } satisfies Record<HomeCarouselSectionProps["cardVariant"], string>;
 
+const autoPlayDelay = 6000;
+const transitionDuration = 1500;
+const manualPauseDuration = 6500;
+const carouselAdvanceEvent = "qingjing-home-carousel-advance";
+const carouselPauseEvent = "qingjing-home-carousel-pause";
+
+type CarouselAdvanceDetail = {
+  direction: 1 | -1;
+  group: string;
+};
+
+type CarouselPauseDetail = {
+  group: string;
+  paused: boolean;
+};
+
 export function HomeCarouselSection({
   autoPlay = true,
   cardVariant,
@@ -30,19 +54,77 @@ export function HomeCarouselSection({
   itemsPerViewDesktop = 2,
   itemsPerViewMobile = 1,
   sectionTitle,
+  syncGroup,
+  syncLeader = false,
   viewAllHref,
   viewAllLabel,
 }: HomeCarouselSectionProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerViewDesktop);
+  const resumeTimerRef = useRef<number | null>(null);
   const visibleItems = items.filter(Boolean);
   const pageCount = Math.max(1, Math.ceil(visibleItems.length / itemsPerPage));
   const canSlide = pageCount > 1;
 
-  const goToPage = (nextPage: number) => {
-    setCurrentPage((nextPage + pageCount) % pageCount);
-  };
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      setCurrentPage((nextPage + pageCount) % pageCount);
+    },
+    [pageCount],
+  );
+
+  const shiftPage = useCallback(
+    (direction: 1 | -1) => {
+      setCurrentPage((page) => (page + direction + pageCount) % pageCount);
+    },
+    [pageCount],
+  );
+
+  const dispatchAdvance = useCallback(
+    (direction: 1 | -1) => {
+      if (!syncGroup) {
+        shiftPage(direction);
+        return;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent<CarouselAdvanceDetail>(carouselAdvanceEvent, {
+          detail: { direction, group: syncGroup },
+        }),
+      );
+    },
+    [shiftPage, syncGroup],
+  );
+
+  const dispatchPause = useCallback(
+    (paused: boolean) => {
+      if (!syncGroup) {
+        setIsPaused(paused);
+        return;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent<CarouselPauseDetail>(carouselPauseEvent, {
+          detail: { group: syncGroup, paused },
+        }),
+      );
+    },
+    [syncGroup],
+  );
+
+  const pauseBriefly = useCallback(() => {
+    dispatchPause(true);
+
+    if (resumeTimerRef.current) {
+      window.clearTimeout(resumeTimerRef.current);
+    }
+
+    resumeTimerRef.current = window.setTimeout(() => {
+      dispatchPause(false);
+      resumeTimerRef.current = null;
+    }, manualPauseDuration);
+  }, [dispatchPause]);
 
   useEffect(() => {
     const updateItemsPerPage = () => {
@@ -64,16 +146,67 @@ export function HomeCarouselSection({
   }, [pageCount]);
 
   useEffect(() => {
-    if (!autoPlay || !canSlide || isPaused) {
+    if (!syncGroup) {
       return;
     }
 
-    const timer = window.setInterval(() => {
-      goToPage(currentPage + 1);
-    }, 5000);
+    const handleAdvance = (event: Event) => {
+      const { detail } = event as CustomEvent<CarouselAdvanceDetail>;
 
-    return () => window.clearInterval(timer);
-  }, [autoPlay, canSlide, currentPage, isPaused, pageCount]);
+      if (detail?.group === syncGroup) {
+        shiftPage(detail.direction);
+      }
+    };
+
+    const handlePause = (event: Event) => {
+      const { detail } = event as CustomEvent<CarouselPauseDetail>;
+
+      if (detail?.group === syncGroup) {
+        setIsPaused(detail.paused);
+      }
+    };
+
+    window.addEventListener(carouselAdvanceEvent, handleAdvance);
+    window.addEventListener(carouselPauseEvent, handlePause);
+
+    return () => {
+      window.removeEventListener(carouselAdvanceEvent, handleAdvance);
+      window.removeEventListener(carouselPauseEvent, handlePause);
+    };
+  }, [shiftPage, syncGroup]);
+
+  useEffect(() => {
+    if (!autoPlay || isPaused || (syncGroup && !syncLeader)) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      if (syncGroup) {
+        dispatchAdvance(1);
+        return;
+      }
+
+      goToPage(currentPage + 1);
+    }, autoPlayDelay);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    autoPlay,
+    currentPage,
+    dispatchAdvance,
+    goToPage,
+    isPaused,
+    syncGroup,
+    syncLeader,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) {
+        window.clearTimeout(resumeTimerRef.current);
+      }
+    };
+  }, []);
 
   if (visibleItems.length === 0) {
     return null;
@@ -92,9 +225,8 @@ export function HomeCarouselSection({
                 aria-label="Previous"
                 className="glass-button flex h-8 w-8 items-center justify-center rounded-full text-secondary transition hover:text-primary"
                 onClick={() => {
-                  setIsPaused(true);
-                  goToPage(currentPage - 1);
-                  window.setTimeout(() => setIsPaused(false), 5000);
+                  pauseBriefly();
+                  dispatchAdvance(-1);
                 }}
                 type="button"
               >
@@ -104,9 +236,8 @@ export function HomeCarouselSection({
                 aria-label="Next"
                 className="glass-button flex h-8 w-8 items-center justify-center rounded-full text-secondary transition hover:text-primary"
                 onClick={() => {
-                  setIsPaused(true);
-                  goToPage(currentPage + 1);
-                  window.setTimeout(() => setIsPaused(false), 5000);
+                  pauseBriefly();
+                  dispatchAdvance(1);
                 }}
                 type="button"
               >
@@ -127,14 +258,17 @@ export function HomeCarouselSection({
 
       <div
         className="overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        onMouseEnter={() => dispatchPause(true)}
+        onMouseLeave={() => dispatchPause(false)}
       >
         <div
-          className="flex transition-transform duration-700 ease-out"
-          style={{transform: `translateX(-${currentPage * 100}%)`}}
+          className="flex transition-transform ease-in-out"
+          style={{
+            transform: `translateX(-${currentPage * 100}%)`,
+            transitionDuration: `${transitionDuration}ms`,
+          }}
         >
-          {Array.from({length: pageCount}).map((_, pageIndex) => {
+          {Array.from({ length: pageCount }).map((_, pageIndex) => {
             const pageItems = visibleItems.slice(
               pageIndex * itemsPerPage,
               pageIndex * itemsPerPage + itemsPerPage,
