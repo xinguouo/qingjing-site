@@ -1,16 +1,17 @@
-import type {SanityImageSource} from "@sanity/image-url";
+import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
-import {notFound} from "next/navigation";
-import type {ComponentProps} from "react";
+import { notFound } from "next/navigation";
+import type { ComponentProps } from "react";
 
-import type {Locale} from "@/config/navigation";
-import {client} from "@/sanity/client";
-import {urlForImage} from "@/sanity/image";
+import type { Locale } from "@/config/navigation";
+import { client } from "@/sanity/client";
+import { urlForImage } from "@/sanity/image";
 import {
   artDerivativeDetailBySlugQuery,
   artDerivativeDetailsForCardsQuery,
   artDerivativeDetailSlugsQuery,
   artworkProductBySlugQuery,
+  artworkProductsQuery,
   derivativeProductBySlugQuery,
   productBySlugQuery,
   productDetailBySlugQuery,
@@ -19,27 +20,23 @@ import {
   productsQuery,
 } from "@/sanity/queries";
 
-import {AppShell} from "./AppShell";
-import {ArtworkDetailLayout} from "./ArtworkDetailPage";
-import {BaseImageCard} from "./BaseImageCard";
-import {ComingSoonPage} from "./ComingSoonPage";
-import {PageContainer} from "./PageContainer";
-import {PageHeader} from "./PageHeader";
-import {glassStyle} from "../../styles/glassStyle";
+import { AppShell } from "./AppShell";
+import { ArtworkDetailLayout } from "./ArtworkDetailPage";
+import { BaseImageCard } from "./BaseImageCard";
+import { ComingSoonPage } from "./ComingSoonPage";
+import { PageContainer } from "./PageContainer";
+import { PageHeader } from "./PageHeader";
+import { glassStyle } from "../../styles/glassStyle";
 
 type SanityImage = SanityImageSource | null | undefined;
 type StoreCategory = "artworks" | "derivatives" | "cultural";
 type ProductCollectionCategory = "artwork" | "derivative" | "cultural";
 type ProductSubcategory =
-  | "vessel"
-  | "wearable"
-  | "toy"
-  | "ornament"
-  | "object"
-  | "packaging";
+  "vessel" | "wearable" | "toy" | "ornament" | "object" | "packaging";
 
 type ProductCollection = {
   _id: string;
+  artworkCategory?: string | string[] | null;
   category?: ProductCollectionCategory | null;
   coverImage?: SanityImage;
   description?: string | null;
@@ -148,6 +145,7 @@ type ArtDerivativeDetail = {
 
 type ProductCardItem = {
   _id: string;
+  artworkCategory?: string | string[] | null;
   category?: ProductCollectionCategory | null;
   description?: string | null;
   image?: SanityImage;
@@ -159,6 +157,7 @@ type ProductCardItem = {
 
 type StoreOverviewProps = {
   activeCategory?: StoreCategory;
+  artworkCategory?: string | null;
   includeLocalePrefix?: boolean;
   locale: Locale;
   subcategory?: string | null;
@@ -247,7 +246,10 @@ const artDerivativeDetailCopy = {
   },
 } satisfies Record<Locale, Record<string, string>>;
 
-const categoryByStoreCategory: Record<StoreCategory, ProductCollectionCategory> = {
+const categoryByStoreCategory: Record<
+  StoreCategory,
+  ProductCollectionCategory
+> = {
   artworks: "artwork",
   cultural: "cultural",
   derivatives: "derivative",
@@ -264,13 +266,25 @@ const derivativeSubcategories: Array<{
   labelEn: string;
   labelZh: string;
 }> = [
-  {id: "vessel", labelEn: "Vessel", labelZh: "器物"},
-  {id: "wearable", labelEn: "Wearable", labelZh: "肖物"},
-  {id: "toy", labelEn: "Toy", labelZh: "玩物"},
-  {id: "ornament", labelEn: "Ornament", labelZh: "饰物"},
-  {id: "object", labelEn: "Object", labelZh: "境物"},
-  {id: "packaging", labelEn: "Packaging", labelZh: "包装"},
+  { id: "vessel", labelEn: "Vessel", labelZh: "器物" },
+  { id: "wearable", labelEn: "Wearable", labelZh: "肖物" },
+  { id: "toy", labelEn: "Toy", labelZh: "玩物" },
+  { id: "ornament", labelEn: "Ornament", labelZh: "饰物" },
+  { id: "object", labelEn: "Object", labelZh: "境物" },
+  { id: "packaging", labelEn: "Packaging", labelZh: "包装" },
 ];
+
+const artworkProductCategories = [
+  "\u88ab\u5b50\u690d\u7269",
+  "\u4f4e\u77ee\u751f\u7269",
+  "\u6d6e\u6e38\u751f\u7269",
+  "\u8568\u7c7b\u690d\u7269",
+  "\u6606\u866b",
+  "\u88f8\u5b50\u690d\u7269",
+  "\u9e1f\u7c7b",
+  "\u5176\u4ed6",
+  "\u6e38\u6cf3\u52a8\u7269",
+] as const;
 
 const fallbackProducts: Record<Locale, ProductCollection[]> = {
   zh: [
@@ -505,10 +519,28 @@ function categoryHref(
   includeLocalePrefix: boolean,
   subcategory?: ProductSubcategory | null,
 ) {
-  const params = new URLSearchParams({category: storeCategorySegments[category]});
+  const params = new URLSearchParams({
+    category: storeCategorySegments[category],
+  });
 
   if (subcategory) {
     params.set("subcategory", subcategory);
+  }
+
+  return `${routePrefix(locale, includeLocalePrefix)}/shop?${params.toString()}`;
+}
+
+function artworkCategoryHref(
+  locale: Locale,
+  includeLocalePrefix: boolean,
+  artworkCategory?: string | null,
+) {
+  const params = new URLSearchParams({
+    category: storeCategorySegments.artworks,
+  });
+
+  if (artworkCategory) {
+    params.set("artworkCategory", artworkCategory);
   }
 
   return `${routePrefix(locale, includeLocalePrefix)}/shop?${params.toString()}`;
@@ -526,21 +558,45 @@ function productHref(
   return slug ? `${base}/${slug}` : null;
 }
 
-function isProductSubcategory(value: string | null | undefined): value is ProductSubcategory {
+function isProductSubcategory(
+  value: string | null | undefined,
+): value is ProductSubcategory {
   return derivativeSubcategories.some((item) => item.id === value);
+}
+
+function isArtworkProductCategory(value: string | null | undefined) {
+  return artworkProductCategories.some((item) => item === value);
+}
+
+function normalizeCategories(value: string | string[] | null | undefined) {
+  if (Array.isArray(value)) {
+    return value.map((item) => compactText(item)).filter(Boolean);
+  }
+
+  const category = compactText(value);
+  return category ? [category] : [];
 }
 
 function subcategoryLabel(
   subcategory: ProductSubcategory | null | undefined,
   locale: Locale,
 ) {
-  const option = derivativeSubcategories.find((item) => item.id === subcategory);
+  const option = derivativeSubcategories.find(
+    (item) => item.id === subcategory,
+  );
   return option ? (locale === "zh" ? option.labelZh : option.labelEn) : "";
 }
 
 function categoryDisplay(item: ProductCardItem, locale: Locale) {
   if (item.category === "derivative" && item.subcategory) {
     return subcategoryLabel(item.subcategory, locale);
+  }
+
+  if (item.category === "artwork") {
+    return (
+      normalizeCategories(item.artworkCategory)[0] ||
+      compactText(item.description)
+    );
   }
 
   return compactText(item.description);
@@ -575,24 +631,24 @@ export function ProductCard({
       imageAlt={title}
       overlayClassName="h-[104px] overflow-hidden"
     >
-          <div className="flex h-full items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
-                {number} ·
-              </p>
-              <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
-                {category || "\u00a0"}
-              </p>
-              <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
-                {title}
-              </h3>
-            </div>
-            {price ? (
-              <p className="shrink-0 text-[13px] leading-none text-[#333] dark:text-white/78">
-                {price}
-              </p>
-            ) : null}
-          </div>
+      <div className="flex h-full items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
+            {number} ·
+          </p>
+          <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
+            {category || "\u00a0"}
+          </p>
+          <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
+            {title}
+          </h3>
+        </div>
+        {price ? (
+          <p className="shrink-0 text-[13px] leading-none text-[#333] dark:text-white/78">
+            {price}
+          </p>
+        ) : null}
+      </div>
     </BaseImageCard>
   );
 }
@@ -676,9 +732,9 @@ function StoreTabs({
   locale: Locale;
 }) {
   const labels = copy[locale];
-  const tabs: Array<{id: StoreCategory; label: string}> = [
-    {id: "artworks", label: labels.artworks},
-    {id: "derivatives", label: labels.derivatives},
+  const tabs: Array<{ id: StoreCategory; label: string }> = [
+    { id: "artworks", label: labels.artworks },
+    { id: "derivatives", label: labels.derivatives },
   ];
 
   return (
@@ -724,7 +780,12 @@ function DerivativeSubcategoryTabs({
             className={`relative pb-3 transition ${
               isActive ? "text-primary" : "hover:text-primary"
             }`}
-            href={categoryHref("derivatives", locale, includeLocalePrefix, item.id)}
+            href={categoryHref(
+              "derivatives",
+              locale,
+              includeLocalePrefix,
+              item.id,
+            )}
             key={item.id}
           >
             {locale === "zh" ? item.labelZh : item.labelEn}
@@ -738,9 +799,56 @@ function DerivativeSubcategoryTabs({
   );
 }
 
+function ArtworkCategoryTabs({
+  activeArtworkCategory,
+  includeLocalePrefix,
+  locale,
+}: {
+  activeArtworkCategory?: string | null;
+  includeLocalePrefix: boolean;
+  locale: Locale;
+}) {
+  const allLabel = locale === "zh" ? "\u5168\u90e8" : "All";
+
+  return (
+    <nav className="mt-6 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
+      <Link
+        className={`relative shrink-0 pb-3 transition ${
+          !activeArtworkCategory ? "text-primary" : "hover:text-primary"
+        }`}
+        href={artworkCategoryHref(locale, includeLocalePrefix)}
+      >
+        {allLabel}
+        {!activeArtworkCategory ? (
+          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+        ) : null}
+      </Link>
+      {artworkProductCategories.map((category) => {
+        const isActive = activeArtworkCategory === category;
+
+        return (
+          <Link
+            className={`relative shrink-0 pb-3 transition ${
+              isActive ? "text-primary" : "hover:text-primary"
+            }`}
+            href={artworkCategoryHref(locale, includeLocalePrefix, category)}
+            key={category}
+          >
+            {category}
+            {isActive ? (
+              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+            ) : null}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 function mapProduct(item: ProductCollection): ProductCardItem {
   return {
     _id: item._id,
+    artworkCategory: item.artworkCategory,
     category:
       item.productType === "artworks"
         ? "artwork"
@@ -758,38 +866,52 @@ function mapProduct(item: ProductCollection): ProductCardItem {
 
 export async function StoreOverview({
   activeCategory = "artworks",
+  artworkCategory,
   includeLocalePrefix = true,
   locale,
   subcategory,
 }: StoreOverviewProps) {
-  const [cmsProducts, productDocuments, artDerivativeDetails, artworkDetailProducts] = await Promise.all([
+  const [
+    cmsProducts,
+    productDocuments,
+    artDerivativeDetails,
+    artworkDetailProducts,
+    artworkProducts,
+  ] = await Promise.all([
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<ProductCollection[]>(
         productCollectionsQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
       ),
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<ProductCollection[]>(
         productsQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
       ),
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<ProductCollection[]>(
         artDerivativeDetailsForCardsQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
       ),
     client
-      .withConfig({useCdn: false})
+      .withConfig({ useCdn: false })
       .fetch<ProductCollection[]>(
         productDetailsForCardsQuery,
-        {locale},
-        {cache: "no-store"},
+        { locale },
+        { cache: "no-store" },
+      ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<ProductCollection[]>(
+        artworkProductsQuery,
+        { locale },
+        { cache: "no-store" },
       ),
   ]);
   const labels = copy[locale];
@@ -799,8 +921,13 @@ export async function StoreOverview({
         ? subcategory
         : "vessel"
       : null;
+  const activeArtworkCategory =
+    activeCategory === "artworks" && isArtworkProductCategory(artworkCategory)
+      ? artworkCategory
+      : null;
   const cmsSource = [
     ...(activeCategory === "artworks" ? artworkDetailProducts : []),
+    ...(activeCategory === "artworks" ? artworkProducts : []),
     ...cmsProducts,
     ...productDocuments,
     ...(activeCategory === "derivatives" ? artDerivativeDetails : []),
@@ -818,6 +945,13 @@ export async function StoreOverview({
     .filter((item) =>
       activeCategory === "derivatives" && activeSubcategory
         ? item.subcategory === activeSubcategory
+        : true,
+    )
+    .filter((item) =>
+      activeCategory === "artworks" && activeArtworkCategory
+        ? normalizeCategories(item.artworkCategory).includes(
+            activeArtworkCategory,
+          )
         : true,
     )
     .map(mapProduct);
@@ -850,9 +984,18 @@ export async function StoreOverview({
               locale={locale}
             />
           ) : null}
+          {activeCategory === "artworks" ? (
+            <ArtworkCategoryTabs
+              activeArtworkCategory={activeArtworkCategory}
+              includeLocalePrefix={includeLocalePrefix}
+              locale={locale}
+            />
+          ) : null}
         </header>
 
-        <section className={`mt-9 lg:mt-10 ${isDerivativeView ? "max-w-[1180px]" : "max-w-[1120px]"}`}>
+        <section
+          className={`mt-9 lg:mt-10 ${isDerivativeView ? "max-w-[1180px]" : "max-w-[1120px]"}`}
+        >
           {items.length ? (
             <div
               className={
@@ -918,7 +1061,13 @@ function DetailImage({
   );
 }
 
-function InfoRow({label, value}: {label: string; value?: string | number | null}) {
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number | null;
+}) {
   const text = compactText(value);
 
   if (!text) {
@@ -944,7 +1093,10 @@ function artDerivativeTitle(product: ArtDerivativeDetail, locale: Locale) {
   return locale === "en" ? titleEn || titleZh : titleZh || titleEn;
 }
 
-function artDerivativeSecondaryTitle(product: ArtDerivativeDetail, locale: Locale) {
+function artDerivativeSecondaryTitle(
+  product: ArtDerivativeDetail,
+  locale: Locale,
+) {
   const titleZh = compactText(product.titleZh);
   const titleEn = compactText(product.titleEn);
   const primary = artDerivativeTitle(product, locale);
@@ -993,11 +1145,11 @@ export async function DerivativeDetailPage({
   }
 
   const product = await client
-    .withConfig({useCdn: false})
+    .withConfig({ useCdn: false })
     .fetch<ArtDerivativeDetail | null>(
       artDerivativeDetailBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
+      { locale, slug },
+      { cache: "no-store" },
     );
 
   if (!product) {
@@ -1007,7 +1159,8 @@ export async function DerivativeDetailPage({
   const labels = artDerivativeDetailCopy[locale];
   const title = artDerivativeTitle(product, locale) || labels.emptyTitle;
   const secondaryTitle = artDerivativeSecondaryTitle(product, locale);
-  const categoryLabel = compactText(product.category) || labels.categoryFallback;
+  const categoryLabel =
+    compactText(product.category) || labels.categoryFallback;
   const dimensions = compactText(product.dimensions);
   const description = compactText(product.description);
   const mainImage = product.mainImage || product.galleryImages?.[0];
@@ -1025,25 +1178,15 @@ export async function DerivativeDetailPage({
           </Link>
 
           <header className="mt-14 max-w-[720px] border-b border-[var(--border)] pb-8 sm:mt-16">
-            <p className="detail-meta uppercase">
-              {categoryLabel}
-            </p>
-            <h1 className="zh-title mt-8">
-              {title}
-            </h1>
+            <p className="detail-meta uppercase">{categoryLabel}</p>
+            <h1 className="zh-title mt-8">{title}</h1>
             {secondaryTitle ? (
-              <p className="en-title mt-3">
-                {secondaryTitle}
-              </p>
+              <p className="en-title mt-3">{secondaryTitle}</p>
             ) : null}
           </header>
 
           <section className="mt-5 max-w-[760px]">
-            {dimensions ? (
-              <p className="detail-meta">
-                {dimensions}
-              </p>
-            ) : null}
+            {dimensions ? <p className="detail-meta">{dimensions}</p> : null}
             {description ? (
               <p className="mt-9 whitespace-pre-line text-[15px] leading-[1.9] text-secondary">
                 {description}
@@ -1083,7 +1226,9 @@ function productDetailSecondaryTitle(product: ProductDetail, locale: Locale) {
   return secondary && secondary !== primary ? secondary : "";
 }
 
-function productDetailCategoryLine(product: ProductDetail | ProductDetailRelated) {
+function productDetailCategoryLine(
+  product: ProductDetail | ProductDetailRelated,
+) {
   const number = compactText(product.basicInfo?.productNumber);
   const category = compactText(product.basicInfo?.category);
 
@@ -1195,11 +1340,11 @@ export async function ShopArtworkDetailPage({
   }
 
   const product = await client
-    .withConfig({useCdn: false})
+    .withConfig({ useCdn: false })
     .fetch<ProductDetail | null>(
       productDetailBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
+      { locale, slug },
+      { cache: "no-store" },
     );
 
   if (!product) {
@@ -1215,7 +1360,8 @@ export async function ShopArtworkDetailPage({
   const material = compactText(product.productInfo?.material);
   const price = compactText(product.commerce?.price);
   const images = productDetailImages(product);
-  const relatedProducts = product.relatedProducts?.filter((item) => item.slug) || [];
+  const relatedProducts =
+    product.relatedProducts?.filter((item) => item.slug) || [];
   const backHref = `${routePrefix(locale, includeLocalePrefix)}/shop`;
 
   return (
@@ -1245,31 +1391,21 @@ export async function ShopArtworkDetailPage({
             <aside className="lg:sticky lg:top-[88px]">
               <div className="border-b border-[var(--border)] pb-7">
                 {categoryLine ? (
-                  <p className="detail-meta uppercase">
-                    {categoryLine}
-                  </p>
+                  <p className="detail-meta uppercase">{categoryLine}</p>
                 ) : null}
-                <h1 className="zh-title mt-7">
-                  {title}
-                </h1>
+                <h1 className="zh-title mt-7">{title}</h1>
                 {secondaryTitle ? (
-                  <p className="en-title mt-3">
-                    {secondaryTitle}
-                  </p>
+                  <p className="en-title mt-3">{secondaryTitle}</p>
                 ) : null}
               </div>
 
               <div className="border-b border-[var(--border)] py-7">
                 {dimensions ? (
-                  <p className="detail-meta">
-                    {dimensions}
-                  </p>
+                  <p className="detail-meta">{dimensions}</p>
                 ) : null}
                 {material ? (
                   <div className="mt-8">
-                    <p className="detail-meta">
-                      {labels.material}
-                    </p>
+                    <p className="detail-meta">{labels.material}</p>
                     <p className="mt-3 text-[16px] leading-none text-primary">
                       {material}
                     </p>
@@ -1321,11 +1457,11 @@ export async function ArtworkProductDetailPage({
   slug,
 }: StoreDetailProps) {
   const product = await client
-    .withConfig({useCdn: false})
+    .withConfig({ useCdn: false })
     .fetch<ArtworkProduct | null>(
       artworkProductBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
+      { locale, slug },
+      { cache: "no-store" },
     );
 
   if (!product) {
@@ -1408,27 +1544,36 @@ export async function DerivativeProductDetailPage({
   slug,
 }: StoreDetailProps) {
   const productDocument = await client
-    .withConfig({useCdn: false})
+    .withConfig({ useCdn: false })
     .fetch<DerivativeProduct | null>(
       productBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
+      { locale, slug },
+      { cache: "no-store" },
     );
-  const legacyProduct = productDocument?.productType === "derivatives" ? null : await client
-    .withConfig({useCdn: false})
-    .fetch<DerivativeProduct | null>(
-      artDerivativeDetailBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
-    );
-  const derivativeProduct = productDocument?.productType === "derivatives" || legacyProduct ? null : await client
-    .withConfig({useCdn: false})
-    .fetch<DerivativeProduct | null>(
-      derivativeProductBySlugQuery,
-      {locale, slug},
-      {cache: "no-store"},
-    );
-  const product = productDocument?.productType === "derivatives" ? productDocument : legacyProduct || derivativeProduct;
+  const legacyProduct =
+    productDocument?.productType === "derivatives"
+      ? null
+      : await client
+          .withConfig({ useCdn: false })
+          .fetch<DerivativeProduct | null>(
+            artDerivativeDetailBySlugQuery,
+            { locale, slug },
+            { cache: "no-store" },
+          );
+  const derivativeProduct =
+    productDocument?.productType === "derivatives" || legacyProduct
+      ? null
+      : await client
+          .withConfig({ useCdn: false })
+          .fetch<DerivativeProduct | null>(
+            derivativeProductBySlugQuery,
+            { locale, slug },
+            { cache: "no-store" },
+          );
+  const product =
+    productDocument?.productType === "derivatives"
+      ? productDocument
+      : legacyProduct || derivativeProduct;
 
   if (!product) {
     notFound();
@@ -1442,16 +1587,21 @@ export async function DerivativeProductDetailPage({
     locale === "en"
       ? titleEn || localizedTitle || titleZh
       : titleZh || localizedTitle || titleEn;
-  const secondaryTitle =
-    locale === "en" ? titleZh || "" : titleEn || "";
+  const secondaryTitle = locale === "en" ? titleZh || "" : titleEn || "";
   const description = compactText(product.description || product.detail);
-  const gallery = (product.gallery || product.galleryImages || product.images || []).filter(Boolean);
+  const gallery = (
+    product.gallery ||
+    product.galleryImages ||
+    product.images ||
+    []
+  ).filter(Boolean);
   const mainImage = product.mainImage || product.coverImage || gallery[0];
   const images = [
     mainImage,
     ...gallery.filter((image) => image && image !== mainImage),
   ].filter(Boolean);
-  const specification = product.specification || product.dimensions || product.size;
+  const specification =
+    product.specification || product.dimensions || product.size;
   const backHref = `${routePrefix(locale, includeLocalePrefix)}/shop?category=derivatives`;
   const descriptionLabel =
     locale === "zh" ? "\u4ea7\u54c1\u63cf\u8ff0" : "Description";
@@ -1466,9 +1616,7 @@ export async function DerivativeProductDetailPage({
       descriptionLabel={descriptionLabel}
       images={images}
       locale={locale}
-      metaItems={[
-        {label: sizeLabel, value: specification},
-      ]}
+      metaItems={[{ label: sizeLabel, value: specification }]}
       primaryTitle={title}
       secondaryTitle={secondaryTitle}
     />
@@ -1481,9 +1629,6 @@ export function CulturalProductComingSoonPage({
   locale?: Locale;
 } = {}) {
   return (
-    <ComingSoonPage
-      pageTitleEn="Cultural Products"
-      pageTitleZh="文创品"
-    />
+    <ComingSoonPage pageTitleEn="Cultural Products" pageTitleZh="文创品" />
   );
 }
