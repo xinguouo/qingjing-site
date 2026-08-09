@@ -78,6 +78,13 @@ export const productCollection = defineType({
       hidden: ({ parent }) => parent?.category !== "artwork",
     }),
     defineField({
+      name: "productNumber",
+      title: "商品编号 / Product Number",
+      type: "string",
+      group: "basic",
+      hidden: ({ parent }) => parent?.category !== "artwork",
+    }),
+    defineField({
       name: "coverImage",
       title: "封面图片 / Cover Image",
       type: "image",

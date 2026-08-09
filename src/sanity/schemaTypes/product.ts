@@ -88,6 +88,14 @@ export const product = defineType({
         !["available-artworks", "artworks"].includes(parent?.productType),
     }),
     defineField({
+      name: "productNumber",
+      title: "商品编号 / Product Number",
+      type: "string",
+      group: "basic",
+      hidden: ({ parent }) =>
+        !["available-artworks", "artworks"].includes(parent?.productType),
+    }),
+    defineField({
       name: "coverImage",
       title: "封面图片 / Cover Image",
       type: "image",

@@ -45,6 +45,12 @@ export const artworkProduct = defineType({
       },
     }),
     defineField({
+      name: "productNumber",
+      title: "商品编号 / Product Number",
+      type: "string",
+      group: "basic",
+    }),
+    defineField({
       name: "images",
       title: "作品图片 / Artwork Images",
       type: "array",

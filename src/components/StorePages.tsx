@@ -43,6 +43,7 @@ type ProductCollection = {
   derivativeCategory?: ProductSubcategory | null;
   galleryImages?: SanityImage[] | null;
   price?: string | number | null;
+  productNumber?: string | number | null;
   productType?: StoreCategory | null;
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
@@ -150,6 +151,7 @@ type ProductCardItem = {
   description?: string | null;
   image?: SanityImage;
   price?: string | number | null;
+  productNumber?: string | number | null;
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
   title?: string | null;
@@ -497,6 +499,35 @@ function compactText(value: string | number | null | undefined) {
   return typeof value === "number" ? String(value) : value?.trim() || "";
 }
 
+function formatProductNumber(value: string | number | null | undefined) {
+  const number = compactText(value);
+
+  if (!number) {
+    return "";
+  }
+
+  return /^\d+$/.test(number) ? number.padStart(2, "0") : number;
+}
+
+function productNumberValue(value: string | number | null | undefined) {
+  const number = Number(compactText(value));
+  return Number.isFinite(number) ? number : Number.POSITIVE_INFINITY;
+}
+
+function formatYuanPrice(value: string | number | null | undefined) {
+  const price = compactText(value);
+
+  if (!price) {
+    return "";
+  }
+
+  const normalized = price
+    .replace(/^¥\s*/, "")
+    .replace(/\s*元$/, "")
+    .trim();
+  return normalized ? `¥ ${normalized} 元` : "";
+}
+
 function imageUrl(image: SanityImage, width: number) {
   if (!image) {
     return null;
@@ -621,7 +652,10 @@ export function ProductCard({
   const title = compactText(item.title) || labels.storeTitle;
   const category = categoryDisplay(item, locale);
   const price = compactText(item.price);
-  const number = String(index + 1).padStart(2, "0");
+  const number =
+    item.category === "artwork"
+      ? formatProductNumber(item.productNumber)
+      : String(index + 1).padStart(2, "0");
 
   return (
     <BaseImageCard
@@ -634,7 +668,7 @@ export function ProductCard({
       <div className="flex h-full items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
-            {number} ·
+            {number ? `${number} ·` : "\u00a0"}
           </p>
           <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
             {category || "\u00a0"}
@@ -858,6 +892,7 @@ function mapProduct(item: ProductCollection): ProductCardItem {
     description: item.description,
     image: item.coverImage || item.galleryImages?.[0],
     price: item.price,
+    productNumber: item.productNumber,
     slug: item.slug,
     subcategory: item.subcategory || item.derivativeCategory,
     title: item.title,
@@ -954,6 +989,24 @@ export async function StoreOverview({
           )
         : true,
     )
+    .sort((a, b) => {
+      if (activeCategory !== "artworks") {
+        return 0;
+      }
+
+      const numberDiff =
+        productNumberValue(a.productNumber) -
+        productNumberValue(b.productNumber);
+
+      if (numberDiff !== 0) {
+        return numberDiff;
+      }
+
+      return compactText(a.title).localeCompare(
+        compactText(b.title),
+        "zh-Hans",
+      );
+    })
     .map(mapProduct);
   const isDerivativeView = activeCategory === "derivatives";
 
@@ -1229,7 +1282,7 @@ function productDetailSecondaryTitle(product: ProductDetail, locale: Locale) {
 function productDetailCategoryLine(
   product: ProductDetail | ProductDetailRelated,
 ) {
-  const number = compactText(product.basicInfo?.productNumber);
+  const number = formatProductNumber(product.basicInfo?.productNumber);
   const category = compactText(product.basicInfo?.category);
 
   return [number, category].filter(Boolean).join(" · ");
@@ -1290,7 +1343,7 @@ function ShopArtworkRelatedCard({
 }) {
   const labels = shopArtworkDetailCopy[locale];
   const title = productDetailTitle(product, locale) || labels.emptyTitle;
-  const price = compactText(product.commerce?.price);
+  const price = formatYuanPrice(product.commerce?.price);
   const image = productDetailRelatedImage(product);
   const src = imageUrl(image, 520);
   const href = `${routePrefix(locale, includeLocalePrefix)}/shop/artworks/${
@@ -1358,7 +1411,7 @@ export async function ShopArtworkDetailPage({
   const description = compactText(product.productInfo?.description);
   const dimensions = compactText(product.productInfo?.dimensions);
   const material = compactText(product.productInfo?.material);
-  const price = compactText(product.commerce?.price);
+  const price = formatYuanPrice(product.commerce?.price);
   const images = productDetailImages(product);
   const relatedProducts =
     product.relatedProducts?.filter((item) => item.slug) || [];

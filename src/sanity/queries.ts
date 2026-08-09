@@ -278,6 +278,7 @@ const productCardFields = `
     productType == "cultural-products" => "cultural",
     productType
   ),
+  productNumber,
   derivativeCategory,
   artworkCategory,
   "subcategory": derivativeCategory,
@@ -332,6 +333,10 @@ const homeProductReferenceFields = `
   "derivativeCategory": select(
     _type == "productCollection" => subcategory,
     derivativeCategory
+  ),
+  "productNumber": select(
+    _type == "productDetail" => basicInfo.productNumber,
+    productNumber
   ),
   "artworkCategory": select(
     _type == "productDetail" => basicInfo.category,
@@ -389,6 +394,7 @@ const artworkProductFields = `
   titleEn,
   "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
+  productNumber,
   artworkCategory,
   images[]{${imageFields}},
   "coverImage": images[0]{${imageFields}},
@@ -440,6 +446,7 @@ const productCollectionFields = `
   "title": ${localizedText("titleEn", "titleZh")},
   "slug": slug.current,
   category,
+  productNumber,
   artworkCategory,
   "productType": select(
     category == "artwork" => "artworks",
@@ -1261,10 +1268,11 @@ export const productDetailBySlugQuery = defineQuery(`*[
 export const productDetailsForCardsQuery = defineQuery(`*[
   _type == "productDetail" &&
   defined(slug.current)
-] | order(order asc) {
+] | order(basicInfo.productNumber asc, order asc) {
   _id,
   "category": "artwork",
   "productType": "artworks",
+  "productNumber": basicInfo.productNumber,
   "description": select(
     defined(basicInfo.category) && basicInfo.category != "" => basicInfo.category,
     ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")}
