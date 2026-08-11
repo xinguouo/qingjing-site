@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const aboutContactPage = defineType({
   name: 'aboutContactPage',
@@ -107,6 +108,7 @@ export const aboutContactPage = defineType({
       type: 'image',
       group: 'contact',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
   ],
   preview: {

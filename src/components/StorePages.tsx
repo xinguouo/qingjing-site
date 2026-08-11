@@ -22,6 +22,7 @@ import {
 
 import { AppShell } from "./AppShell";
 import { ArtworkDetailLayout } from "./ArtworkDetailPage";
+import { ArtworkVideoPlayer } from "./ArtworkVideoPlayer";
 import { BaseImageCard } from "./BaseImageCard";
 import { ComingSoonPage } from "./ComingSoonPage";
 import { PageContainer } from "./PageContainer";
@@ -33,6 +34,15 @@ type StoreCategory = "artworks" | "derivatives" | "cultural";
 type ProductCollectionCategory = "artwork" | "derivative" | "cultural";
 type ProductSubcategory =
   "vessel" | "wearable" | "toy" | "ornament" | "object" | "packaging";
+
+type ProductVideo = {
+  asset?: {
+    _id?: string;
+    mimeType?: string | null;
+    originalFilename?: string | null;
+    url?: string | null;
+  } | null;
+} | null;
 
 type ProductCollection = {
   _id: string;
@@ -48,6 +58,7 @@ type ProductCollection = {
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
   title?: string | null;
+  video?: ProductVideo;
 };
 
 type ArtworkProduct = {
@@ -59,6 +70,7 @@ type ArtworkProduct = {
   quantity?: string | null;
   slug?: string | null;
   title?: string | null;
+  video?: ProductVideo;
 };
 
 type DerivativeProduct = {
@@ -81,6 +93,7 @@ type DerivativeProduct = {
   title?: string | null;
   titleEn?: string | null;
   titleZh?: string | null;
+  video?: ProductVideo;
 };
 
 type ProductDetail = {
@@ -98,6 +111,7 @@ type ProductDetail = {
   media?: {
     galleryImages?: SanityImage[] | null;
     mainImage?: SanityImage;
+    video?: ProductVideo;
   } | null;
   productInfo?: {
     description?: string | null;
@@ -142,6 +156,7 @@ type ArtDerivativeDetail = {
   title?: string | null;
   titleEn?: string | null;
   titleZh?: string | null;
+  video?: ProductVideo;
 };
 
 type ProductCardItem = {
@@ -540,6 +555,49 @@ function imageUrl(image: SanityImage, width: number) {
   }
 }
 
+function imageCaption(image: SanityImage, locale: Locale) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  const imageWithCaption = image as {
+    caption?: string | null;
+    captionEn?: string | null;
+    captionZh?: string | null;
+  };
+
+  return compactText(
+    locale === "en"
+      ? imageWithCaption.captionEn ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionZh
+      : imageWithCaption.captionZh ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionEn,
+  );
+}
+
+function productVideoSrc(video?: ProductVideo) {
+  return compactText(video?.asset?.url);
+}
+
+function ProductVideo({video}: {video?: ProductVideo}) {
+  const src = productVideoSrc(video);
+
+  if (!src) {
+    return null;
+  }
+
+  return (
+    <div className="w-full">
+      <ArtworkVideoPlayer
+        mimeType={video?.asset?.mimeType}
+        src={src}
+      />
+    </div>
+  );
+}
+
 function routePrefix(locale: Locale, includeLocalePrefix: boolean) {
   return includeLocalePrefix ? `/${locale}` : "";
 }
@@ -651,7 +709,6 @@ export function ProductCard({
   const labels = copy[locale];
   const title = compactText(item.title) || labels.storeTitle;
   const category = categoryDisplay(item, locale);
-  const price = compactText(item.price);
   const number =
     item.category === "artwork"
       ? formatProductNumber(item.productNumber)
@@ -665,23 +722,16 @@ export function ProductCard({
       imageAlt={title}
       overlayClassName="h-[104px] overflow-hidden"
     >
-      <div className="flex h-full items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
-            {number ? `${number} ·` : "\u00a0"}
-          </p>
-          <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
-            {category || "\u00a0"}
-          </p>
-          <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
-            {title}
-          </h3>
-        </div>
-        {price ? (
-          <p className="shrink-0 text-[13px] leading-none text-[#333] dark:text-white/78">
-            {price}
-          </p>
-        ) : null}
+      <div className="h-full min-w-0">
+        <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
+          {number || "\u00a0"}
+        </p>
+        <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
+          {category || "\u00a0"}
+        </p>
+        <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
+          {title}
+        </h3>
       </div>
     </BaseImageCard>
   );
@@ -1008,8 +1058,6 @@ export async function StoreOverview({
       );
     })
     .map(mapProduct);
-  const isDerivativeView = activeCategory === "derivatives";
-
   return (
     <AppShell locale={locale}>
       <PageContainer className="pb-16 lg:pb-20">
@@ -1046,17 +1094,9 @@ export async function StoreOverview({
           ) : null}
         </header>
 
-        <section
-          className={`mt-9 lg:mt-10 ${isDerivativeView ? "max-w-[1180px]" : "max-w-[1120px]"}`}
-        >
+        <section className="mt-9 max-w-[1180px] lg:mt-10">
           {items.length ? (
-            <div
-              className={
-                isDerivativeView
-                  ? "grid justify-items-start gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-                  : "grid justify-items-start gap-6 sm:grid-cols-2 xl:grid-cols-4"
-              }
-            >
+            <div className="grid justify-items-start gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {items.map((item, index) => (
                 <ProductCard
                   href={productHref(
@@ -1086,31 +1126,41 @@ export async function StoreOverview({
 function DetailImage({
   image,
   label,
+  locale,
   priority = false,
   title,
 }: {
   image: SanityImage;
   label: string;
+  locale: Locale;
   priority?: boolean;
   title: string;
 }) {
   const src = imageUrl(image, priority ? 1800 : 900);
+  const caption = imageCaption(image, locale);
 
   return (
-    <div className="flex w-full items-center justify-center rounded-[18px] border border-[var(--border)] bg-[rgba(255,255,255,0.42)] p-4 dark:bg-[rgba(255,255,255,0.04)]">
-      {src ? (
-        <img
-          alt={title}
-          className="max-h-[640px] w-full object-contain"
-          loading={priority ? "eager" : "lazy"}
-          src={src}
-        />
-      ) : (
-        <div className="image-placeholder flex min-h-[340px] w-full items-center justify-center text-xs text-muted-token">
-          {label}
-        </div>
-      )}
-    </div>
+    <figure>
+      <div className="flex w-full items-center justify-center rounded-[18px] border border-[var(--border)] bg-[rgba(255,255,255,0.42)] p-4 dark:bg-[rgba(255,255,255,0.04)]">
+        {src ? (
+          <img
+            alt={title}
+            className="max-h-[640px] w-full object-contain"
+            loading={priority ? "eager" : "lazy"}
+            src={src}
+          />
+        ) : (
+          <div className="image-placeholder flex min-h-[340px] w-full items-center justify-center text-xs text-muted-token">
+            {label}
+          </div>
+        )}
+      </div>
+      {caption ? (
+        <figcaption className="mt-3 max-w-[720px] whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
   );
 }
 
@@ -1247,7 +1297,8 @@ export async function DerivativeDetailPage({
             ) : null}
           </section>
 
-          <section className="mt-16 lg:mt-20">
+          <section className="mt-16 space-y-8 lg:mt-20">
+            <ProductVideo video={product.video} />
             <ArtDerivativeMainImage
               image={mainImage}
               label={labels.emptyImage}
@@ -1304,31 +1355,41 @@ function productDetailRelatedImage(product: ProductDetailRelated) {
 function ShopArtworkImage({
   image,
   label,
+  locale,
   priority = false,
   title,
 }: {
   image: SanityImage;
   label: string;
+  locale: Locale;
   priority?: boolean;
   title: string;
 }) {
   const src = imageUrl(image, priority ? 1500 : 1100);
+  const caption = imageCaption(image, locale);
 
   return (
-    <div className="overflow-hidden rounded-[12px] bg-[#ededeb] dark:bg-white/[0.04]">
-      {src ? (
-        <img
-          alt={title}
-          className="block h-auto w-full object-contain"
-          loading={priority ? "eager" : "lazy"}
-          src={src}
-        />
-      ) : (
-        <div className="image-placeholder flex min-h-[360px] items-center justify-center px-6 text-center text-xs text-muted-token">
-          {label}
-        </div>
-      )}
-    </div>
+    <figure>
+      <div className="overflow-hidden rounded-[12px] bg-[#ededeb] dark:bg-white/[0.04]">
+        {src ? (
+          <img
+            alt={title}
+            className="block h-auto w-full object-contain"
+            loading={priority ? "eager" : "lazy"}
+            src={src}
+          />
+        ) : (
+          <div className="image-placeholder flex min-h-[360px] items-center justify-center px-6 text-center text-xs text-muted-token">
+            {label}
+          </div>
+        )}
+      </div>
+      {caption ? (
+        <figcaption className="mt-3 max-w-[720px] whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
   );
 }
 
@@ -1430,11 +1491,13 @@ export async function ShopArtworkDetailPage({
 
           <section className="mt-9 grid gap-8 lg:grid-cols-[minmax(0,630px)_minmax(340px,390px)] lg:items-start lg:gap-14 xl:gap-16">
             <div className="grid gap-4">
+              <ProductVideo video={product.media?.video} />
               {images.map((image, index) => (
                 <ShopArtworkImage
                   image={image}
                   key={index}
                   label={labels.emptyImage}
+                  locale={locale}
                   priority={index === 0}
                   title={`${title} ${index + 1}`}
                 />
@@ -1544,10 +1607,12 @@ export async function ArtworkProductDetailPage({
         </div>
 
         <section className="mt-10 grid max-w-[1120px] gap-8 lg:grid-cols-[minmax(0,760px)_280px] lg:items-start">
-          <div>
+          <div className="grid gap-5">
+            <ProductVideo video={product.video} />
             <DetailImage
               image={mainImage}
               label={labels.emptyImage}
+              locale={locale}
               priority
               title={title}
             />
@@ -1558,6 +1623,7 @@ export async function ArtworkProductDetailPage({
                     image={image}
                     key={index}
                     label={labels.emptyImage}
+                    locale={locale}
                     title={`${title} ${index + 2}`}
                   />
                 ))}
@@ -1672,6 +1738,15 @@ export async function DerivativeProductDetailPage({
       metaItems={[{ label: sizeLabel, value: specification }]}
       primaryTitle={title}
       secondaryTitle={secondaryTitle}
+      videos={
+        product.video
+          ? [
+              {
+                videoFile: product.video,
+              },
+            ]
+          : null
+      }
     />
   );
 }

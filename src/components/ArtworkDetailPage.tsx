@@ -73,6 +73,28 @@ function imageUrl(image: SanityImage, width: number) {
   }
 }
 
+function imageCaption(image: SanityImage, locale: Locale) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  const imageWithCaption = image as {
+    caption?: string | null;
+    captionEn?: string | null;
+    captionZh?: string | null;
+  };
+
+  return compactText(
+    locale === "en"
+      ? imageWithCaption.captionEn ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionZh
+      : imageWithCaption.captionZh ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionEn,
+  );
+}
+
 function uploadedVideoSource(video: ArtworkVideo) {
   return compactText(video.videoFile?.asset?.url);
 }
@@ -107,12 +129,12 @@ function imageIdentity(image: SanityImage) {
   );
 }
 
-function artworkImageDescription(entry: ArtworkImageEntry) {
+function artworkImageDescription(entry: ArtworkImageEntry, locale: Locale) {
   if (!entry || typeof entry !== "object" || !("description" in entry)) {
-    return "";
+    return imageCaption(entry as SanityImage, locale);
   }
 
-  return compactText(entry.description);
+  return compactText(entry.description) || imageCaption(entry.image, locale);
 }
 
 function artworkImageKey(entry: ArtworkImageEntry) {
@@ -126,6 +148,7 @@ function artworkImageKey(entry: ArtworkImageEntry) {
 function mergeArtworkImages(
   coverImage: SanityImage,
   artworkImages: ArtworkImageEntry[] | null | undefined,
+  locale: Locale,
 ) {
   const seen = new Set<string>();
   const merged: ArtworkGalleryItem[] = [];
@@ -137,7 +160,11 @@ function mergeArtworkImages(
       seen.add(identity);
     }
 
-    merged.push({image: coverImage, key: identity || "cover-image"});
+    merged.push({
+      description: imageCaption(coverImage, locale),
+      image: coverImage,
+      key: identity || "cover-image",
+    });
   }
 
   (artworkImages || []).forEach((entry) => {
@@ -158,7 +185,7 @@ function mergeArtworkImages(
     }
 
     merged.push({
-      description: artworkImageDescription(entry),
+      description: artworkImageDescription(entry, locale),
       image,
       key: artworkImageKey(entry) || identity,
     });
@@ -311,24 +338,38 @@ function ArtworkDescription({
 
 function ArtworkGallery({
   images,
+  locale,
   title,
 }: {
   images: ArtworkGalleryInput[];
+  locale: Locale;
   title: string;
 }) {
-  const visibleImages = images
-    .map((item) => {
+  const visibleImages = images.reduce<ArtworkGalleryItem[]>((items, item) => {
       if (!item || typeof item !== "object") {
-        return null;
+        return items;
       }
 
       if ("image" in item) {
-        return item;
+        if (item.image) {
+          items.push({
+            description:
+              compactText(item.description) || imageCaption(item.image, locale),
+            image: item.image,
+            key: item.key,
+          });
+        }
+
+        return items;
       }
 
-      return {image: item as SanityImage};
-    })
-    .filter((item): item is ArtworkGalleryItem => Boolean(item?.image));
+      const image = item as SanityImage;
+      if (image) {
+        items.push({description: imageCaption(image, locale), image});
+      }
+
+      return items;
+    }, []);
 
   if (!visibleImages.length) {
     return null;
@@ -457,6 +498,7 @@ export function ArtworkDetailLayout({
         />
         <ArtworkGallery
           images={images}
+          locale={locale}
           title={primaryTitle}
         />
       </PageContainer>
@@ -498,7 +540,11 @@ export async function ArtworkDetailPage({
     locale === "en" ? titleZh || "" : titleEn || "";
   const size = compactText(artwork.size || artwork.dimensions);
   const description = compactText(artwork.description);
-  const galleryImages = mergeArtworkImages(artwork.coverImage, artwork.images);
+  const galleryImages = mergeArtworkImages(
+    artwork.coverImage,
+    artwork.images,
+    locale,
+  );
   const prefix = includeLocalePrefix ? `/${locale}` : "";
   const backHref = `${prefix}/art-projects/${categorySlug}`;
   const backLabel = `${labels.backPrefix} ${categoryLabel(categorySlug, locale)}`;

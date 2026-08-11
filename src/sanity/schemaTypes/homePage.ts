@@ -1,4 +1,6 @@
-﻿import { defineField, defineType } from "sanity";
+import { defineField, defineType } from "sanity";
+
+import { imageCaptionFields } from "./imageCaptionFields";
 
 export const homePage = defineType({
   name: "homePage",
@@ -44,6 +46,7 @@ export const homePage = defineType({
       type: "image",
       group: "hero",
       options: { hotspot: true },
+      fields: imageCaptionFields,
       hidden: true,
     }),
     defineField({
@@ -63,6 +66,7 @@ export const homePage = defineType({
               title: "替代文字 / Alt Text",
               type: "string",
             }),
+            ...imageCaptionFields,
             defineField({
               name: "titleLogoWhite",
               title: "白色标题 PNG / White Title Logo",
@@ -252,6 +256,7 @@ export const homePage = defineType({
               title: "图片 / Image",
               type: "image",
               options: { hotspot: true },
+              fields: imageCaptionFields,
               validation: (Rule) => Rule.required(),
             }),
             defineField({

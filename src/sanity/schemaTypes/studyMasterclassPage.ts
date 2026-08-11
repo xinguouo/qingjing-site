@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { imageCaptionFields } from "./imageCaptionFields";
+
 export const studyMasterclassPage = defineType({
   name: "studyMasterclassPage",
   title: "国际大师班页面 / International Masterclass Page",
@@ -35,6 +37,7 @@ export const studyMasterclassPage = defineType({
               title: "图片 / Image",
               type: "image",
               options: { hotspot: true },
+              fields: imageCaptionFields,
               validation: (Rule) => Rule.required(),
             }),
             defineField({

@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const artDerivativeDetail = defineType({
   name: 'artDerivativeDetail',
@@ -74,13 +75,23 @@ export const artDerivativeDetail = defineType({
       type: 'image',
       group: 'media',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'galleryImages',
       title: '作品图片 / Gallery Images',
       type: 'array',
       group: 'media',
-      of: [{type: 'image', options: {hotspot: true}}],
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
+    }),
+    defineField({
+      name: 'video',
+      title: '商品视频 / Product Video',
+      type: 'file',
+      group: 'media',
+      options: {
+        accept: 'video/mp4,video/webm',
+      },
     }),
     defineField({
       name: 'order',

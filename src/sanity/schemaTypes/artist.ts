@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const artist = defineType({
   name: 'artist',
@@ -96,6 +97,7 @@ export const artist = defineType({
       type: 'image',
       group: 'profile',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'educationExperienceZh',

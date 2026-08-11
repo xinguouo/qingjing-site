@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const experienceCourse = defineType({
   name: 'experienceCourse',
@@ -53,6 +54,7 @@ export const experienceCourse = defineType({
       type: 'image',
       group: 'media',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'coverImage',
@@ -60,13 +62,14 @@ export const experienceCourse = defineType({
       type: 'image',
       group: 'media',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'galleryImages',
       title: '课程图片 / Gallery Images',
       type: 'array',
       group: 'media',
-      of: [{type: 'image', options: {hotspot: true}}],
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
     }),
     defineField({
       name: 'descriptionZh',

@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const residencyPage = defineType({
   name: 'residencyPage',
@@ -14,6 +15,7 @@ export const residencyPage = defineType({
       title: '封面图片',
       type: 'image',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({name: 'spaceTitleZh', title: '空间标题（中文）', type: 'string'}),
     defineField({name: 'spaceTitleEn', title: '空间标题（英文）', type: 'string'}),
@@ -33,7 +35,7 @@ export const residencyPage = defineType({
       name: 'spaceImages',
       title: '空间图片',
       type: 'array',
-      of: [{type: 'image', options: {hotspot: true}}],
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
     }),
     defineField({
       name: 'applicationRequirementsZh',

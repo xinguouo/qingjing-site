@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { imageCaptionFields } from "./imageCaptionFields";
+
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
 
 export const product = defineType({
@@ -101,20 +103,30 @@ export const product = defineType({
       type: "image",
       group: "media",
       options: { hotspot: true },
+      fields: imageCaptionFields,
     }),
     defineField({
       name: "images",
       title: "商品图片 / Images",
       type: "array",
       group: "media",
-      of: [{ type: "image", options: { hotspot: true } }],
+      of: [{ type: "image", options: { hotspot: true }, fields: imageCaptionFields }],
     }),
     defineField({
       name: "galleryImages",
       title: "展示图片 / Gallery Images",
       type: "array",
       group: "media",
-      of: [{ type: "image", options: { hotspot: true } }],
+      of: [{ type: "image", options: { hotspot: true }, fields: imageCaptionFields }],
+    }),
+    defineField({
+      name: "video",
+      title: "商品视频 / Product Video",
+      type: "file",
+      group: "media",
+      options: {
+        accept: "video/mp4,video/webm",
+      },
     }),
     defineField({
       name: "price",

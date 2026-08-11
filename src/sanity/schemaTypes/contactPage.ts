@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const contactPage = defineType({
   name: 'contactPage',
@@ -57,6 +58,7 @@ export const contactPage = defineType({
           title: '地图图片 / Map Image',
           type: 'image',
           options: {hotspot: true},
+          fields: imageCaptionFields,
         }),
       ],
     }),

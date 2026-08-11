@@ -175,8 +175,8 @@ export function ArtCategorySortableGrid({
         </div>
       ) : null}
 
-      <section className="mt-9 max-w-[1120px] lg:mt-10">
-        <div className="grid justify-items-start gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="mt-9 max-w-[1180px] lg:mt-10">
+        <div className="grid justify-items-start gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {sortedArtworks.map((artwork, index) => (
             <ArtworkCard
               artwork={artwork}

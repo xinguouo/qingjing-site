@@ -196,6 +196,28 @@ function imageUrl(image: SanityImage, width: number) {
   }
 }
 
+function imageCaption(image: SanityImage, locale: Locale) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  const imageWithCaption = image as {
+    caption?: string | null;
+    captionEn?: string | null;
+    captionZh?: string | null;
+  };
+
+  return compactText(
+    locale === "en"
+      ? imageWithCaption.captionEn ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionZh
+      : imageWithCaption.captionZh ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionEn,
+  );
+}
+
 function mapToCourseCard(course: ExperienceCourse): StudyProgram {
   const teacher =
     course.supportTeacher ||
@@ -340,14 +362,21 @@ function DetailText({
 
 function Gallery({
   images,
+  locale,
   title,
 }: {
   images: SanityImage[] | null | undefined;
+  locale: Locale;
   title: string;
 }) {
   const validImages = (images || [])
-    .map((image) => imageUrl(image, 900))
-    .filter(Boolean) as string[];
+    .map((image) => ({
+      caption: imageCaption(image, locale),
+      src: imageUrl(image, 900),
+    }))
+    .filter((item): item is {caption: string; src: string} =>
+      Boolean(item.src),
+    );
 
   if (!validImages.length) {
     return null;
@@ -355,18 +384,22 @@ function Gallery({
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {validImages.map((src, index) => (
-        <div
-          className="image-placeholder aspect-[4/3] overflow-hidden rounded-[18px] bg-[rgba(255,255,255,0.58)] dark:bg-[rgba(255,255,255,0.06)]"
-          key={src}
-        >
-          <img
-            alt={`${title} ${index + 1}`}
-            className="h-full w-full object-cover"
-            loading="lazy"
-            src={src}
-          />
-        </div>
+      {validImages.map((item, index) => (
+        <figure key={item.src}>
+          <div className="image-placeholder aspect-[4/3] overflow-hidden rounded-[18px] bg-[rgba(255,255,255,0.58)] dark:bg-[rgba(255,255,255,0.06)]">
+            <img
+              alt={`${title} ${index + 1}`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              src={item.src}
+            />
+          </div>
+          {item.caption ? (
+            <figcaption className="mt-3 whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
+              {item.caption}
+            </figcaption>
+          ) : null}
+        </figure>
       ))}
     </div>
   );
@@ -466,7 +499,11 @@ export async function ExperienceCourseDetailPage({
           </DetailSection>
 
           <DetailSection title={labels.gallery}>
-            <Gallery images={item.galleryImages} title={title} />
+            <Gallery
+              images={item.galleryImages}
+              locale={locale}
+              title={title}
+            />
           </DetailSection>
 
           <DetailSection title={labels.audience}>

@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const artCategory = defineType({
   name: 'artCategory',
@@ -67,7 +68,7 @@ export const artCategory = defineType({
               name: 'images',
               title: '作品图片 / Images',
               type: 'array',
-              of: [{type: 'image', options: {hotspot: true}}],
+              of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
             }),
             defineField({
               name: 'dimensions',

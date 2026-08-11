@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const offlineWorkshop = defineType({
   name: 'offlineWorkshop',
@@ -37,6 +38,7 @@ export const offlineWorkshop = defineType({
       type: 'image',
       group: 'card',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'shortDescriptionZh',

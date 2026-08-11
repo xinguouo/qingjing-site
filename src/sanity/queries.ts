@@ -3,7 +3,14 @@ import { defineQuery } from "next-sanity";
 const imageFields = `
   asset,
   crop,
-  hotspot
+  hotspot,
+  captionZh,
+  captionEn,
+  "caption": select(
+    $locale == "en" && defined(captionEn) && captionEn != "" => captionEn,
+    defined(captionZh) && captionZh != "" => captionZh,
+    caption
+  )
 `;
 
 const artworkImageItemFields = `
@@ -14,15 +21,17 @@ const artworkImageItemFields = `
   "description": select(
     $locale == "en" && defined(descriptionEn) && descriptionEn != "" => descriptionEn,
     defined(descriptionZh) && descriptionZh != "" => descriptionZh,
-    description
+    defined(description) && description != "" => description,
+    $locale == "en" && defined(image.captionEn) && image.captionEn != "" => image.captionEn,
+    defined(image.captionZh) && image.captionZh != "" => image.captionZh,
+    defined(image.caption) && image.caption != "" => image.caption,
+    $locale == "en" && defined(captionEn) && captionEn != "" => captionEn,
+    defined(captionZh) && captionZh != "" => captionZh,
+    caption
   ),
   "image": select(
     defined(image.asset) => image{${imageFields}},
-    defined(asset) => {
-      asset,
-      crop,
-      hotspot
-    }
+    defined(asset) => {${imageFields}}
   )
 `;
 
@@ -45,6 +54,15 @@ const artworkVideoItemFields = `
   autoplay,
   muted,
   loop
+`;
+
+const productVideoFields = `
+  asset->{
+    _id,
+    url,
+    mimeType,
+    originalFilename
+  }
 `;
 
 const siteSettingsFields = `
@@ -285,6 +303,7 @@ const productCardFields = `
   coverImage{${imageFields}},
   images[]{${imageFields}},
   galleryImages[]{${imageFields}},
+  video{${productVideoFields}},
   price,
   "size": coalesce(size, dimensions),
   dimensions,
@@ -364,6 +383,10 @@ const homeProductReferenceFields = `
     _type == "derivativeProduct" => gallery[]{${imageFields}},
     galleryImages[]{${imageFields}}
   ),
+  "video": select(
+    _type == "productDetail" => media.video{${productVideoFields}},
+    video{${productVideoFields}}
+  ),
   "price": select(
     _type == "productDetail" => commerce.price,
     price
@@ -398,6 +421,7 @@ const artworkProductFields = `
   artworkCategory,
   images[]{${imageFields}},
   "coverImage": images[0]{${imageFields}},
+  video{${productVideoFields}},
   dimensions,
   quantity,
   descriptionZh,
@@ -414,6 +438,7 @@ const derivativeProductFields = `
   "slug": slug.current,
   coverImage{${imageFields}},
   gallery[]{${imageFields}},
+  video{${productVideoFields}},
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
@@ -456,6 +481,7 @@ const productCollectionFields = `
   subcategory,
   coverImage{${imageFields}},
   galleryImages[]{${imageFields}},
+  video{${productVideoFields}},
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
@@ -487,7 +513,8 @@ const productDetailFields = `
   },
   media{
     mainImage{${imageFields}},
-    galleryImages[]{${imageFields}}
+    galleryImages[]{${imageFields}},
+    video{${productVideoFields}}
   },
   relatedProducts[]->{
     _id,
@@ -523,6 +550,7 @@ const artDerivativeDetailFields = `
   "description": ${localizedText("descriptionEn", "descriptionZh")},
   mainImage{${imageFields}},
   galleryImages[]{${imageFields}},
+  video{${productVideoFields}},
   order
 `;
 

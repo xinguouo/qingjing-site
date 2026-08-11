@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { imageCaptionFields } from "./imageCaptionFields";
+
 export const offlineExperiencePage = defineType({
   name: "offlineExperiencePage",
   title: "线下体验页面 / Offline Experience Page",
@@ -29,6 +31,7 @@ export const offlineExperiencePage = defineType({
       type: "image",
       group: "banner",
       options: { hotspot: true },
+      fields: imageCaptionFields,
     }),
     defineField({
       name: "bannerTitleZh",
@@ -68,6 +71,7 @@ export const offlineExperiencePage = defineType({
               title: "课程图片 / Cover Image",
               type: "image",
               options: { hotspot: true },
+              fields: imageCaptionFields,
             }),
             defineField({
               name: "descriptionZh",
@@ -113,6 +117,7 @@ export const offlineExperiencePage = defineType({
               title: "图片 / Image",
               type: "image",
               options: { hotspot: true },
+              fields: imageCaptionFields,
               validation: (Rule) => Rule.required(),
             }),
             defineField({

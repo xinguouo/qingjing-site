@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const aboutMissionPage = defineType({
   name: 'aboutMissionPage',
@@ -34,6 +35,7 @@ export const aboutMissionPage = defineType({
       title: '图片 / Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'order',

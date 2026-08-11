@@ -270,6 +270,28 @@ function imageUrl(image: SanityImage, width: number) {
   }
 }
 
+function imageCaption(image: SanityImage, locale: Locale) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  const imageWithCaption = image as {
+    caption?: string | null;
+    captionEn?: string | null;
+    captionZh?: string | null;
+  };
+
+  return compactText(
+    locale === "en"
+      ? imageWithCaption.captionEn ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionZh
+      : imageWithCaption.captionZh ||
+          imageWithCaption.caption ||
+          imageWithCaption.captionEn,
+  );
+}
+
 function CourseCardPoster({
   image,
   label,
@@ -596,15 +618,22 @@ function TeacherCard({
 function CourseGallery({
   images,
   label,
+  locale,
 }: {
   images: SanityImage[];
   label: string;
+  locale: Locale;
 }) {
-  const urls = images
-    .map((image) => imageUrl(image, 900))
-    .filter((src): src is string => Boolean(src));
+  const visibleImages = images
+    .map((image) => ({
+      caption: imageCaption(image, locale),
+      src: imageUrl(image, 900),
+    }))
+    .filter((item): item is {caption: string; src: string} =>
+      Boolean(item.src),
+    );
 
-  if (urls.length === 0) {
+  if (visibleImages.length === 0) {
     return null;
   }
 
@@ -614,14 +643,20 @@ function CourseGallery({
         {label}
       </h2>
       <div className="mt-6 columns-1 gap-5 sm:columns-2 xl:columns-3">
-        {urls.map((src, index) => (
-          <img
-            alt={`${label} ${index + 1}`}
-            className="mb-5 w-full break-inside-avoid rounded-[18px] border border-[var(--border)] bg-[var(--card)] shadow-[0_14px_34px_rgba(0,0,0,0.055)]"
-            key={src}
-            loading="lazy"
-            src={src}
-          />
+        {visibleImages.map((item, index) => (
+          <figure className="mb-5 break-inside-avoid" key={item.src}>
+            <img
+              alt={`${label} ${index + 1}`}
+              className="w-full rounded-[18px] border border-[var(--border)] bg-[var(--card)] shadow-[0_14px_34px_rgba(0,0,0,0.055)]"
+              loading="lazy"
+              src={item.src}
+            />
+            {item.caption ? (
+              <figcaption className="mt-3 whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
+                {item.caption}
+              </figcaption>
+            ) : null}
+          </figure>
         ))}
       </div>
     </section>
@@ -962,29 +997,42 @@ function TeacherTeam({
 
 function ModuleImageGrid({
   images,
+  locale,
   title,
 }: {
   images: SanityImage[] | null | undefined;
+  locale: Locale;
   title: string;
 }) {
-  const urls = (images || [])
-    .map((image) => imageUrl(image, 760))
-    .filter((src): src is string => Boolean(src));
+  const visibleImages = (images || [])
+    .map((image) => ({
+      caption: imageCaption(image, locale),
+      src: imageUrl(image, 760),
+    }))
+    .filter((item): item is {caption: string; src: string} =>
+      Boolean(item.src),
+    );
 
-  if (!urls.length) {
+  if (!visibleImages.length) {
     return null;
   }
 
   return (
     <div className="mt-5 grid gap-2.5 sm:grid-cols-3 lg:max-w-[640px]">
-      {urls.map((src, index) => (
-        <img
-          alt={`${title} ${index + 1}`}
-          className="aspect-[4/3] w-full rounded-[4px] bg-[#211f1c] object-cover"
-          key={`${src}-${index}`}
-          loading="lazy"
-          src={src}
-        />
+      {visibleImages.map((item, index) => (
+        <figure key={`${item.src}-${index}`}>
+          <img
+            alt={`${title} ${index + 1}`}
+            className="aspect-[4/3] w-full rounded-[4px] bg-[#211f1c] object-cover"
+            loading="lazy"
+            src={item.src}
+          />
+          {item.caption ? (
+            <figcaption className="mt-2 whitespace-pre-line text-[12px] leading-[1.7] text-secondary">
+              {item.caption}
+            </figcaption>
+          ) : null}
+        </figure>
       ))}
     </div>
   );
@@ -992,9 +1040,11 @@ function ModuleImageGrid({
 
 function CourseScheduleBlock({
   index,
+  locale,
   module,
 }: {
   index: number;
+  locale: Locale;
   module: CourseScheduleItem | CourseModule;
 }) {
   const number =
@@ -1022,7 +1072,11 @@ function CourseScheduleBlock({
             {description}
           </p>
         ) : null}
-        <ModuleImageGrid images={module.images} title={title || number} />
+        <ModuleImageGrid
+          images={module.images}
+          locale={locale}
+          title={title || number}
+        />
       </div>
     </article>
   );
@@ -1055,9 +1109,11 @@ function CourseWideImage({
 
 function CourseModulesSection({
   labels,
+  locale,
   modules,
 }: {
   labels: (typeof copy)[Locale];
+  locale: Locale;
   modules: Array<CourseScheduleItem | CourseModule>;
 }) {
   if (!modules.length) {
@@ -1074,6 +1130,7 @@ function CourseModulesSection({
           <CourseScheduleBlock
             index={index}
             key={module._key || `${index}-${module.title || "schedule"}`}
+            locale={locale}
             module={module}
           />
         ))}
@@ -1322,7 +1379,11 @@ export async function MasterclassDetailPage({
               <CourseIntroSection labels={labels} value={intro} />
               <AcademicHostSection labels={labels} value={item?.academicHost} />
               <TeacherTeamSection labels={labels} value={item?.teacherTeam} />
-              <CourseModulesSection labels={labels} modules={courseModules} />
+              <CourseModulesSection
+                labels={labels}
+                locale={locale}
+                modules={courseModules}
+              />
               <div className="space-y-9">
                 <TargetAudienceSection
                   labels={labels}

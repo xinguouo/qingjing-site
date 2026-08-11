@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 import {ArtworkImagesInput} from '../components/ArtworkImagesInput'
 
@@ -67,6 +68,7 @@ export const artWork = defineType({
               title: '图片 / Image',
               type: 'image',
               options: {hotspot: true},
+              fields: imageCaptionFields,
               validation: (rule) => rule.required(),
             }),
             defineField({
@@ -130,6 +132,7 @@ export const artWork = defineType({
               title: '视频封面图 / Poster Image',
               type: 'image',
               options: {hotspot: true},
+              fields: imageCaptionFields,
               hidden: true,
             }),
             defineField({

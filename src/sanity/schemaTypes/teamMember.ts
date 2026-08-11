@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 const englishFallbackDescription = 'If empty, fallback to Chinese content.'
 
@@ -54,6 +55,7 @@ export const teamMember = defineType({
       type: 'image',
       group: ['card', 'detail'],
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'shortBioZh',
@@ -213,7 +215,7 @@ export const teamMember = defineType({
       title: '\u76f8\u5173\u56fe\u7247 / Related Images',
       type: 'array',
       group: 'detail',
-      of: [{type: 'image', options: {hotspot: true}}],
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
     }),
     defineField({
       name: 'detailBioZh',

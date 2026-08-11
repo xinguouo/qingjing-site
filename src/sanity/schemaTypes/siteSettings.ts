@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -48,6 +49,7 @@ export const siteSettings = defineType({
       type: 'image',
       group: 'logo',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'email',

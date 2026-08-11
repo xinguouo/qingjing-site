@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageCaptionFields} from './imageCaptionFields'
 
 export const culturalProduct = defineType({
   name: 'culturalProduct',
@@ -37,6 +38,7 @@ export const culturalProduct = defineType({
       type: 'image',
       group: 'media',
       options: {hotspot: true},
+      fields: imageCaptionFields,
     }),
     defineField({
       name: 'category',
