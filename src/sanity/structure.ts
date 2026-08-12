@@ -80,6 +80,26 @@ export const structure: StructureResolver = (S, context) => {
       context,
     })
 
+  const orderableProductListItem = ({
+    id,
+    title,
+    schemaType,
+    filter,
+  }: {
+    id: string
+    title: string
+    schemaType: string
+    filter: string
+  }) =>
+    orderableDocumentListDeskItem({
+      type: schemaType,
+      id,
+      title,
+      filter,
+      S,
+      context,
+    })
+
   return S.list()
     .id('content')
     .title('内容管理 / Content')
@@ -308,13 +328,13 @@ export const structure: StructureResolver = (S, context) => {
             .id('shopPageEntries')
             .title('商店 / Shop')
             .items([
-              typedListItem({
+              orderableProductListItem({
                 id: 'shopAvailableArtworkDetail',
                 title: '在售艺术商品 / Available Art Goods',
                 schemaType: 'productDetail',
                 filter: '_type == "productDetail"',
               }),
-              typedListItem({
+              orderableProductListItem({
                 id: 'shopArtDerivativeDetail',
                 title: '艺术衍生品 / Art Derivatives',
                 schemaType: 'artDerivativeDetail',

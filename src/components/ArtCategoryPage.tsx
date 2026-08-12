@@ -309,7 +309,6 @@ export async function ArtCategoryPage({
         <ArtCategorySortableGrid
           artworks={artworks}
           category={category}
-          enableSorting={category === "glass-art"}
           includeLocalePrefix={includeLocalePrefix}
           locale={locale}
         />

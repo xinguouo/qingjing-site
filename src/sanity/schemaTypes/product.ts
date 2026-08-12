@@ -1,3 +1,7 @@
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
 import { defineField, defineType } from "sanity";
 
 import { imageCaptionFields } from "./imageCaptionFields";
@@ -18,6 +22,7 @@ export const product = defineType({
     { name: "legacy", title: "旧字段 / Legacy" },
   ],
   fields: [
+    orderRankField({ type: "product", hidden: true }),
     defineField({
       name: "titleZh",
       title: "商品标题（中文） / Title Zh",
@@ -245,6 +250,7 @@ export const product = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: "排序 / Order",
       name: "orderAsc",

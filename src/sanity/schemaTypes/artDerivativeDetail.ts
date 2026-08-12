@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
 
@@ -12,6 +13,7 @@ export const artDerivativeDetail = defineType({
     {name: 'admin', title: '后台管理 / Admin'},
   ],
   fields: [
+    orderRankField({type: 'artDerivativeDetail', hidden: true}),
     defineField({
       name: 'titleZh',
       title: '标题（中文） / Title (Chinese)',
@@ -102,6 +104,7 @@ export const artDerivativeDetail = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: '排序 / Order',
       name: 'orderAsc',

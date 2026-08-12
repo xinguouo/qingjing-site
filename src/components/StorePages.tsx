@@ -55,6 +55,8 @@ type ProductCollection = {
   price?: string | number | null;
   productNumber?: string | number | null;
   productType?: StoreCategory | null;
+  order?: number | null;
+  orderRank?: string | null;
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
   title?: string | null;
@@ -165,6 +167,8 @@ type ProductCardItem = {
   category?: ProductCollectionCategory | null;
   description?: string | null;
   image?: SanityImage;
+  order?: number | null;
+  orderRank?: string | null;
   price?: string | number | null;
   productNumber?: string | number | null;
   slug?: string | null;
@@ -522,11 +526,6 @@ function formatProductNumber(value: string | number | null | undefined) {
   }
 
   return /^\d+$/.test(number) ? number.padStart(2, "0") : number;
-}
-
-function productNumberValue(value: string | number | null | undefined) {
-  const number = Number(compactText(value));
-  return Number.isFinite(number) ? number : Number.POSITIVE_INFINITY;
 }
 
 function formatYuanPrice(value: string | number | null | undefined) {
@@ -941,6 +940,8 @@ function mapProduct(item: ProductCollection): ProductCardItem {
           : item.category,
     description: item.description,
     image: item.coverImage || item.galleryImages?.[0],
+    order: item.order,
+    orderRank: item.orderRank,
     price: item.price,
     productNumber: item.productNumber,
     slug: item.slug,
@@ -1040,16 +1041,21 @@ export async function StoreOverview({
         : true,
     )
     .sort((a, b) => {
-      if (activeCategory !== "artworks") {
-        return 0;
+      const rankA = compactText(a.orderRank);
+      const rankB = compactText(b.orderRank);
+
+      if (rankA || rankB) {
+        return (rankA || "zzzzzzzzzz").localeCompare(
+          rankB || "zzzzzzzzzz",
+        );
       }
 
-      const numberDiff =
-        productNumberValue(a.productNumber) -
-        productNumberValue(b.productNumber);
+      const orderA = typeof a.order === "number" ? a.order : 0;
+      const orderB = typeof b.order === "number" ? b.order : 0;
+      const orderDiff = orderA - orderB;
 
-      if (numberDiff !== 0) {
-        return numberDiff;
+      if (orderDiff !== 0) {
+        return orderDiff;
       }
 
       return compactText(a.title).localeCompare(
