@@ -599,6 +599,17 @@ const artDerivativeDetailCardFields = `
   order
 `;
 
+const artDerivativePackagingPageFields = `
+  _id,
+  titleZh,
+  titleEn,
+  "title": ${localizedText("titleEn", "titleZh")},
+  descriptionZh,
+  descriptionEn,
+  "description": ${localizedText("descriptionEn", "descriptionZh")},
+  images[]{${imageFields}}
+`;
+
 const artistFields = `
   _id,
   nameZh,
@@ -1346,6 +1357,13 @@ export const artDerivativeDetailSlugsQuery = defineQuery(`*[
   defined(slug.current)
 ]{
   "slug": slug.current
+}`);
+
+export const artDerivativePackagingPageQuery = defineQuery(`*[
+  _type == "artDerivativePackagingPage" &&
+  _id == "artDerivativePackagingPage"
+][0]{
+  ${artDerivativePackagingPageFields}
 }`);
 
 export const culturalProductSlugsQuery = defineQuery(`*[

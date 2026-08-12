@@ -2,6 +2,7 @@ import {aboutContactPage} from './aboutContactPage'
 import {aboutMissionPage} from './aboutMissionPage'
 import {artCategory} from './artCategory'
 import {artDerivativeDetail} from './artDerivativeDetail'
+import {artDerivativePackagingPage} from './artDerivativePackagingPage'
 import {artworkProduct} from './artworkProduct'
 import {artProject} from './artProject'
 import {artWork} from './artWork'
@@ -42,6 +43,7 @@ export const schemaTypes = [
   offlineWorkshop,
   artCategory,
   artDerivativeDetail,
+  artDerivativePackagingPage,
   artWork,
   artworkProduct,
   derivativeProduct,

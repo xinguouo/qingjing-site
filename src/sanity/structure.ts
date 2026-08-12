@@ -340,6 +340,18 @@ export const structure: StructureResolver = (S, context) => {
                 schemaType: 'artDerivativeDetail',
                 filter: '_type == "artDerivativeDetail"',
               }),
+              S.listItem()
+                .id('shopArtDerivativePackaging')
+                .title('包装 / Packaging')
+                .schemaType('artDerivativePackagingPage')
+                .child(
+                  singleton({
+                    id: 'shopArtDerivativePackagingDocument',
+                    title: '包装 / Packaging',
+                    schemaType: 'artDerivativePackagingPage',
+                    documentId: 'artDerivativePackagingPage',
+                  }),
+                ),
               typedListItem({
                 id: 'shopCulturalProductDetail',
                 title: '文创品 / Cultural Products',

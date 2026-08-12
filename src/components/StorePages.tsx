@@ -10,6 +10,7 @@ import {
   artDerivativeDetailBySlugQuery,
   artDerivativeDetailsForCardsQuery,
   artDerivativeDetailSlugsQuery,
+  artDerivativePackagingPageQuery,
   artworkProductBySlugQuery,
   artworkProductsQuery,
   derivativeProductBySlugQuery,
@@ -175,6 +176,17 @@ type ProductCardItem = {
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
   title?: string | null;
+};
+
+type ArtDerivativePackagingPage = {
+  _id?: string;
+  description?: string | null;
+  descriptionEn?: string | null;
+  descriptionZh?: string | null;
+  images?: SanityImage[] | null;
+  title?: string | null;
+  titleEn?: string | null;
+  titleZh?: string | null;
 };
 
 type StoreOverviewProps = {
@@ -951,6 +963,53 @@ function mapProduct(item: ProductCollection): ProductCardItem {
   };
 }
 
+function PackagingPageContent({
+  fallbackTitle,
+  page,
+}: {
+  fallbackTitle: string;
+  page?: ArtDerivativePackagingPage | null;
+}) {
+  const title = compactText(page?.title) || fallbackTitle;
+  const description = compactText(page?.description);
+  const images = (page?.images || [])
+    .map((image) => ({
+      image,
+      src: imageUrl(image, 1800),
+    }))
+    .filter((item) => item.src);
+
+  if (!description && !images.length) {
+    return null;
+  }
+
+  return (
+    <section className="mt-9 max-w-[980px] lg:mt-10">
+      <h2 className="font-title text-[32px] font-normal leading-tight text-primary sm:text-[38px]">
+        {title}
+      </h2>
+      {description ? (
+        <p className="mt-6 whitespace-pre-line text-[16px] leading-[1.9] text-secondary">
+          {description}
+        </p>
+      ) : null}
+      {images.length ? (
+        <div className="mt-10 space-y-8">
+          {images.map((item, index) => (
+            <img
+              alt={`${title} ${index + 1}`}
+              className="block h-auto w-full max-w-full object-contain"
+              key={`${title}-image-${index}`}
+              loading="lazy"
+              src={item.src || ""}
+            />
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export async function StoreOverview({
   activeCategory = "artworks",
   artworkCategory,
@@ -964,6 +1023,7 @@ export async function StoreOverview({
     artDerivativeDetails,
     artworkDetailProducts,
     artworkProducts,
+    packagingPage,
   ] = await Promise.all([
     client
       .withConfig({ useCdn: false })
@@ -997,6 +1057,13 @@ export async function StoreOverview({
       .withConfig({ useCdn: false })
       .fetch<ProductCollection[]>(
         artworkProductsQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<ArtDerivativePackagingPage | null>(
+        artDerivativePackagingPageQuery,
         { locale },
         { cache: "no-store" },
       ),
@@ -1101,8 +1168,17 @@ export async function StoreOverview({
           ) : null}
         </header>
 
-        <section className="mt-9 max-w-[1180px] lg:mt-10">
-          {items.length ? (
+        {activeCategory === "derivatives" &&
+        activeSubcategory === "packaging" ? (
+          <PackagingPageContent
+            fallbackTitle={
+              locale === "en" ? "Packaging" : "\u5305\u88c5"
+            }
+            page={packagingPage}
+          />
+        ) : (
+          <section className="mt-9 max-w-[1180px] lg:mt-10">
+            {items.length ? (
             <div className="grid justify-items-start gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
               {items.map((item, index) => (
                 <ProductCard
@@ -1119,12 +1195,13 @@ export async function StoreOverview({
                 />
               ))}
             </div>
-          ) : (
+            ) : (
             <p className="text-[15px] leading-8 text-secondary">
               {labels.emptyList}
             </p>
-          )}
-        </section>
+            )}
+          </section>
+        )}
       </PageContainer>
     </AppShell>
   );
