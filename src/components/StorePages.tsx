@@ -154,6 +154,7 @@ type ArtDerivativeDetail = {
   dimensions?: string | null;
   galleryImages?: SanityImage[] | null;
   mainImage?: SanityImage;
+  packagingImages?: SanityImage[] | null;
   slug?: string | null;
   title?: string | null;
   titleEn?: string | null;
@@ -1243,6 +1244,44 @@ function ArtDerivativeMainImage({
   );
 }
 
+function PackagingImagesSection({
+  images,
+  title,
+}: {
+  images?: SanityImage[] | null;
+  title: string;
+}) {
+  const validImages = (images || [])
+    .map((image) => ({
+      image,
+      src: imageUrl(image, 1800),
+    }))
+    .filter((item) => item.src);
+
+  if (!validImages.length) {
+    return null;
+  }
+
+  return (
+    <section className="mt-16 space-y-8 lg:mt-20">
+      <h2 className="font-title text-[28px] font-normal leading-tight text-primary sm:text-[32px]">
+        Packaging
+      </h2>
+      <div className="space-y-8">
+        {validImages.map((item, index) => (
+          <img
+            alt={`${title} packaging ${index + 1}`}
+            className="block h-auto w-full max-w-full object-contain"
+            key={`${title}-packaging-${index}`}
+            loading="lazy"
+            src={item.src || ""}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export async function DerivativeDetailPage({
   category,
   includeLocalePrefix = true,
@@ -1311,6 +1350,11 @@ export async function DerivativeDetailPage({
               title={title}
             />
           </section>
+
+          <PackagingImagesSection
+            images={product.packagingImages}
+            title={title}
+          />
         </article>
       </PageContainer>
     </AppShell>

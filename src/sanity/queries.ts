@@ -556,6 +556,7 @@ const artDerivativeDetailFields = `
   "description": ${localizedText("descriptionEn", "descriptionZh")},
   mainImage{${imageFields}},
   galleryImages[]{${imageFields}},
+  packagingImages[]{${imageFields}},
   video{${productVideoFields}},
   "orderRank": _orderRank,
   order

@@ -87,6 +87,13 @@ export const artDerivativeDetail = defineType({
       of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
     }),
     defineField({
+      name: 'packagingImages',
+      title: '包装图片 / Packaging Images',
+      type: 'array',
+      group: 'media',
+      of: [{type: 'image', options: {hotspot: true}}],
+    }),
+    defineField({
       name: 'video',
       title: '商品视频 / Product Video',
       type: 'file',
