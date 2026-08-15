@@ -1315,7 +1315,8 @@ export const productDetailBySlugQuery = defineQuery(`*[
 
 export const productDetailsForCardsQuery = defineQuery(`*[
   _type == "productDetail" &&
-  defined(slug.current)
+  defined(slug.current) &&
+  !(_id in path("drafts.**"))
 ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   _id,
   "category": "artwork",

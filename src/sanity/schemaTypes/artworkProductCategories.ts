@@ -1,6 +1,6 @@
 export const artworkProductCategoryOptions = [
   { title: "\u88ab\u5b50\u690d\u7269", value: "\u88ab\u5b50\u690d\u7269" },
-  { title: "\u4f4e\u77ee\u751f\u7269", value: "\u4f4e\u77ee\u751f\u7269" },
+  { title: "\u4f4e\u6816\u751f\u7269", value: "\u4f4e\u6816\u751f\u7269" },
   { title: "\u6d6e\u6e38\u751f\u7269", value: "\u6d6e\u6e38\u751f\u7269" },
   { title: "\u8568\u7c7b\u690d\u7269", value: "\u8568\u7c7b\u690d\u7269" },
   { title: "\u6606\u866b", value: "\u6606\u866b" },

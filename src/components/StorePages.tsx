@@ -12,7 +12,6 @@ import {
   artDerivativeDetailSlugsQuery,
   artDerivativePackagingPageQuery,
   artworkProductBySlugQuery,
-  artworkProductsQuery,
   derivativeProductBySlugQuery,
   productBySlugQuery,
   productDetailBySlugQuery,
@@ -310,7 +309,7 @@ const derivativeSubcategories: Array<{
 
 const artworkProductCategories = [
   "\u88ab\u5b50\u690d\u7269",
-  "\u4f4e\u77ee\u751f\u7269",
+  "\u4f4e\u6816\u751f\u7269",
   "\u6d6e\u6e38\u751f\u7269",
   "\u8568\u7c7b\u690d\u7269",
   "\u6606\u866b",
@@ -319,213 +318,6 @@ const artworkProductCategories = [
   "\u5176\u4ed6",
   "\u6e38\u6cf3\u52a8\u7269",
 ] as const;
-
-const fallbackProducts: Record<Locale, ProductCollection[]> = {
-  zh: [
-    {
-      _id: "product-collection-artwork-01",
-      category: "artwork",
-      description: "被子植物",
-      price: "¥18000",
-      slug: "glass-artwork-study",
-      title: "野器栗毛芭目",
-    },
-    {
-      _id: "product-collection-artwork-02",
-      category: "artwork",
-      description: "玻璃艺术",
-      price: "¥12000",
-      slug: "transparent-light-study",
-      title: "风过青岚",
-    },
-    {
-      _id: "product-collection-artwork-03",
-      category: "artwork",
-      description: "玻璃艺术",
-      price: "¥15000",
-      slug: "layered-glass-study",
-      title: "层叠之境",
-    },
-    {
-      _id: "product-collection-artwork-04",
-      category: "artwork",
-      description: "玻璃艺术",
-      price: "¥16000",
-      slug: "mist-glass-study",
-      title: "雾色器形",
-    },
-    {
-      _id: "product-collection-derivative-01",
-      category: "derivative",
-      description: "器物",
-      price: "¥880",
-      slug: "glass-vessel-study",
-      subcategory: "vessel",
-      title: "玻璃器物",
-    },
-    {
-      _id: "product-collection-derivative-02",
-      category: "derivative",
-      description: "肖物",
-      price: "¥680",
-      slug: "glass-wearable-study",
-      subcategory: "wearable",
-      title: "玻璃肖物",
-    },
-    {
-      _id: "product-collection-derivative-03",
-      category: "derivative",
-      description: "玩物",
-      price: "¥580",
-      slug: "glass-toy-study",
-      subcategory: "toy",
-      title: "玻璃玩物",
-    },
-    {
-      _id: "product-collection-derivative-04",
-      category: "derivative",
-      description: "饰物",
-      price: "¥780",
-      slug: "glass-ornament-study",
-      subcategory: "ornament",
-      title: "玻璃饰物",
-    },
-    {
-      _id: "product-collection-cultural-01",
-      category: "cultural",
-      description: "文创品",
-      price: "¥128",
-      slug: "cultural-study-01",
-      title: "清境文创产品",
-    },
-    {
-      _id: "product-collection-cultural-02",
-      category: "cultural",
-      description: "文创品",
-      price: "¥168",
-      slug: "cultural-study-02",
-      title: "玻璃花园纪念品",
-    },
-    {
-      _id: "product-collection-cultural-03",
-      category: "cultural",
-      description: "文创品",
-      price: "¥98",
-      slug: "cultural-study-03",
-      title: "艺术出版物",
-    },
-    {
-      _id: "product-collection-cultural-04",
-      category: "cultural",
-      description: "文创品",
-      price: "¥138",
-      slug: "cultural-study-04",
-      title: "清境手册",
-    },
-  ],
-  en: [
-    {
-      _id: "product-collection-artwork-01",
-      category: "artwork",
-      description: "Artwork",
-      price: "¥18000",
-      slug: "glass-artwork-study",
-      title: "Wild Vessel",
-    },
-    {
-      _id: "product-collection-artwork-02",
-      category: "artwork",
-      description: "Artwork",
-      price: "¥12000",
-      slug: "transparent-light-study",
-      title: "Wind Over Green Mist",
-    },
-    {
-      _id: "product-collection-artwork-03",
-      category: "artwork",
-      description: "Artwork",
-      price: "¥15000",
-      slug: "layered-glass-study",
-      title: "Layered Realm",
-    },
-    {
-      _id: "product-collection-artwork-04",
-      category: "artwork",
-      description: "Artwork",
-      price: "¥16000",
-      slug: "mist-glass-study",
-      title: "Mist Vessel",
-    },
-    {
-      _id: "product-collection-derivative-01",
-      category: "derivative",
-      description: "Vessel",
-      price: "¥880",
-      slug: "glass-vessel-study",
-      subcategory: "vessel",
-      title: "Glass Vessel",
-    },
-    {
-      _id: "product-collection-derivative-02",
-      category: "derivative",
-      description: "Wearable",
-      price: "¥680",
-      slug: "glass-wearable-study",
-      subcategory: "wearable",
-      title: "Glass Wearable",
-    },
-    {
-      _id: "product-collection-derivative-03",
-      category: "derivative",
-      description: "Toy",
-      price: "¥580",
-      slug: "glass-toy-study",
-      subcategory: "toy",
-      title: "Glass Toy",
-    },
-    {
-      _id: "product-collection-derivative-04",
-      category: "derivative",
-      description: "Ornament",
-      price: "¥780",
-      slug: "glass-ornament-study",
-      subcategory: "ornament",
-      title: "Glass Ornament",
-    },
-    {
-      _id: "product-collection-cultural-01",
-      category: "cultural",
-      description: "Cultural",
-      price: "¥128",
-      slug: "cultural-study-01",
-      title: "Qingjing Cultural Product",
-    },
-    {
-      _id: "product-collection-cultural-02",
-      category: "cultural",
-      description: "Cultural",
-      price: "¥168",
-      slug: "cultural-study-02",
-      title: "Glass Garden Souvenir",
-    },
-    {
-      _id: "product-collection-cultural-03",
-      category: "cultural",
-      description: "Cultural",
-      price: "¥98",
-      slug: "cultural-study-03",
-      title: "Art Publication",
-    },
-    {
-      _id: "product-collection-cultural-04",
-      category: "cultural",
-      description: "Cultural",
-      price: "¥138",
-      slug: "cultural-study-04",
-      title: "Qingjing Booklet",
-    },
-  ],
-};
 
 function compactText(value: string | number | null | undefined) {
   return typeof value === "number" ? String(value) : value?.trim() || "";
@@ -539,6 +331,11 @@ function formatProductNumber(value: string | number | null | undefined) {
   }
 
   return /^\d+$/.test(number) ? number.padStart(2, "0") : number;
+}
+
+function productNumberValue(value: string | number | null | undefined) {
+  const number = Number(compactText(value));
+  return Number.isFinite(number) ? number : Number.POSITIVE_INFINITY;
 }
 
 function formatYuanPrice(value: string | number | null | undefined) {
@@ -666,15 +463,30 @@ function isProductSubcategory(
 }
 
 function isArtworkProductCategory(value: string | null | undefined) {
-  return artworkProductCategories.some((item) => item === value);
+  return artworkProductCategories.some(
+    (item) =>
+      item === value ||
+      (value === "\u4f4e\u77ee\u751f\u7269" &&
+        item === "\u4f4e\u6816\u751f\u7269"),
+  );
+}
+
+function normalizeArtworkProductCategory(value: string | null | undefined) {
+  const category = compactText(value);
+
+  if (category === "\u4f4e\u77ee\u751f\u7269") {
+    return "\u4f4e\u6816\u751f\u7269";
+  }
+
+  return category;
 }
 
 function normalizeCategories(value: string | string[] | null | undefined) {
   if (Array.isArray(value)) {
-    return value.map((item) => compactText(item)).filter(Boolean);
+    return value.map((item) => normalizeArtworkProductCategory(item)).filter(Boolean);
   }
 
-  const category = compactText(value);
+  const category = normalizeArtworkProductCategory(value);
   return category ? [category] : [];
 }
 
@@ -1022,7 +834,6 @@ export async function StoreOverview({
     productDocuments,
     artDerivativeDetails,
     artworkDetailProducts,
-    artworkProducts,
     packagingPage,
   ] = await Promise.all([
     client
@@ -1055,13 +866,6 @@ export async function StoreOverview({
       ),
     client
       .withConfig({ useCdn: false })
-      .fetch<ProductCollection[]>(
-        artworkProductsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
       .fetch<ArtDerivativePackagingPage | null>(
         artDerivativePackagingPageQuery,
         { locale },
@@ -1079,14 +883,14 @@ export async function StoreOverview({
     activeCategory === "artworks" && isArtworkProductCategory(artworkCategory)
       ? artworkCategory
       : null;
-  const cmsSource = [
-    ...(activeCategory === "artworks" ? artworkDetailProducts : []),
-    ...(activeCategory === "artworks" ? artworkProducts : []),
-    ...cmsProducts,
-    ...productDocuments,
-    ...(activeCategory === "derivatives" ? artDerivativeDetails : []),
-  ];
-  const source = cmsSource.length ? cmsSource : fallbackProducts[locale];
+  const source =
+    activeCategory === "artworks"
+      ? artworkDetailProducts
+      : [
+          ...cmsProducts,
+          ...productDocuments,
+          ...(activeCategory === "derivatives" ? artDerivativeDetails : []),
+        ];
   const activeCollectionCategory = categoryByStoreCategory[activeCategory];
   const items = source
     .filter((item) => {
@@ -1109,6 +913,16 @@ export async function StoreOverview({
         : true,
     )
     .sort((a, b) => {
+      if (activeCategory === "artworks") {
+        const numberDiff =
+          productNumberValue(a.productNumber) -
+          productNumberValue(b.productNumber);
+
+        if (numberDiff !== 0) {
+          return numberDiff;
+        }
+      }
+
       const rankA = compactText(a.orderRank);
       const rankB = compactText(b.orderRank);
 
