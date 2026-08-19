@@ -38,6 +38,33 @@ const artworkImageItemFields = `
 const localizedText = (enField: string, zhField: string) =>
   `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`;
 
+const publishedDocumentFilter = `
+  !(_id in path("drafts.**")) &&
+  !(_id in path("versions.**"))
+`;
+
+const publishedProductDetailFilter = `
+  _type == "productDetail" &&
+  defined(slug.current) &&
+  ${publishedDocumentFilter}
+`;
+
+const canonicalProductDetailFilter = `
+  ${publishedProductDetailFilter} &&
+  !defined(*[
+    ${publishedProductDetailFilter} &&
+    (
+      slug.current == ^.slug.current ||
+      (
+        defined(basicInfo.productNumber) &&
+        basicInfo.productNumber != "" &&
+        basicInfo.productNumber == ^.basicInfo.productNumber
+      )
+    ) &&
+    _updatedAt > ^._updatedAt
+  ][0])
+`;
+
 const artworkVideoItemFields = `
   _key,
   videoFile{
@@ -1307,16 +1334,14 @@ export const productCollectionsQuery = defineQuery(`*[
 }`);
 
 export const productDetailBySlugQuery = defineQuery(`*[
-  _type == "productDetail" &&
+  ${canonicalProductDetailFilter} &&
   slug.current == $slug
-][0]{
+] | order(_updatedAt desc)[0]{
   ${productDetailFields}
 }`);
 
 export const productDetailsForCardsQuery = defineQuery(`*[
-  _type == "productDetail" &&
-  defined(slug.current) &&
-  !(_id in path("drafts.**"))
+  ${canonicalProductDetailFilter}
 ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   _id,
   "category": "artwork",
@@ -1340,8 +1365,7 @@ export const productDetailsForCardsQuery = defineQuery(`*[
 }`);
 
 export const productDetailSlugsQuery = defineQuery(`*[
-  _type == "productDetail" &&
-  defined(slug.current)
+  ${canonicalProductDetailFilter}
 ]{
   "slug": slug.current
 }`);

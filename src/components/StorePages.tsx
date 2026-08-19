@@ -315,8 +315,8 @@ const artworkProductCategories = [
   "\u6606\u866b",
   "\u88f8\u5b50\u690d\u7269",
   "\u9e1f\u7c7b",
-  "\u5176\u4ed6",
   "\u6e38\u6cf3\u52a8\u7269",
+  "\u5176\u4ed6",
 ] as const;
 
 function compactText(value: string | number | null | undefined) {
@@ -336,6 +336,48 @@ function formatProductNumber(value: string | number | null | undefined) {
 function productNumberValue(value: string | number | null | undefined) {
   const number = Number(compactText(value));
   return Number.isFinite(number) ? number : Number.POSITIVE_INFINITY;
+}
+
+function canonicalDocumentId(value: string | null | undefined) {
+  return compactText(value)
+    .replace(/^drafts\./, "")
+    .replace(/^versions\.[^.]+\./, "");
+}
+
+function artworkProductIdentityKeys(item: ProductCollection) {
+  const keys = [];
+  const documentId = canonicalDocumentId(item._id);
+  const slug = compactText(item.slug);
+  const productNumber = compactText(item.productNumber);
+
+  if (documentId) {
+    keys.push(`id:${documentId}`);
+  }
+
+  if (slug) {
+    keys.push(`slug:${slug}`);
+  }
+
+  if (productNumber) {
+    keys.push(`number:${formatProductNumber(productNumber)}`);
+  }
+
+  return keys;
+}
+
+function uniqueArtworkProductsByIdentity(items: ProductCollection[]) {
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    const keys = artworkProductIdentityKeys(item);
+
+    if (keys.some((key) => seen.has(key))) {
+      return false;
+    }
+
+    keys.forEach((key) => seen.add(key));
+    return true;
+  });
 }
 
 function formatYuanPrice(value: string | number | null | undefined) {
@@ -892,7 +934,7 @@ export async function StoreOverview({
           ...(activeCategory === "derivatives" ? artDerivativeDetails : []),
         ];
   const activeCollectionCategory = categoryByStoreCategory[activeCategory];
-  const items = source
+  const sortedItems = source
     .filter((item) => {
       if (item.productType) {
         return item.productType === activeCategory;
@@ -944,8 +986,11 @@ export async function StoreOverview({
         compactText(b.title),
         "zh-Hans",
       );
-    })
-    .map(mapProduct);
+    });
+  const items = (activeCategory === "artworks"
+    ? uniqueArtworkProductsByIdentity(sortedItems)
+    : sortedItems
+  ).map(mapProduct);
   return (
     <AppShell locale={locale}>
       <PageContainer className="pb-16 lg:pb-20">
