@@ -4,6 +4,7 @@ import type { SanityImageSource } from "@sanity/image-url";
 import type { Locale } from "@/config/navigation";
 
 import { Logo } from "./Logo";
+import { SiteSearch } from "./SiteSearch";
 
 type MobileHeaderProps = {
   locale: Locale;
@@ -23,10 +24,21 @@ export function MobileHeader({
   siteName,
 }: MobileHeaderProps) {
   return (
-    <header className="topbar-shell sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b px-5 lg:hidden">
-      <Logo image={logo} locale={locale} siteName={siteName} variant="mobile" />
+    <header className="topbar-shell sticky top-0 z-40 flex h-16 w-full items-center justify-between gap-3 border-b px-5 lg:hidden">
+      <Logo
+        className="shrink min-w-0"
+        image={logo}
+        locale={locale}
+        siteName={siteName}
+        variant="mobile"
+      />
+      <SiteSearch
+        controlClassName="glass-control flex h-10 min-w-0 items-center rounded-full px-3 text-xs text-muted-token"
+        locale={locale}
+        variant="mobile"
+      />
       <button
-        className="glass-button flex h-11 min-w-11 items-center justify-center rounded-full px-4 text-sm font-medium"
+        className="glass-button flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-medium"
         onClick={onMenuClick}
         type="button"
       >

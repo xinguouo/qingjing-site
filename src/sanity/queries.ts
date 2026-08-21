@@ -1370,6 +1370,204 @@ export const productDetailSlugsQuery = defineQuery(`*[
   "slug": slug.current
 }`);
 
+export const siteSearchContentQuery = defineQuery(`{
+  "artworks": *[
+    (_type == "artWork" || _type == "artProject") &&
+    ${publishedDocumentFilter} &&
+    ${publishedArtWorkFilter} &&
+    defined(slug.current)
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    _id,
+    "_type": _type,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    "category": coalesce(category, workType, projectType),
+    "workType": coalesce(category, workType, projectType),
+    artist,
+    year,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText("descriptionEn", "descriptionZh")},
+    "coverImage": coalesce(coverImage{${imageFields}}, galleryImages[0].image{${imageFields}}, galleryImages[0]{${imageFields}}, images[0].image{${imageFields}}, images[0]{${imageFields}})
+  },
+  "events": *[
+    _type == "event" &&
+    ${publishedDocumentFilter}
+  ] | order(order asc) {
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    "eventType": select(eventType == "event" => "activity", eventType),
+    courseIntroZh,
+    courseIntroEn,
+    "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
+    facultyZh,
+    facultyEn,
+    "faculty": ${localizedText("facultyEn", "facultyZh")},
+    contentZh,
+    contentEn,
+    "content": ${localizedText("contentEn", "contentZh")},
+    coverImage{${imageFields}},
+    posterImage{${imageFields}}
+  },
+  "studyPrograms": *[
+    _type == "studyProgram" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(order asc) {
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    programType,
+    courseIntroZh,
+    courseIntroEn,
+    "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
+    academicHostZh,
+    academicHostEn,
+    "academicHost": ${localizedText("academicHostEn", "academicHostZh")},
+    teacherTeamZh,
+    teacherTeamEn,
+    "teacherTeam": ${localizedText("teacherTeamEn", "teacherTeamZh")},
+    heroImage{${imageFields}},
+    coverImage{${imageFields}}
+  },
+  "experienceCourses": *[
+    _type == "experienceCourse" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(order asc) {
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText("descriptionEn", "descriptionZh")},
+    teacher,
+    academicSupport,
+    category,
+    heroImage{${imageFields}},
+    coverImage{${imageFields}}
+  },
+  "offlineWorkshops": *[
+    _type == "offlineWorkshop" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(order asc) {
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    shortDescriptionZh,
+    shortDescriptionEn,
+    "shortDescription": ${localizedText("shortDescriptionEn", "shortDescriptionZh")},
+    tagZh,
+    tagEn,
+    "tag": ${localizedText("tagEn", "tagZh")},
+    category,
+    coverImage{${imageFields}}
+  },
+  "productDetails": *[
+    ${canonicalProductDetailFilter}
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    _id,
+    "slug": slug.current,
+    "productType": "artworks",
+    "titleZh": basicInfo.titleZh,
+    "titleEn": basicInfo.titleEn,
+    "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
+    "productNumber": basicInfo.productNumber,
+    "category": basicInfo.category,
+    "descriptionZh": productInfo.descriptionZh,
+    "descriptionEn": productInfo.descriptionEn,
+    "description": ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")},
+    "coverImage": coalesce(media.mainImage{${imageFields}}, media.galleryImages[0]{${imageFields}})
+  },
+  "products": *[
+    _type == "product" &&
+    ${publishedDocumentFilter} &&
+    coalesce(needsReview, false) != true &&
+    defined(slug.current)
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${productCardFields}
+  },
+  "derivativeProducts": *[
+    _type == "derivativeProduct" &&
+    ${publishedDocumentFilter} &&
+    coalesce(needsReview, false) != true &&
+    defined(slug.current)
+  ] | order(order asc) {
+    ${derivativeProductFields},
+    "productType": "derivatives"
+  },
+  "artDerivativeDetails": *[
+    _type == "artDerivativeDetail" &&
+    ${publishedDocumentFilter} &&
+    coalesce(needsReview, false) != true &&
+    defined(slug.current)
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${artDerivativeDetailCardFields}
+  },
+  "artworkProducts": *[
+    _type == "artworkProduct" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${artworkProductFields}
+  },
+  "teamMembers": *[
+    _type == "teamMember" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(order asc) {
+    _id,
+    nameZh,
+    nameEn,
+    "name": ${localizedText("nameEn", "nameZh")},
+    "slug": slug.current,
+    roleZh,
+    roleEn,
+    "role": ${localizedText("roleEn", "roleZh")},
+    shortBioZh,
+    shortBioEn,
+    bioZh,
+    bioEn,
+    "bio": select(
+      $locale == "en" && defined(shortBioEn) && shortBioEn != "" => shortBioEn,
+      defined(shortBioZh) && shortBioZh != "" => shortBioZh,
+      $locale == "en" && defined(bioEn) && bioEn != "" => bioEn,
+      bioZh
+    ),
+    portrait{${imageFields}}
+  },
+  "artists": *[
+    _type == "artist" &&
+    ${publishedDocumentFilter} &&
+    defined(slug.current)
+  ] | order(order asc) {
+    _id,
+    nameZh,
+    nameEn,
+    "name": ${localizedText("nameEn", "nameZh")},
+    "slug": slug.current,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    bioZh,
+    bioEn,
+    "bio": ${localizedText("bioEn", "bioZh")},
+    portrait{${imageFields}}
+  }
+}`);
+
 export const artDerivativeDetailBySlugQuery = defineQuery(`*[
   _type == "artDerivativeDetail" &&
   slug.current == $slug

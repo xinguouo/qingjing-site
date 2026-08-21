@@ -10,13 +10,10 @@ import {
 } from "@/config/navigation";
 
 import { ThemeToggle } from "./ThemeToggle";
+import { SiteSearch } from "./SiteSearch";
 
 type TopBarProps = {
   locale: Locale;
-};
-
-const labels = {
-  searchZh: "\u641c\u7d22\u9875\u9762\u3001\u6d3b\u52a8\u3001\u827a\u672f\u5bb6...",
 };
 
 function getCurrentPageTitle(pathname: string, locale: Locale) {
@@ -57,9 +54,7 @@ export function TopBar({ locale }: TopBarProps) {
   return (
     <header className="topbar-shell hidden h-[62px] items-center justify-between border-b px-6 lg:flex">
       <p className="text-sm text-muted-token">{title}</p>
-      <div className="glass-control flex h-9 w-[min(360px,34vw)] items-center rounded-full px-4 text-xs text-muted-token">
-        {locale === "zh" ? labels.searchZh : "Search pages, events, artists..."}
-      </div>
+      <SiteSearch locale={locale} />
       <div className="flex items-center gap-2">
         <Link
           className="glass-button flex h-8 min-w-8 items-center justify-center rounded-full px-2.5 text-[11px] transition"
