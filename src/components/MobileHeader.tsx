@@ -24,7 +24,7 @@ export function MobileHeader({
   siteName,
 }: MobileHeaderProps) {
   return (
-    <header className="topbar-shell sticky top-0 z-40 flex h-16 w-full items-center justify-between gap-3 border-b px-5 lg:hidden">
+    <header className="topbar-shell sticky top-0 z-[60] flex h-16 w-full items-center justify-between gap-3 overflow-visible border-b px-5 lg:hidden">
       <Logo
         className="shrink min-w-0"
         image={logo}

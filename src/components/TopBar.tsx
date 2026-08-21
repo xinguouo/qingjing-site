@@ -52,7 +52,7 @@ export function TopBar({ locale }: TopBarProps) {
   const languageHref = getLanguageHref(pathname, locale);
 
   return (
-    <header className="topbar-shell hidden h-[62px] items-center justify-between border-b px-6 lg:flex">
+    <header className="topbar-shell relative z-[60] hidden h-[62px] items-center justify-between overflow-visible border-b px-6 lg:flex">
       <p className="text-sm text-muted-token">{title}</p>
       <SiteSearch locale={locale} />
       <div className="flex items-center gap-2">
