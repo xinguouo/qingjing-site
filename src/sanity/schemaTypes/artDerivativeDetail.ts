@@ -38,7 +38,7 @@ export const artDerivativeDetail = defineType({
     }),
     defineField({
       name: 'category',
-      title: '分类 / Category',
+      title: '产品类型 / Product Type',
       type: 'string',
       group: 'basic',
       options: {

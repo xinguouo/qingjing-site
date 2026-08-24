@@ -59,7 +59,7 @@ export const productCollection = defineType({
     }),
     defineField({
       name: "subcategory",
-      title: "艺术衍生品二级分类 / Derivative Subcategory",
+      title: "产品类型 / Product Type",
       type: "string",
       group: "basic",
       options: {

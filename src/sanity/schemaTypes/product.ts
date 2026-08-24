@@ -64,7 +64,7 @@ export const product = defineType({
     }),
     defineField({
       name: "derivativeCategory",
-      title: "衍生品分类 / Derivative Category",
+      title: "产品类型 / Product Type",
       type: "string",
       group: "basic",
       options: {

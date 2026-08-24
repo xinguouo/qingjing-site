@@ -114,7 +114,7 @@ export function shopTaxonomyFields(group = 'basic') {
   return [
     defineField({
       name: 'craftCategory',
-      title: '工艺分类 / Craft Category',
+      title: '玻璃工艺 / Craft Category',
       type: 'array',
       group,
       of: [{type: 'string'}],
@@ -125,7 +125,7 @@ export function shopTaxonomyFields(group = 'basic') {
     }),
     defineField({
       name: 'series',
-      title: '系列 / Series',
+      title: '作品系列 / Series',
       type: 'reference',
       group,
       to: [{type: 'shopSeries'}],

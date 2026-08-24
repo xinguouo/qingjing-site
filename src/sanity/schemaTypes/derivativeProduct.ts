@@ -38,6 +38,23 @@ export const derivativeProduct = defineType({
       options: {source: 'titleEn', maxLength: 96},
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'derivativeCategory',
+      title: '产品类型 / Product Type',
+      type: 'string',
+      group: 'basic',
+      options: {
+        list: [
+          {title: '器物 / Vessel', value: 'vessel'},
+          {title: '肖物 / Wearable', value: 'wearable'},
+          {title: '玩物 / Toy', value: 'toy'},
+          {title: '饰物 / Ornament', value: 'ornament'},
+          {title: '境物 / Object', value: 'object'},
+          {title: '包装 / Packaging', value: 'packaging'},
+        ],
+        layout: 'dropdown',
+      },
+    }),
     ...shopTaxonomyFields('basic'),
     defineField({
       name: 'coverImage',

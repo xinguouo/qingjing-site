@@ -375,6 +375,16 @@ const artworkProductCategories = [
 ] as const;
 
 const defaultSeriesSlug = "wanwu-sheng";
+const filterTextNavClass =
+  "flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
+const filterGroupTitleClass =
+  "mb-3 text-[10px] font-medium uppercase tracking-[0.28em] text-muted-token";
+const craftButtonBaseClass =
+  "relative flex h-9 shrink-0 items-center overflow-hidden rounded-[10px] border px-4 text-[13px] leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-[6px] transition before:pointer-events-none before:absolute before:inset-x-2 before:top-px before:h-px before:bg-white/45 before:opacity-50";
+const craftButtonIdleClass =
+  "border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.045)] text-muted-token hover:border-[rgba(255,255,255,0.32)] hover:bg-[rgba(255,255,255,0.08)] hover:text-primary";
+const craftButtonActiveClass =
+  "border-[rgba(255,255,255,0.42)] bg-[rgba(255,255,255,0.14)] text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.36),0_8px_24px_rgba(0,0,0,0.12)] before:opacity-80";
 
 function compactText(value: string | number | null | undefined) {
   return typeof value === "number" ? String(value) : value?.trim() || "";
@@ -641,6 +651,14 @@ function subcategoryLabel(
   return option ? (locale === "zh" ? option.labelZh : option.labelEn) : "";
 }
 
+function FilterGroupTitle({
+  children,
+}: {
+  children: string;
+}) {
+  return <p className={filterGroupTitleClass}>{children}</p>;
+}
+
 function categoryDisplay(item: ProductCardItem, locale: Locale) {
   if (item.category === "derivative" && item.subcategory) {
     return subcategoryLabel(item.subcategory, locale);
@@ -840,54 +858,58 @@ function DerivativeSubcategoryTabs({
   locale: Locale;
 }) {
   const allLabel = locale === "zh" ? "全部" : "All";
+  const title = locale === "zh" ? "产品类型" : "Product Type";
 
   return (
-    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
-      <Link
-        className={`relative shrink-0 pb-3 transition ${
-          !activeSubcategory ? "text-primary" : "hover:text-primary"
-        }`}
-        href={shopFilterHref({
-          category: "derivatives",
-          craftCategory: activeCraftCategory,
-          includeLocalePrefix,
-          locale,
-          series: activeSeries,
-          seriesBranch: activeSeriesBranch,
-        })}
-      >
-        {allLabel}
-        {!activeSubcategory ? (
-          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-        ) : null}
-      </Link>
-      {derivativeSubcategories.map((item) => {
-        const isActive = activeSubcategory === item.id;
+    <div className="mt-5">
+      <FilterGroupTitle>{title}</FilterGroupTitle>
+      <nav className={filterTextNavClass}>
+        <Link
+          className={`relative shrink-0 pb-3 transition ${
+            !activeSubcategory ? "text-primary" : "hover:text-primary"
+          }`}
+          href={shopFilterHref({
+            category: "derivatives",
+            craftCategory: activeCraftCategory,
+            includeLocalePrefix,
+            locale,
+            series: activeSeries,
+            seriesBranch: activeSeriesBranch,
+          })}
+        >
+          {allLabel}
+          {!activeSubcategory ? (
+            <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+          ) : null}
+        </Link>
+        {derivativeSubcategories.map((item) => {
+          const isActive = activeSubcategory === item.id;
 
-        return (
-          <Link
-            className={`relative shrink-0 pb-3 transition ${
-              isActive ? "text-primary" : "hover:text-primary"
-            }`}
-            href={shopFilterHref({
-              category: "derivatives",
-              craftCategory: activeCraftCategory,
-              includeLocalePrefix,
-              locale,
-              series: activeSeries,
-              seriesBranch: activeSeriesBranch,
-              subcategory: item.id,
-            })}
-            key={item.id}
-          >
-            {locale === "zh" ? item.labelZh : item.labelEn}
-            {isActive ? (
-              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
+          return (
+            <Link
+              className={`relative shrink-0 pb-3 transition ${
+                isActive ? "text-primary" : "hover:text-primary"
+              }`}
+              href={shopFilterHref({
+                category: "derivatives",
+                craftCategory: activeCraftCategory,
+                includeLocalePrefix,
+                locale,
+                series: activeSeries,
+                seriesBranch: activeSeriesBranch,
+                subcategory: item.id,
+              })}
+              key={item.id}
+            >
+              {locale === "zh" ? item.labelZh : item.labelEn}
+              {isActive ? (
+                <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+              ) : null}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 
@@ -909,54 +931,52 @@ function CraftCategoryTabs({
   locale: Locale;
 }) {
   const allLabel = locale === "zh" ? "全部" : "All";
+  const title = locale === "zh" ? "玻璃工艺" : "Glass Craft";
 
   return (
-    <nav className="mt-6 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
-      <Link
-        className={`relative shrink-0 pb-3 transition ${
-          !activeCraftCategory ? "text-primary" : "hover:text-primary"
-        }`}
-        href={shopFilterHref({
-          category: activeCategory,
-          includeLocalePrefix,
-          locale,
-          series: activeSeries,
-          seriesBranch: activeSeriesBranch,
-          subcategory: activeSubcategory,
-        })}
-      >
-        {allLabel}
-        {!activeCraftCategory ? (
-          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-        ) : null}
-      </Link>
-      {craftCategoryOptions.map((item) => {
-        const isActive = activeCraftCategory === item.id;
+    <div className="mt-7">
+      <FilterGroupTitle>{title}</FilterGroupTitle>
+      <nav className="flex gap-3 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <Link
+          className={`${craftButtonBaseClass} ${
+            !activeCraftCategory ? craftButtonActiveClass : craftButtonIdleClass
+          }`}
+          href={shopFilterHref({
+            category: activeCategory,
+            includeLocalePrefix,
+            locale,
+            series: activeSeries,
+            seriesBranch: activeSeriesBranch,
+            subcategory: activeSubcategory,
+          })}
+        >
+          {allLabel}
+        </Link>
+        {craftCategoryOptions.map((item) => {
+          const isActive = activeCraftCategory === item.id;
 
-        return (
-          <Link
-            className={`relative shrink-0 pb-3 transition ${
-              isActive ? "text-primary" : "hover:text-primary"
-            }`}
-            href={shopFilterHref({
-              category: activeCategory,
-              craftCategory: item.id,
-              includeLocalePrefix,
-              locale,
-              series: activeSeries,
-              seriesBranch: activeSeriesBranch,
-              subcategory: activeSubcategory,
-            })}
-            key={item.id}
-          >
-            {locale === "zh" ? item.labelZh : item.labelEn}
-            {isActive ? (
-              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
+          return (
+            <Link
+              className={`${craftButtonBaseClass} ${
+                isActive ? craftButtonActiveClass : craftButtonIdleClass
+              }`}
+              href={shopFilterHref({
+                category: activeCategory,
+                craftCategory: item.id,
+                includeLocalePrefix,
+                locale,
+                series: activeSeries,
+                seriesBranch: activeSeriesBranch,
+                subcategory: activeSubcategory,
+              })}
+              key={item.id}
+            >
+              {locale === "zh" ? item.labelZh : item.labelEn}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 
@@ -978,58 +998,62 @@ function SeriesTabs({
   seriesItems: ShopSeries[];
 }) {
   const allLabel = locale === "zh" ? "全部系列" : "All Series";
+  const title = locale === "zh" ? "作品系列" : "Series";
 
   return (
-    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
-      <Link
-        className={`relative shrink-0 pb-3 transition ${
-          !activeSeries ? "text-primary" : "hover:text-primary"
-        }`}
-        href={shopFilterHref({
-          category: activeCategory,
-          craftCategory: activeCraftCategory,
-          includeLocalePrefix,
-          locale,
-          subcategory: activeSubcategory,
+    <div className="mt-5">
+      <FilterGroupTitle>{title}</FilterGroupTitle>
+      <nav className={filterTextNavClass}>
+        <Link
+          className={`relative shrink-0 pb-3 transition ${
+            !activeSeries ? "text-primary" : "hover:text-primary"
+          }`}
+          href={shopFilterHref({
+            category: activeCategory,
+            craftCategory: activeCraftCategory,
+            includeLocalePrefix,
+            locale,
+            subcategory: activeSubcategory,
+          })}
+        >
+          {allLabel}
+          {!activeSeries ? (
+            <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+          ) : null}
+        </Link>
+        {seriesItems.map((item) => {
+          const slug = compactText(item.slug);
+          const seriesTitle = compactText(item.title) || compactText(item.titleZh);
+          const isActive = activeSeries === slug;
+
+          if (!slug || !seriesTitle) {
+            return null;
+          }
+
+          return (
+            <Link
+              className={`relative shrink-0 pb-3 transition ${
+                isActive ? "text-primary" : "hover:text-primary"
+              }`}
+              href={shopFilterHref({
+                category: activeCategory,
+                craftCategory: activeCraftCategory,
+                includeLocalePrefix,
+                locale,
+                series: slug,
+                subcategory: activeSubcategory,
+              })}
+              key={item._id}
+            >
+              {seriesTitle}
+              {isActive ? (
+                <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+              ) : null}
+            </Link>
+          );
         })}
-      >
-        {allLabel}
-        {!activeSeries ? (
-          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-        ) : null}
-      </Link>
-      {seriesItems.map((item) => {
-        const slug = compactText(item.slug);
-        const title = compactText(item.title) || compactText(item.titleZh);
-        const isActive = activeSeries === slug;
-
-        if (!slug || !title) {
-          return null;
-        }
-
-        return (
-          <Link
-            className={`relative shrink-0 pb-3 transition ${
-              isActive ? "text-primary" : "hover:text-primary"
-            }`}
-            href={shopFilterHref({
-              category: activeCategory,
-              craftCategory: activeCraftCategory,
-              includeLocalePrefix,
-              locale,
-              series: slug,
-              subcategory: activeSubcategory,
-            })}
-            key={item._id}
-          >
-            {title}
-            {isActive ? (
-              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
+      </nav>
+    </div>
   );
 }
 
@@ -1053,64 +1077,68 @@ function SeriesBranchTabs({
   locale: Locale;
 }) {
   const allLabel = locale === "zh" ? "全部" : "All";
+  const title = locale === "zh" ? "系列分支" : "Series Branch";
 
   if (!branches.length) {
     return null;
   }
 
   return (
-    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
-      <Link
-        className={`relative shrink-0 pb-3 transition ${
-          !activeSeriesBranch ? "text-primary" : "hover:text-primary"
-        }`}
-        href={shopFilterHref({
-          category: activeCategory,
-          craftCategory: activeCraftCategory,
-          includeLocalePrefix,
-          locale,
-          series: activeSeries,
-          subcategory: activeSubcategory,
+    <div className="mt-5">
+      <FilterGroupTitle>{title}</FilterGroupTitle>
+      <nav className={filterTextNavClass}>
+        <Link
+          className={`relative shrink-0 pb-3 transition ${
+            !activeSeriesBranch ? "text-primary" : "hover:text-primary"
+          }`}
+          href={shopFilterHref({
+            category: activeCategory,
+            craftCategory: activeCraftCategory,
+            includeLocalePrefix,
+            locale,
+            series: activeSeries,
+            subcategory: activeSubcategory,
+          })}
+        >
+          {allLabel}
+          {!activeSeriesBranch ? (
+            <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+          ) : null}
+        </Link>
+        {branches.map((branch) => {
+          const slug = compactText(branch.slug);
+          const branchTitle = compactText(branch.title) || compactText(branch.titleZh);
+          const isActive = activeSeriesBranch === slug;
+
+          if (!slug || !branchTitle) {
+            return null;
+          }
+
+          return (
+            <Link
+              className={`relative shrink-0 pb-3 transition ${
+                isActive ? "text-primary" : "hover:text-primary"
+              }`}
+              href={shopFilterHref({
+                category: activeCategory,
+                craftCategory: activeCraftCategory,
+                includeLocalePrefix,
+                locale,
+                series: activeSeries,
+                seriesBranch: slug,
+                subcategory: activeSubcategory,
+              })}
+              key={branch._id}
+            >
+              {branchTitle}
+              {isActive ? (
+                <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+              ) : null}
+            </Link>
+          );
         })}
-      >
-        {allLabel}
-        {!activeSeriesBranch ? (
-          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-        ) : null}
-      </Link>
-      {branches.map((branch) => {
-        const slug = compactText(branch.slug);
-        const title = compactText(branch.title) || compactText(branch.titleZh);
-        const isActive = activeSeriesBranch === slug;
-
-        if (!slug || !title) {
-          return null;
-        }
-
-        return (
-          <Link
-            className={`relative shrink-0 pb-3 transition ${
-              isActive ? "text-primary" : "hover:text-primary"
-            }`}
-            href={shopFilterHref({
-              category: activeCategory,
-              craftCategory: activeCraftCategory,
-              includeLocalePrefix,
-              locale,
-              series: activeSeries,
-              seriesBranch: slug,
-              subcategory: activeSubcategory,
-            })}
-            key={branch._id}
-          >
-            {title}
-            {isActive ? (
-              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
+      </nav>
+    </div>
   );
 }
 
