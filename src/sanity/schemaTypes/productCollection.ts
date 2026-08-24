@@ -9,6 +9,10 @@ import { imageCaptionFields } from "./imageCaptionFields";
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
 import { shopTaxonomyFields } from "./shopTaxonomy";
 
+function isDerivativeCollection(parent?: Record<string, unknown>) {
+  return parent?.category === "derivative";
+}
+
 export const productCollection = defineType({
   name: "productCollection",
   title: "商店商品集合 / Product Collection",
@@ -92,7 +96,10 @@ export const productCollection = defineType({
       group: "basic",
       hidden: ({ parent }) => parent?.category !== "artwork",
     }),
-    ...shopTaxonomyFields("basic"),
+    ...shopTaxonomyFields("basic", {
+      seriesBranchHidden: ({ parent }) => isDerivativeCollection(parent),
+      seriesHidden: ({ parent }) => isDerivativeCollection(parent),
+    }),
     defineField({
       name: "coverImage",
       title: "封面图片 / Cover Image",

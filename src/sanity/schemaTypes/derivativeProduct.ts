@@ -1,7 +1,7 @@
 import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
-import {shopTaxonomyFields} from './shopTaxonomy'
+import {shopCraftCategoryFields} from './shopTaxonomy'
 
 export const derivativeProduct = defineType({
   name: 'derivativeProduct',
@@ -55,7 +55,7 @@ export const derivativeProduct = defineType({
         layout: 'dropdown',
       },
     }),
-    ...shopTaxonomyFields('basic'),
+    ...shopCraftCategoryFields('basic'),
     defineField({
       name: 'coverImage',
       title: '封面图片 / Cover Image',

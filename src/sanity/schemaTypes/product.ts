@@ -9,6 +9,16 @@ import { imageCaptionFields } from "./imageCaptionFields";
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
 import { shopTaxonomyFields } from "./shopTaxonomy";
 
+const derivativeProductTypes = [
+  "derivatives",
+  "art-derivatives",
+  "art-merchandise",
+];
+
+function isDerivativeProduct(parent?: Record<string, unknown>) {
+  return derivativeProductTypes.includes(String(parent?.productType || ""));
+}
+
 export const product = defineType({
   name: "product",
   title: "商品 / Product",
@@ -103,7 +113,10 @@ export const product = defineType({
       hidden: ({ parent }) =>
         !["available-artworks", "artworks"].includes(parent?.productType),
     }),
-    ...shopTaxonomyFields("basic"),
+    ...shopTaxonomyFields("basic", {
+      seriesBranchHidden: ({ parent }) => isDerivativeProduct(parent),
+      seriesHidden: ({ parent }) => isDerivativeProduct(parent),
+    }),
     defineField({
       name: "coverImage",
       title: "封面图片 / Cover Image",

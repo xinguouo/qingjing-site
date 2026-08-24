@@ -815,6 +815,9 @@ function StoreTabs({
     <nav className="flex flex-wrap gap-x-9 gap-y-3 text-[14px] text-muted-token">
       {tabs.map((tab) => {
         const isActive = tab.id === activeCategory;
+        const tabSeries = tab.id === "artworks" ? activeSeries : null;
+        const tabSeriesBranch =
+          tab.id === "artworks" ? activeSeriesBranch : null;
 
         return (
           <Link
@@ -826,8 +829,8 @@ function StoreTabs({
               craftCategory: activeCraftCategory,
               includeLocalePrefix,
               locale,
-              series: activeSeries,
-              seriesBranch: activeSeriesBranch,
+              series: tabSeries,
+              seriesBranch: tabSeriesBranch,
             })}
             key={tab.id}
           >
@@ -844,15 +847,11 @@ function StoreTabs({
 
 function DerivativeSubcategoryTabs({
   activeCraftCategory,
-  activeSeries,
-  activeSeriesBranch,
   activeSubcategory,
   includeLocalePrefix,
   locale,
 }: {
   activeCraftCategory?: CraftCategory | null;
-  activeSeries?: string | null;
-  activeSeriesBranch?: string | null;
   activeSubcategory?: ProductSubcategory | null;
   includeLocalePrefix: boolean;
   locale: Locale;
@@ -873,8 +872,6 @@ function DerivativeSubcategoryTabs({
             craftCategory: activeCraftCategory,
             includeLocalePrefix,
             locale,
-            series: activeSeries,
-            seriesBranch: activeSeriesBranch,
           })}
         >
           {allLabel}
@@ -895,8 +892,6 @@ function DerivativeSubcategoryTabs({
                 craftCategory: activeCraftCategory,
                 includeLocalePrefix,
                 locale,
-                series: activeSeries,
-                seriesBranch: activeSeriesBranch,
                 subcategory: item.id,
               })}
               key={item.id}
@@ -1245,11 +1240,12 @@ export async function StoreOverview({
       ? subcategory
       : null;
   const activeCraftCategory = isCraftCategory(craftCategory) ? craftCategory : null;
+  const supportsSeriesFilters = activeCategory === "artworks";
   const legacyArtworkBranch =
-    activeCategory === "artworks" && isArtworkProductCategory(artworkCategory)
+    supportsSeriesFilters && isArtworkProductCategory(artworkCategory)
       ? normalizeArtworkProductCategory(artworkCategory)
       : null;
-  const requestedSeries = compactText(series);
+  const requestedSeries = supportsSeriesFilters ? compactText(series) : "";
   const activeSeriesSlug =
     requestedSeries ||
     (legacyArtworkBranch && seriesItems.some((item) => item.slug === defaultSeriesSlug)
@@ -1263,7 +1259,9 @@ export async function StoreOverview({
         (branch) => compactText(branch.titleZh) === legacyArtworkBranch,
       )
     : null;
-  const requestedSeriesBranch = compactText(seriesBranch);
+  const requestedSeriesBranch = supportsSeriesFilters
+    ? compactText(seriesBranch)
+    : "";
   const activeSeriesBranchSlug =
     activeSeriesItem &&
     (activeSeriesItem.branches || []).some(
@@ -1296,10 +1294,12 @@ export async function StoreOverview({
         : true,
     )
     .filter((item) =>
-      activeSeriesSlug ? compactText(item.seriesSlug) === activeSeriesSlug : true,
+      supportsSeriesFilters && activeSeriesSlug
+        ? compactText(item.seriesSlug) === activeSeriesSlug
+        : true,
     )
     .filter((item) =>
-      activeSeriesSlug && activeSeriesBranchSlug
+      supportsSeriesFilters && activeSeriesSlug && activeSeriesBranchSlug
         ? compactText(item.seriesBranchSlug) === activeSeriesBranchSlug
         : true,
     )
@@ -1371,38 +1371,42 @@ export async function StoreOverview({
           <CraftCategoryTabs
             activeCategory={activeCategory}
             activeCraftCategory={activeCraftCategory}
-            activeSeries={activeSeriesSlug}
-            activeSeriesBranch={activeSeriesBranchSlug}
+            activeSeries={supportsSeriesFilters ? activeSeriesSlug : null}
+            activeSeriesBranch={
+              supportsSeriesFilters ? activeSeriesBranchSlug : null
+            }
             activeSubcategory={activeSubcategory}
             includeLocalePrefix={includeLocalePrefix}
             locale={locale}
           />
-          <SeriesTabs
-            activeCategory={activeCategory}
-            activeCraftCategory={activeCraftCategory}
-            activeSeries={activeSeriesSlug}
-            activeSubcategory={activeSubcategory}
-            includeLocalePrefix={includeLocalePrefix}
-            locale={locale}
-            seriesItems={seriesItems}
-          />
-          {activeSeriesItem ? (
-            <SeriesBranchTabs
-              activeCategory={activeCategory}
-              activeCraftCategory={activeCraftCategory}
-              activeSeries={activeSeriesSlug}
-              activeSeriesBranch={activeSeriesBranchSlug}
-              activeSubcategory={activeSubcategory}
-              branches={activeSeriesItem.branches || []}
-              includeLocalePrefix={includeLocalePrefix}
-              locale={locale}
-            />
+          {supportsSeriesFilters ? (
+            <>
+              <SeriesTabs
+                activeCategory={activeCategory}
+                activeCraftCategory={activeCraftCategory}
+                activeSeries={activeSeriesSlug}
+                activeSubcategory={activeSubcategory}
+                includeLocalePrefix={includeLocalePrefix}
+                locale={locale}
+                seriesItems={seriesItems}
+              />
+              {activeSeriesItem ? (
+                <SeriesBranchTabs
+                  activeCategory={activeCategory}
+                  activeCraftCategory={activeCraftCategory}
+                  activeSeries={activeSeriesSlug}
+                  activeSeriesBranch={activeSeriesBranchSlug}
+                  activeSubcategory={activeSubcategory}
+                  branches={activeSeriesItem.branches || []}
+                  includeLocalePrefix={includeLocalePrefix}
+                  locale={locale}
+                />
+              ) : null}
+            </>
           ) : null}
           {activeCategory === "derivatives" ? (
             <DerivativeSubcategoryTabs
               activeCraftCategory={activeCraftCategory}
-              activeSeries={activeSeriesSlug}
-              activeSeriesBranch={activeSeriesBranchSlug}
               activeSubcategory={activeSubcategory}
               includeLocalePrefix={includeLocalePrefix}
               locale={locale}

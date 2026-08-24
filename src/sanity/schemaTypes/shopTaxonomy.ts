@@ -1,5 +1,15 @@
 import {defineField, defineType} from 'sanity'
 
+type ShopTaxonomyHiddenCallback = (context: {
+  document?: Record<string, unknown>
+  parent?: Record<string, unknown>
+}) => boolean
+
+type ShopTaxonomyFieldOptions = {
+  seriesBranchHidden?: ShopTaxonomyHiddenCallback
+  seriesHidden?: ShopTaxonomyHiddenCallback
+}
+
 export const shopCraftCategoryOptions = [
   {title: '玻璃铸造 / Glass Casting', value: 'glass-casting'},
   {title: '玻璃吹制 / Glass Blowing', value: 'glass-blowing'},
@@ -110,24 +120,33 @@ export const shopSeriesBranch = defineType({
   },
 })
 
-export function shopTaxonomyFields(group = 'basic') {
+export function shopCraftCategoryField(group = 'basic') {
+  return defineField({
+    name: 'craftCategory',
+    title: '玻璃工艺 / Craft Category',
+    type: 'array',
+    group,
+    of: [{type: 'string'}],
+    options: {
+      list: shopCraftCategoryOptions,
+      layout: 'tags',
+    },
+  })
+}
+
+export function shopCraftCategoryFields(group = 'basic') {
+  return [shopCraftCategoryField(group)]
+}
+
+export function shopTaxonomyFields(group = 'basic', options: ShopTaxonomyFieldOptions = {}) {
   return [
-    defineField({
-      name: 'craftCategory',
-      title: '玻璃工艺 / Craft Category',
-      type: 'array',
-      group,
-      of: [{type: 'string'}],
-      options: {
-        list: shopCraftCategoryOptions,
-        layout: 'tags',
-      },
-    }),
+    shopCraftCategoryField(group),
     defineField({
       name: 'series',
       title: '作品系列 / Series',
       type: 'reference',
       group,
+      hidden: options.seriesHidden,
       to: [{type: 'shopSeries'}],
     }),
     defineField({
@@ -135,6 +154,7 @@ export function shopTaxonomyFields(group = 'basic') {
       title: '系列分支 / Series Branch',
       type: 'reference',
       group,
+      hidden: options.seriesBranchHidden,
       to: [{type: 'shopSeriesBranch'}],
       options: {
         filter: ({document}) => {
