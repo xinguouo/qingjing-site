@@ -300,7 +300,7 @@ export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
           <h2 className="font-title text-[26px] font-normal leading-tight text-primary lg:text-[32px]">
             {featuredTitle}
           </h2>
-          <div className="mt-5 grid max-w-[1280px] gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 grid max-w-[1280px] gap-5 md:grid-cols-2 lg:grid-cols-4">
             {items.map((course, index) => (
               <CourseCard
                 hrefPrefix="/events/offline-experience"

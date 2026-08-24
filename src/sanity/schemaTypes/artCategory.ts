@@ -30,10 +30,9 @@ export const artCategory = defineType({
       group: 'basic',
       options: {
         list: [
-          {title: '玻璃艺术 / Glass Art', value: 'glass'},
-          {title: '装置艺术 / Installation Art', value: 'installation'},
-          {title: '公共艺术 / Public Art', value: 'public'},
-          {title: '雕塑艺术 / Sculpture Art', value: 'sculpture'},
+          {title: '雕塑 / Sculpture', value: 'sculpture'},
+          {title: '装置艺术 / Installation Art', value: 'installation-art'},
+          {title: '公共艺术 / Public Art', value: 'public-art'},
         ],
         layout: 'radio',
       },

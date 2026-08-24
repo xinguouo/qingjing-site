@@ -298,9 +298,9 @@ export const structure: StructureResolver = (S, context) => {
             .title('艺术创作 / Art Creation')
             .items([
               orderableArtProjectListItem({
-                id: 'artCreationGlassArt',
-                title: '玻璃艺术 / Glass Art',
-                category: 'glass-art',
+                id: 'artCreationSculpture',
+                title: '雕塑 / Sculpture',
+                category: 'sculpture',
               }),
               orderableArtProjectListItem({
                 id: 'artCreationInstallationArt',
@@ -311,11 +311,6 @@ export const structure: StructureResolver = (S, context) => {
                 id: 'artCreationPublicArt',
                 title: '公共艺术 / Public Art',
                 category: 'public-art',
-              }),
-              orderableArtProjectListItem({
-                id: 'artCreationSculptureArt',
-                title: '雕塑艺术 / Sculpture Art',
-                category: 'sculpture-art',
               }),
             ]),
         ),

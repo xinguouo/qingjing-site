@@ -1,5 +1,5 @@
-import { ArtCategoryPage } from "@/components/ArtCategoryPage";
+import {redirect} from "next/navigation";
 
 export default function Page() {
-  return <ArtCategoryPage category="sculpture-art" locale="en" />;
+  redirect("/en/art-creation/sculpture");
 }

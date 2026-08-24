@@ -11,7 +11,7 @@ import {
   artCategoryConfigs,
   fallbackArtworks,
   getArtworkImageSource,
-  isArtCategorySlug,
+  normalizeArtCategorySlug,
   type ArtCategorySlug,
   type Artwork,
   type ArtworkImageEntry,
@@ -195,7 +195,7 @@ function mergeArtworkImages(
 }
 
 function normalizeCategory(value: string | null | undefined): ArtCategorySlug | null {
-  return value && isArtCategorySlug(value) ? value : null;
+  return normalizeArtCategorySlug(value);
 }
 
 function findFallbackArtwork(
@@ -528,7 +528,7 @@ export async function ArtworkDetailPage({
 
   const labels = copy[locale];
   const categorySlug =
-    normalizeCategory(artwork.category) || requestedCategory || "glass-art";
+    normalizeCategory(artwork.category) || requestedCategory || "sculpture";
   const titleZh = compactText(artwork.titleZh);
   const titleEn = compactText(artwork.titleEn);
   const localizedTitle = compactText(artwork.title) || labels.title;

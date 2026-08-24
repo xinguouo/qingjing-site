@@ -42,10 +42,9 @@ export type ArtworkVideo = {
 };
 
 export type ArtCategorySlug =
-  | "glass-art"
+  | "sculpture"
   | "installation-art"
-  | "public-art"
-  | "sculpture-art";
+  | "public-art";
 
 export type Artwork = {
   _id?: string;
@@ -80,9 +79,9 @@ type ArtCategoryPageProps = {
 };
 
 export const artCategoryConfigs: Record<ArtCategorySlug, ArtCategoryConfig> = {
-  "glass-art": {
-    titleEn: "GLASS ART",
-    titleZh: "玻璃艺术",
+  sculpture: {
+    titleEn: "SCULPTURE",
+    titleZh: "雕塑",
   },
   "installation-art": {
     titleEn: "INSTALLATION ART",
@@ -91,10 +90,6 @@ export const artCategoryConfigs: Record<ArtCategorySlug, ArtCategoryConfig> = {
   "public-art": {
     titleEn: "PUBLIC ART",
     titleZh: "公共艺术",
-  },
-  "sculpture-art": {
-    titleEn: "SCULPTURE ART",
-    titleZh: "雕塑艺术",
   },
 };
 
@@ -110,64 +105,64 @@ const copy = {
 } satisfies Record<Locale, Record<string, string>>;
 
 export const fallbackArtworks: Record<ArtCategorySlug, Record<Locale, Artwork[]>> = {
-  "glass-art": {
+  sculpture: {
     zh: [
       {
-        _id: "glass-art-01",
+        _id: "sculpture-01",
         description: "玻璃作品的光影与材料研究。",
         dimensions: "260x430x240mm",
-        slug: "glass-art-study-01",
+        slug: "sculpture-study-01",
         title: "风过青岚-III",
       },
       {
-        _id: "glass-art-02",
+        _id: "sculpture-02",
         description: "以透明层次呈现自然气息。",
         dimensions: "320x280x180mm",
-        slug: "glass-art-study-02",
+        slug: "sculpture-study-02",
         title: "野器栗毛芭目",
       },
       {
-        _id: "glass-art-03",
+        _id: "sculpture-03",
         description: "材料边界与光线的结构片段。",
         dimensions: "300x300x220mm",
-        slug: "glass-art-study-03",
+        slug: "sculpture-study-03",
         title: "层叠之境",
       },
       {
-        _id: "glass-art-04",
+        _id: "sculpture-04",
         description: "热玻璃成型中的流动痕迹。",
         dimensions: "240x360x210mm",
-        slug: "glass-art-study-04",
+        slug: "sculpture-study-04",
         title: "透明光域",
       },
     ],
     en: [
       {
-        _id: "glass-art-01",
-        description: "A study of light and material in glass.",
+        _id: "sculpture-01",
+        description: "A study of light and material in sculpture.",
         dimensions: "260x430x240mm",
-        slug: "glass-art-study-01",
+        slug: "sculpture-study-01",
         title: "Wind Over Green Mist III",
       },
       {
-        _id: "glass-art-02",
+        _id: "sculpture-02",
         description: "Transparent layers carrying a natural breath.",
         dimensions: "320x280x180mm",
-        slug: "glass-art-study-02",
+        slug: "sculpture-study-02",
         title: "Wild Vessel",
       },
       {
-        _id: "glass-art-03",
+        _id: "sculpture-03",
         description: "Material boundary and fragments of light.",
         dimensions: "300x300x220mm",
-        slug: "glass-art-study-03",
+        slug: "sculpture-study-03",
         title: "Layered Realm",
       },
       {
-        _id: "glass-art-04",
+        _id: "sculpture-04",
         description: "Flowing traces from hot glass forming.",
         dimensions: "240x360x210mm",
-        slug: "glass-art-study-04",
+        slug: "sculpture-study-04",
         title: "Transparent Light",
       },
     ],
@@ -188,36 +183,36 @@ export const fallbackArtworks: Record<ArtCategorySlug, Record<Locale, Artwork[]>
   },
   "public-art": {
     zh: [
-      {_id: "public-art-01", description: "公共空间中的玻璃艺术节点。", dimensions: "Variable", slug: "public-art-study-01", title: "公共节点"},
+      {_id: "public-art-01", description: "公共空间中的雕塑节点。", dimensions: "Variable", slug: "public-art-study-01", title: "公共节点"},
       {_id: "public-art-02", description: "城市环境里的透明光线。", dimensions: "Variable", slug: "public-art-study-02", title: "城市光线"},
       {_id: "public-art-03", description: "回应场所记忆的作品形态。", dimensions: "Variable", slug: "public-art-study-03", title: "场所之器"},
       {_id: "public-art-04", description: "面向公共观看的透明地标。", dimensions: "Variable", slug: "public-art-study-04", title: "透明地标"},
     ],
     en: [
-      {_id: "public-art-01", description: "Glass art node in public space.", dimensions: "Variable", slug: "public-art-study-01", title: "Public Node"},
+      {_id: "public-art-01", description: "Sculpture node in public space.", dimensions: "Variable", slug: "public-art-study-01", title: "Public Node"},
       {_id: "public-art-02", description: "Transparent light in the urban environment.", dimensions: "Variable", slug: "public-art-study-02", title: "Urban Light"},
       {_id: "public-art-03", description: "A form responding to memory of place.", dimensions: "Variable", slug: "public-art-study-03", title: "Site Vessel"},
       {_id: "public-art-04", description: "A transparent landmark for public viewing.", dimensions: "Variable", slug: "public-art-study-04", title: "Transparent Landmark"},
-    ],
-  },
-  "sculpture-art": {
-    zh: [
-      {_id: "sculpture-art-01", description: "玻璃体量与雕塑语言的研究。", dimensions: "280x420x260mm", slug: "sculpture-art-study-01", title: "透明体量"},
-      {_id: "sculpture-art-02", description: "手工痕迹与材料边界并置。", dimensions: "300x360x240mm", slug: "sculpture-art-study-02", title: "材料边界"},
-      {_id: "sculpture-art-03", description: "凝固光线中的形体结构。", dimensions: "260x380x220mm", slug: "sculpture-art-study-03", title: "凝固之光"},
-      {_id: "sculpture-art-04", description: "雕塑表面的手作痕迹。", dimensions: "240x320x200mm", slug: "sculpture-art-study-04", title: "手工痕迹"},
-    ],
-    en: [
-      {_id: "sculpture-art-01", description: "A study of glass volume and sculptural language.", dimensions: "280x420x260mm", slug: "sculpture-art-study-01", title: "Transparent Volume"},
-      {_id: "sculpture-art-02", description: "Handmade traces placed against material boundaries.", dimensions: "300x360x240mm", slug: "sculpture-art-study-02", title: "Material Boundary"},
-      {_id: "sculpture-art-03", description: "Form structure within frozen light.", dimensions: "260x380x220mm", slug: "sculpture-art-study-03", title: "Frozen Light"},
-      {_id: "sculpture-art-04", description: "Handmade marks across sculptural surfaces.", dimensions: "240x320x200mm", slug: "sculpture-art-study-04", title: "Handmade Trace"},
     ],
   },
 };
 
 export function isArtCategorySlug(value: string): value is ArtCategorySlug {
   return value in artCategoryConfigs;
+}
+
+export function normalizeArtCategorySlug(
+  value: string | null | undefined,
+): ArtCategorySlug | null {
+  if (!value) {
+    return null;
+  }
+
+  if (value === "glass-art" || value === "sculpture-art") {
+    return "sculpture";
+  }
+
+  return isArtCategorySlug(value) ? value : null;
 }
 
 export function getArtworkImageSource(image: ArtworkImageEntry): SanityImage {
@@ -296,7 +291,8 @@ export async function ArtCategoryPage({
       artWorksByTypeQuery,
       {locale, workType: category},
       {cache: "no-store"},
-    );
+    )
+    .catch(() => []);
   const artworks = cmsArtworks.length ? cmsArtworks : fallbackArtworks[category][locale];
 
   return (

@@ -1,4 +1,4 @@
-import {ArtworkDetailPage} from "@/components/ArtworkDetailPage";
+import {redirect} from "next/navigation";
 
 export default async function Page({
   params,
@@ -7,5 +7,5 @@ export default async function Page({
 }) {
   const {slug} = await params;
 
-  return <ArtworkDetailPage category="sculpture-art" locale="zh" slug={slug} />;
+  redirect(`/zh/art-creation/sculpture/${slug}`);
 }

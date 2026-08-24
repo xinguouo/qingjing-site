@@ -47,10 +47,9 @@ export const artProject = defineType({
       group: "basic",
       options: {
         list: [
-          { title: "玻璃艺术 / Glass Art", value: "glass-art" },
+          { title: "雕塑 / Sculpture", value: "sculpture" },
           { title: "装置艺术 / Installation Art", value: "installation-art" },
           { title: "公共艺术 / Public Art", value: "public-art" },
-          { title: "雕塑艺术 / Sculpture Art", value: "sculpture-art" },
         ],
         layout: "radio",
       },

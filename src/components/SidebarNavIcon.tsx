@@ -19,10 +19,9 @@ const sidebarIconByHref: Record<string, string> = {
   "/events/offline-experience": "/icons/sidebar/offline-experience.svg",
   "/events/open-class": "/icons/sidebar/open-class.svg",
   "/events/activity": "/icons/sidebar/activity.svg",
-  "/art-creation/glass-art": "/icons/sidebar/glass-art.svg",
+  "/art-creation/sculpture": "/icons/sidebar/sculpture.svg",
   "/art-creation/installation-art": "/icons/sidebar/installation-art.svg",
   "/art-creation/public-art": "/icons/sidebar/public-art.svg",
-  "/art-creation/sculpture-art": "/icons/sidebar/sculpture-art.svg",
   "/store": "/icons/sidebar/shop.svg",
   "/shop": "/icons/sidebar/shop.svg",
 };

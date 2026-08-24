@@ -1,5 +1,5 @@
-import { ArtCategoryPage } from "@/components/ArtCategoryPage";
+import {redirect} from "next/navigation";
 
 export default function Page() {
-  return <ArtCategoryPage category="glass-art" locale="zh" />;
+  redirect("/zh/art-creation/sculpture");
 }

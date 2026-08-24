@@ -164,13 +164,13 @@ export const navigationItems: NavigationItem[] = [
     status: "comingSoon",
   },
   {
-    labelZh: "\u73bb\u7483\u827a\u672f",
-    labelEn: "Glass Art",
-    href: "/art-creation/glass-art",
+    labelZh: "\u96d5\u5851",
+    labelEn: "Sculpture",
+    href: "/art-creation/sculpture",
     icon: "glass",
     group: "artCreation",
     status: "live",
-    activePathPrefixes: ["/art-projects/glass-art"],
+    activePathPrefixes: ["/art-projects/sculpture"],
   },
   {
     labelZh: "\u88c5\u7f6e\u827a\u672f",

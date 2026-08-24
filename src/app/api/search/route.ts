@@ -6,7 +6,6 @@ import {
   navigationGroupLabels,
   navigationItems,
   type Locale,
-  type NavigationGroup,
 } from "@/config/navigation";
 import {client} from "@/sanity/client";
 import {urlForImage} from "@/sanity/image";
@@ -54,22 +53,10 @@ type SearchContent = {
   artists?: Array<Record<string, unknown>>;
 };
 
-const extraPageItems = [
-  {
-    labelZh: "\u96d5\u5851\u827a\u672f",
-    labelEn: "Sculpture Art",
-    href: "/art-creation/sculpture-art",
-    group: "artCreation" as NavigationGroup,
-    keywordsZh: "\u827a\u672f\u521b\u4f5c \u96d5\u5851 \u73bb\u7483",
-    keywordsEn: "art creation sculpture glass artwork",
-  },
-];
-
 const artCategoryLabels: Record<string, {zh: string; en: string}> = {
-  "glass-art": {zh: "\u73bb\u7483\u827a\u672f", en: "Glass Art"},
+  sculpture: {zh: "\u96d5\u5851", en: "Sculpture"},
   "installation-art": {zh: "\u88c5\u7f6e\u827a\u672f", en: "Installation Art"},
   "public-art": {zh: "\u516c\u5171\u827a\u672f", en: "Public Art"},
-  "sculpture-art": {zh: "\u96d5\u5851\u827a\u672f", en: "Sculpture Art"},
 };
 
 const typeLabels: Record<SearchKind, {zh: string; en: string}> = {
@@ -147,10 +134,6 @@ function getThumbnailUrl(image?: SanityImageSource | null) {
   } catch {
     return null;
   }
-}
-
-function prefixHref(locale: Locale, href: string) {
-  return href === "/" ? `/${locale}` : `/${locale}${href}`;
 }
 
 function typeLabel(kind: SearchKind, locale: Locale) {
@@ -249,28 +232,7 @@ function pageCandidates(locale: Locale): SearchCandidate[] {
     };
   });
 
-  const extraPages = extraPageItems.map((item) => {
-    const groupLabel = navigationGroupLabels[item.group];
-
-    return {
-      id: `page:${item.href}`,
-      kind: "page" as SearchKind,
-      title: locale === "zh" ? item.labelZh : item.labelEn,
-      titleZh: item.labelZh,
-      titleEn: item.labelEn,
-      description: locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn,
-      href: prefixHref(locale, item.href),
-      primaryFields: [item.labelZh, item.labelEn],
-      secondaryFields: [
-        groupLabel.labelZh,
-        groupLabel.labelEn,
-        item.keywordsZh,
-        item.keywordsEn,
-      ],
-    };
-  });
-
-  return [...navPages, ...extraPages];
+  return navPages;
 }
 
 function candidatesFromContent(data: SearchContent, locale: Locale) {
