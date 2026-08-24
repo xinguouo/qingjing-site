@@ -1,6 +1,12 @@
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
 
+const artCategoryTypeTitles: Record<string, string> = {
+  sculpture: '玻璃架上艺术 / Glass Easel Art',
+  'installation-art': '玻璃装置艺术 / Glass Installation Art',
+  'public-art': '玻璃公共艺术 / Glass Public Art',
+}
+
 export const artCategory = defineType({
   name: 'artCategory',
   title: '艺术项目分类 / Art Category',
@@ -30,9 +36,9 @@ export const artCategory = defineType({
       group: 'basic',
       options: {
         list: [
-          {title: '雕塑 / Sculpture', value: 'sculpture'},
-          {title: '装置艺术 / Installation Art', value: 'installation-art'},
-          {title: '公共艺术 / Public Art', value: 'public-art'},
+          {title: '玻璃架上艺术 / Glass Easel Art', value: 'sculpture'},
+          {title: '玻璃装置艺术 / Glass Installation Art', value: 'installation-art'},
+          {title: '玻璃公共艺术 / Glass Public Art', value: 'public-art'},
         ],
         layout: 'radio',
       },
@@ -116,6 +122,15 @@ export const artCategory = defineType({
     select: {
       title: 'titleZh',
       subtitle: 'categoryType',
+    },
+    prepare({title, subtitle}) {
+      return {
+        title,
+        subtitle:
+          typeof subtitle === 'string'
+            ? artCategoryTypeTitles[subtitle] || subtitle
+            : subtitle,
+      }
     },
   },
 })

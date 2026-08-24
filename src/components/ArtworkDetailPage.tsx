@@ -514,12 +514,12 @@ export async function ArtworkDetailPage({
 }: ArtworkDetailPageProps) {
   const requestedCategory = normalizeCategory(category);
   const cmsArtwork = await client
-    .withConfig({useCdn: false})
     .fetch<Artwork | null>(
       artWorkBySlugQuery,
       {locale, slug},
       {cache: "no-store"},
-    );
+    )
+    .catch(() => null);
   const artwork = cmsArtwork || findFallbackArtwork(slug, requestedCategory, locale);
 
   if (!artwork) {
@@ -553,6 +553,7 @@ export async function ArtworkDetailPage({
     <ArtworkDetailLayout
       backHref={backHref}
       backLabel={backLabel}
+      categoryLabel={categoryLabel(categorySlug, locale)}
       description={description}
       descriptionLabel={labels.description}
       images={galleryImages}

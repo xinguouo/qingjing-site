@@ -3,6 +3,12 @@ import {imageCaptionFields} from './imageCaptionFields'
 
 import {ArtworkImagesInput} from '../components/ArtworkImagesInput'
 
+const artWorkCategoryTitles: Record<string, string> = {
+  sculpture: '玻璃架上艺术 / Glass Easel Art',
+  'installation-art': '玻璃装置艺术 / Glass Installation Art',
+  'public-art': '玻璃公共艺术 / Glass Public Art',
+}
+
 export const artWork = defineType({
   name: 'artWork',
   title: '艺术作品 / Art Work',
@@ -40,9 +46,9 @@ export const artWork = defineType({
       group: 'basic',
       options: {
         list: [
-          {title: '雕塑 / Sculpture', value: 'sculpture'},
-          {title: '装置艺术 / Installation Art', value: 'installation-art'},
-          {title: '公共艺术 / Public Art', value: 'public-art'},
+          {title: '玻璃架上艺术 / Glass Easel Art', value: 'sculpture'},
+          {title: '玻璃装置艺术 / Glass Installation Art', value: 'installation-art'},
+          {title: '玻璃公共艺术 / Glass Public Art', value: 'public-art'},
         ],
         layout: 'radio',
       },
@@ -225,7 +231,10 @@ export const artWork = defineType({
     prepare({title, subtitle, media, legacyMedia}) {
       return {
         title,
-        subtitle,
+        subtitle:
+          typeof subtitle === 'string'
+            ? artWorkCategoryTitles[subtitle] || subtitle
+            : subtitle,
         media: media || legacyMedia,
       }
     },

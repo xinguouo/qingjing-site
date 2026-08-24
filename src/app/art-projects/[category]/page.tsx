@@ -5,7 +5,7 @@ import {
 import { ArtworkDetailPage } from "@/components/ArtworkDetailPage";
 import { redirect } from "next/navigation";
 
-function isLegacySculptureCategory(category: string) {
+function isLegacyGlassEaselCategory(category: string) {
   return category === "glass-art" || category === "sculpture-art";
 }
 
@@ -16,7 +16,7 @@ export default async function Page({
 }) {
   const { category } = await params;
 
-  if (isLegacySculptureCategory(category)) {
+  if (isLegacyGlassEaselCategory(category)) {
     redirect("/art-projects/sculpture");
   }
 

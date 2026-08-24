@@ -54,9 +54,9 @@ type SearchContent = {
 };
 
 const artCategoryLabels: Record<string, {zh: string; en: string}> = {
-  sculpture: {zh: "\u96d5\u5851", en: "Sculpture"},
-  "installation-art": {zh: "\u88c5\u7f6e\u827a\u672f", en: "Installation Art"},
-  "public-art": {zh: "\u516c\u5171\u827a\u672f", en: "Public Art"},
+  sculpture: {zh: "\u73bb\u7483\u67b6\u4e0a\u827a\u672f", en: "Glass Easel Art"},
+  "installation-art": {zh: "\u73bb\u7483\u88c5\u7f6e\u827a\u672f", en: "Glass Installation Art"},
+  "public-art": {zh: "\u73bb\u7483\u516c\u5171\u827a\u672f", en: "Glass Public Art"},
 };
 
 const typeLabels: Record<SearchKind, {zh: string; en: string}> = {
@@ -554,12 +554,12 @@ export async function GET(request: NextRequest) {
   }
 
   const data = await client
-    .withConfig({useCdn: false})
     .fetch<SearchContent>(
       siteSearchContentQuery,
       {locale},
       {cache: "no-store"},
-    );
+    )
+    .catch(() => ({}));
   const seen = new Set<string>();
   const results = candidatesFromContent(data, locale)
     .map((candidate) => ({

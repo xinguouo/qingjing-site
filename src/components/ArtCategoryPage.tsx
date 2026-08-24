@@ -80,16 +80,16 @@ type ArtCategoryPageProps = {
 
 export const artCategoryConfigs: Record<ArtCategorySlug, ArtCategoryConfig> = {
   sculpture: {
-    titleEn: "SCULPTURE",
-    titleZh: "雕塑",
+    titleEn: "GLASS EASEL ART",
+    titleZh: "玻璃架上艺术",
   },
   "installation-art": {
-    titleEn: "INSTALLATION ART",
-    titleZh: "装置艺术",
+    titleEn: "GLASS INSTALLATION ART",
+    titleZh: "玻璃装置艺术",
   },
   "public-art": {
-    titleEn: "PUBLIC ART",
-    titleZh: "公共艺术",
+    titleEn: "GLASS PUBLIC ART",
+    titleZh: "玻璃公共艺术",
   },
 };
 
@@ -139,7 +139,7 @@ export const fallbackArtworks: Record<ArtCategorySlug, Record<Locale, Artwork[]>
     en: [
       {
         _id: "sculpture-01",
-        description: "A study of light and material in sculpture.",
+        description: "A study of light and material in glass easel art.",
         dimensions: "260x430x240mm",
         slug: "sculpture-study-01",
         title: "Wind Over Green Mist III",
@@ -183,13 +183,13 @@ export const fallbackArtworks: Record<ArtCategorySlug, Record<Locale, Artwork[]>
   },
   "public-art": {
     zh: [
-      {_id: "public-art-01", description: "公共空间中的雕塑节点。", dimensions: "Variable", slug: "public-art-study-01", title: "公共节点"},
+      {_id: "public-art-01", description: "公共空间中的玻璃艺术节点。", dimensions: "Variable", slug: "public-art-study-01", title: "公共节点"},
       {_id: "public-art-02", description: "城市环境里的透明光线。", dimensions: "Variable", slug: "public-art-study-02", title: "城市光线"},
       {_id: "public-art-03", description: "回应场所记忆的作品形态。", dimensions: "Variable", slug: "public-art-study-03", title: "场所之器"},
       {_id: "public-art-04", description: "面向公共观看的透明地标。", dimensions: "Variable", slug: "public-art-study-04", title: "透明地标"},
     ],
     en: [
-      {_id: "public-art-01", description: "Sculpture node in public space.", dimensions: "Variable", slug: "public-art-study-01", title: "Public Node"},
+      {_id: "public-art-01", description: "Glass art node in public space.", dimensions: "Variable", slug: "public-art-study-01", title: "Public Node"},
       {_id: "public-art-02", description: "Transparent light in the urban environment.", dimensions: "Variable", slug: "public-art-study-02", title: "Urban Light"},
       {_id: "public-art-03", description: "A form responding to memory of place.", dimensions: "Variable", slug: "public-art-study-03", title: "Site Vessel"},
       {_id: "public-art-04", description: "A transparent landmark for public viewing.", dimensions: "Variable", slug: "public-art-study-04", title: "Transparent Landmark"},
@@ -286,7 +286,6 @@ export async function ArtCategoryPage({
 }: ArtCategoryPageProps) {
   const config = artCategoryConfigs[category];
   const cmsArtworks = await client
-    .withConfig({useCdn: false})
     .fetch<Artwork[]>(
       artWorksByTypeQuery,
       {locale, workType: category},

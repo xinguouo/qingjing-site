@@ -34,7 +34,7 @@ const copy = {
     emptyImage: "海报待上传",
     eyebrow: "OFFLINE WORKSHOP",
     intro:
-      "探索雕塑与材料的创作过程，通过亲手制作体验玻璃材料的独特魅力。",
+      "探索玻璃架上艺术与材料的创作过程，通过亲手制作体验玻璃材料的独特魅力。",
     reserve: "立即预约",
     sectionTitle: "精选体验",
     tagFallback: "手作体验",

@@ -164,8 +164,8 @@ export const navigationItems: NavigationItem[] = [
     status: "comingSoon",
   },
   {
-    labelZh: "\u96d5\u5851",
-    labelEn: "Sculpture",
+    labelZh: "\u73bb\u7483\u67b6\u4e0a\u827a\u672f",
+    labelEn: "Glass Easel Art",
     href: "/art-creation/sculpture",
     icon: "glass",
     group: "artCreation",
@@ -173,8 +173,8 @@ export const navigationItems: NavigationItem[] = [
     activePathPrefixes: ["/art-projects/sculpture"],
   },
   {
-    labelZh: "\u88c5\u7f6e\u827a\u672f",
-    labelEn: "Installation Art",
+    labelZh: "\u73bb\u7483\u88c5\u7f6e\u827a\u672f",
+    labelEn: "Glass Installation Art",
     href: "/art-creation/installation-art",
     icon: "install",
     group: "artCreation",
@@ -182,8 +182,8 @@ export const navigationItems: NavigationItem[] = [
     activePathPrefixes: ["/art-projects/installation-art"],
   },
   {
-    labelZh: "\u516c\u5171\u827a\u672f",
-    labelEn: "Public Art",
+    labelZh: "\u73bb\u7483\u516c\u5171\u827a\u672f",
+    labelEn: "Glass Public Art",
     href: "/art-creation/public-art",
     icon: "museum",
     group: "artCreation",
