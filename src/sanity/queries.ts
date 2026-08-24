@@ -38,6 +38,44 @@ const artworkImageItemFields = `
 const localizedText = (enField: string, zhField: string) =>
   `select($locale == "en" && defined(${enField}) && ${enField} != "" => ${enField}, ${zhField})`;
 
+const shopTaxonomyFields = `
+  craftCategory,
+  "craftCategories": select(
+    defined(craftCategory[0]) => craftCategory,
+    defined(craftCategory) && craftCategory != "" => [craftCategory],
+    []
+  ),
+  "series": series->{
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    order
+  },
+  "seriesBranch": seriesBranch->{
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    "seriesId": series._ref,
+    order
+  },
+  "seriesId": series._ref,
+  "seriesSlug": series->slug.current,
+  "seriesTitle": select(
+    $locale == "en" && defined(series->titleEn) && series->titleEn != "" => series->titleEn,
+    series->titleZh
+  ),
+  "seriesBranchId": seriesBranch._ref,
+  "seriesBranchSlug": seriesBranch->slug.current,
+  "seriesBranchTitle": select(
+    $locale == "en" && defined(seriesBranch->titleEn) && seriesBranch->titleEn != "" => seriesBranch->titleEn,
+    seriesBranch->titleZh
+  )
+`;
+
 const publishedDocumentFilter = `
   !(_id in path("drafts.**")) &&
   !(_id in path("versions.**"))
@@ -344,6 +382,7 @@ const productCardFields = `
   importSource,
   needsReview,
   importNotes,
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -435,6 +474,7 @@ const homeProductReferenceFields = `
   importSource,
   needsReview,
   importNotes,
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -457,6 +497,7 @@ const artworkProductFields = `
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -481,6 +522,7 @@ const derivativeProductFields = `
   importSource,
   needsReview,
   importNotes,
+  ${shopTaxonomyFields},
   order
 `;
 
@@ -519,6 +561,7 @@ const productCollectionFields = `
   price,
   status,
   needsReview,
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -548,6 +591,7 @@ const productDetailFields = `
     galleryImages[]{${imageFields}},
     video{${productVideoFields}}
   },
+  ${shopTaxonomyFields},
   relatedProducts[]->{
     _id,
     "slug": slug.current,
@@ -564,7 +608,8 @@ const productDetailFields = `
     media{
       mainImage{${imageFields}},
       galleryImages[]{${imageFields}}
-    }
+    },
+    ${shopTaxonomyFields}
   },
   "orderRank": _orderRank,
   order
@@ -585,6 +630,7 @@ const artDerivativeDetailFields = `
   galleryImages[]{${imageFields}},
   packagingImages[]{${imageFields}},
   video{${productVideoFields}},
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -622,6 +668,7 @@ const artDerivativeDetailCardFields = `
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 `;
@@ -1325,6 +1372,124 @@ export const productCollectionsQuery = defineQuery(`*[
   ${productCollectionFields}
 }`);
 
+export const shopSeriesQuery = defineQuery(`*[
+  _type == "shopSeries" &&
+  !(_id in path("drafts.**")) &&
+  defined(slug.current)
+] | order(order asc, titleZh asc) {
+  _id,
+  titleZh,
+  titleEn,
+  "title": ${localizedText("titleEn", "titleZh")},
+  "slug": slug.current,
+  order,
+  "branches": coalesce(
+    branches[]->{
+      _id,
+      titleZh,
+      titleEn,
+      "title": ${localizedText("titleEn", "titleZh")},
+      "slug": slug.current,
+      "seriesId": series._ref,
+      order
+    },
+    *[_type == "shopSeriesBranch" && !(_id in path("drafts.**")) && series._ref == ^._id] | order(order asc, titleZh asc) {
+      _id,
+      titleZh,
+      titleEn,
+      "title": ${localizedText("titleEn", "titleZh")},
+      "slug": slug.current,
+      "seriesId": series._ref,
+      order
+    }
+  )
+}`);
+
+export const storeOverviewQuery = defineQuery(`{
+  "cmsProducts": *[
+    _type == "productCollection" &&
+    coalesce(needsReview, false) != true &&
+    coalesce(status, "visible") != "hidden"
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${productCollectionFields}
+  },
+  "productDocuments": *[
+    _type == "product" &&
+    coalesce(needsReview, false) != true
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${productCardFields}
+  },
+  "artDerivativeDetails": *[
+    _type == "artDerivativeDetail" &&
+    coalesce(needsReview, false) != true &&
+    defined(slug.current)
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    ${artDerivativeDetailCardFields}
+  },
+  "artworkDetailProducts": *[
+    ${canonicalProductDetailFilter}
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+    _id,
+    "category": "artwork",
+    "productType": "artworks",
+    "productNumber": basicInfo.productNumber,
+    "description": select(
+      defined(basicInfo.category) && basicInfo.category != "" => basicInfo.category,
+      ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")}
+    ),
+    "artworkCategory": basicInfo.category,
+    "slug": slug.current,
+    "coverImage": select(
+      defined(media.mainImage) => media.mainImage{${imageFields}},
+      media.galleryImages[0]{${imageFields}}
+    ),
+    "galleryImages": media.galleryImages[]{${imageFields}},
+    "price": commerce.price,
+    "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
+    ${shopTaxonomyFields},
+    "orderRank": _orderRank,
+    order
+  },
+  "packagingPage": *[
+    _type == "artDerivativePackagingPage" &&
+    _id == "artDerivativePackagingPage"
+  ][0]{
+    ${artDerivativePackagingPageFields}
+  },
+  "seriesItems": *[
+    _type == "shopSeries" &&
+    !(_id in path("drafts.**")) &&
+    defined(slug.current)
+  ] | order(order asc, titleZh asc) {
+    _id,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
+    order,
+    "branches": coalesce(
+      branches[]->{
+        _id,
+        titleZh,
+        titleEn,
+        "title": ${localizedText("titleEn", "titleZh")},
+        "slug": slug.current,
+        "seriesId": series._ref,
+        order
+      },
+      *[_type == "shopSeriesBranch" && !(_id in path("drafts.**")) && series._ref == ^._id] | order(order asc, titleZh asc) {
+        _id,
+        titleZh,
+        titleEn,
+        "title": ${localizedText("titleEn", "titleZh")},
+        "slug": slug.current,
+        "seriesId": series._ref,
+        order
+      }
+    )
+  }
+}`);
+
 export const productDetailBySlugQuery = defineQuery(`*[
   ${canonicalProductDetailFilter} &&
   slug.current == $slug
@@ -1352,6 +1517,7 @@ export const productDetailsForCardsQuery = defineQuery(`*[
   "galleryImages": media.galleryImages[]{${imageFields}},
   "price": commerce.price,
   "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
+  ${shopTaxonomyFields},
   "orderRank": _orderRank,
   order
 }`);
@@ -1481,7 +1647,8 @@ export const siteSearchContentQuery = defineQuery(`{
     "descriptionZh": productInfo.descriptionZh,
     "descriptionEn": productInfo.descriptionEn,
     "description": ${localizedText("productInfo.descriptionEn", "productInfo.descriptionZh")},
-    "coverImage": coalesce(media.mainImage{${imageFields}}, media.galleryImages[0]{${imageFields}})
+    "coverImage": coalesce(media.mainImage{${imageFields}}, media.galleryImages[0]{${imageFields}}),
+    ${shopTaxonomyFields}
   },
   "products": *[
     _type == "product" &&

@@ -7,6 +7,7 @@ import { defineField, defineType } from "sanity";
 import { imageCaptionFields } from "./imageCaptionFields";
 
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
+import { shopTaxonomyFields } from "./shopTaxonomy";
 
 export const productDetail = defineType({
   name: "productDetail",
@@ -63,6 +64,7 @@ export const productDetail = defineType({
         }),
       ],
     }),
+    ...shopTaxonomyFields("basic"),
     defineField({
       name: "productInfo",
       title: "商品信息 / Product Info",

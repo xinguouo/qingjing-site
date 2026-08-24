@@ -335,6 +335,16 @@ export const structure: StructureResolver = (S, context) => {
                 schemaType: 'artDerivativeDetail',
                 filter: '_type == "artDerivativeDetail"',
               }),
+              typedListItem({
+                id: 'shopSeries',
+                title: '商品系列 / Product Series',
+                schemaType: 'shopSeries',
+              }),
+              typedListItem({
+                id: 'shopSeriesBranch',
+                title: '系列分支 / Series Branches',
+                schemaType: 'shopSeriesBranch',
+              }),
               S.listItem()
                 .id('shopArtDerivativePackaging')
                 .title('包装 / Packaging')

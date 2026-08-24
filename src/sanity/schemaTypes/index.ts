@@ -24,6 +24,7 @@ import {studyMasterclassPage} from './studyMasterclassPage'
 import {studyProgram} from './studyProgram'
 import {teamPage} from './teamPage'
 import {teamMember} from './teamMember'
+import {shopSeries, shopSeriesBranch} from './shopTaxonomy'
 
 export const schemaTypes = [
   siteSettings,
@@ -48,6 +49,8 @@ export const schemaTypes = [
   artworkProduct,
   derivativeProduct,
   culturalProduct,
+  shopSeries,
+  shopSeriesBranch,
   productCollection,
   productDetail,
   artProject,

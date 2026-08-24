@@ -15,9 +15,7 @@ import {
   derivativeProductBySlugQuery,
   productBySlugQuery,
   productDetailBySlugQuery,
-  productDetailsForCardsQuery,
-  productCollectionsQuery,
-  productsQuery,
+  storeOverviewQuery,
 } from "@/sanity/queries";
 
 import { AppShell } from "./AppShell";
@@ -49,6 +47,8 @@ type ProductCollection = {
   artworkCategory?: string | string[] | null;
   category?: ProductCollectionCategory | null;
   coverImage?: SanityImage;
+  craftCategories?: string[] | null;
+  craftCategory?: string | string[] | null;
   description?: string | null;
   derivativeCategory?: ProductSubcategory | null;
   galleryImages?: SanityImage[] | null;
@@ -59,6 +59,12 @@ type ProductCollection = {
   orderRank?: string | null;
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
+  seriesBranchId?: string | null;
+  seriesBranchSlug?: string | null;
+  seriesBranchTitle?: string | null;
+  seriesId?: string | null;
+  seriesSlug?: string | null;
+  seriesTitle?: string | null;
   title?: string | null;
   video?: ProductVideo;
 };
@@ -166,6 +172,7 @@ type ProductCardItem = {
   _id: string;
   artworkCategory?: string | string[] | null;
   category?: ProductCollectionCategory | null;
+  craftCategories?: string[] | null;
   description?: string | null;
   image?: SanityImage;
   order?: number | null;
@@ -174,7 +181,31 @@ type ProductCardItem = {
   productNumber?: string | number | null;
   slug?: string | null;
   subcategory?: ProductSubcategory | null;
+  seriesBranchSlug?: string | null;
+  seriesBranchTitle?: string | null;
+  seriesSlug?: string | null;
+  seriesTitle?: string | null;
   title?: string | null;
+};
+
+type ShopSeriesBranch = {
+  _id: string;
+  order?: number | null;
+  seriesId?: string | null;
+  slug?: string | null;
+  title?: string | null;
+  titleEn?: string | null;
+  titleZh?: string | null;
+};
+
+type ShopSeries = {
+  _id: string;
+  branches?: ShopSeriesBranch[] | null;
+  order?: number | null;
+  slug?: string | null;
+  title?: string | null;
+  titleEn?: string | null;
+  titleZh?: string | null;
 };
 
 type ArtDerivativePackagingPage = {
@@ -188,11 +219,23 @@ type ArtDerivativePackagingPage = {
   titleZh?: string | null;
 };
 
+type StoreOverviewData = {
+  artDerivativeDetails?: ProductCollection[] | null;
+  artworkDetailProducts?: ProductCollection[] | null;
+  cmsProducts?: ProductCollection[] | null;
+  packagingPage?: ArtDerivativePackagingPage | null;
+  productDocuments?: ProductCollection[] | null;
+  seriesItems?: ShopSeries[] | null;
+};
+
 type StoreOverviewProps = {
   activeCategory?: StoreCategory;
   artworkCategory?: string | null;
+  craftCategory?: string | null;
   includeLocalePrefix?: boolean;
   locale: Locale;
+  series?: string | null;
+  seriesBranch?: string | null;
   subcategory?: string | null;
 };
 
@@ -307,6 +350,18 @@ const derivativeSubcategories: Array<{
   { id: "packaging", labelEn: "Packaging", labelZh: "包装" },
 ];
 
+const craftCategoryOptions = [
+  { id: "glass-casting", labelEn: "Glass Casting", labelZh: "玻璃铸造" },
+  { id: "glass-blowing", labelEn: "Glass Blowing", labelZh: "玻璃吹制" },
+  { id: "lampworking", labelEn: "Lampworking", labelZh: "玻璃灯工" },
+  { id: "cold-working", labelEn: "Cold Working", labelZh: "玻璃冷加工" },
+  { id: "glass-mosaic", labelEn: "Glass Mosaic", labelZh: "玻璃马赛克" },
+  { id: "stained-glass", labelEn: "Stained Glass", labelZh: "玻璃镶嵌" },
+  { id: "glass-painting", labelEn: "Glass Painting", labelZh: "玻璃绘画" },
+] as const;
+
+type CraftCategory = (typeof craftCategoryOptions)[number]["id"];
+
 const artworkProductCategories = [
   "\u88ab\u5b50\u690d\u7269",
   "\u4f4e\u6816\u751f\u7269",
@@ -318,6 +373,8 @@ const artworkProductCategories = [
   "\u6e38\u6cf3\u52a8\u7269",
   "\u5176\u4ed6",
 ] as const;
+
+const defaultSeriesSlug = "wanwu-sheng";
 
 function compactText(value: string | number | null | undefined) {
   return typeof value === "number" ? String(value) : value?.trim() || "";
@@ -470,17 +527,41 @@ function categoryHref(
   return `${routePrefix(locale, includeLocalePrefix)}/shop?${params.toString()}`;
 }
 
-function artworkCategoryHref(
-  locale: Locale,
-  includeLocalePrefix: boolean,
-  artworkCategory?: string | null,
-) {
+function shopFilterHref({
+  category,
+  craftCategory,
+  includeLocalePrefix,
+  locale,
+  series,
+  seriesBranch,
+  subcategory,
+}: {
+  category: StoreCategory;
+  craftCategory?: string | null;
+  includeLocalePrefix: boolean;
+  locale: Locale;
+  series?: string | null;
+  seriesBranch?: string | null;
+  subcategory?: ProductSubcategory | null;
+}) {
   const params = new URLSearchParams({
-    category: storeCategorySegments.artworks,
+    category: storeCategorySegments[category],
   });
 
-  if (artworkCategory) {
-    params.set("artworkCategory", artworkCategory);
+  if (craftCategory) {
+    params.set("craftCategory", craftCategory);
+  }
+
+  if (series) {
+    params.set("series", series);
+  }
+
+  if (series && seriesBranch) {
+    params.set("seriesBranch", seriesBranch);
+  }
+
+  if (category === "derivatives" && subcategory) {
+    params.set("subcategory", subcategory);
   }
 
   return `${routePrefix(locale, includeLocalePrefix)}/shop?${params.toString()}`;
@@ -502,6 +583,10 @@ function isProductSubcategory(
   value: string | null | undefined,
 ): value is ProductSubcategory {
   return derivativeSubcategories.some((item) => item.id === value);
+}
+
+function isCraftCategory(value: string | null | undefined): value is CraftCategory {
+  return craftCategoryOptions.some((item) => item.id === value);
 }
 
 function isArtworkProductCategory(value: string | null | undefined) {
@@ -532,6 +617,20 @@ function normalizeCategories(value: string | string[] | null | undefined) {
   return category ? [category] : [];
 }
 
+function normalizeCraftCategories(
+  value: string | string[] | null | undefined,
+  projected?: string[] | null,
+) {
+  const values = Array.isArray(projected) && projected.length ? projected : value;
+
+  if (Array.isArray(values)) {
+    return values.map(compactText).filter(Boolean);
+  }
+
+  const category = compactText(values);
+  return category ? [category] : [];
+}
+
 function subcategoryLabel(
   subcategory: ProductSubcategory | null | undefined,
   locale: Locale,
@@ -549,6 +648,7 @@ function categoryDisplay(item: ProductCardItem, locale: Locale) {
 
   if (item.category === "artwork") {
     return (
+      compactText(item.seriesBranchTitle) ||
       normalizeCategories(item.artworkCategory)[0] ||
       compactText(item.description)
     );
@@ -674,10 +774,16 @@ function LegacyInlineShopProductCard({
 
 function StoreTabs({
   activeCategory,
+  activeCraftCategory,
+  activeSeries,
+  activeSeriesBranch,
   includeLocalePrefix,
   locale,
 }: {
   activeCategory: StoreCategory;
+  activeCraftCategory?: CraftCategory | null;
+  activeSeries?: string | null;
+  activeSeriesBranch?: string | null;
   includeLocalePrefix: boolean;
   locale: Locale;
 }) {
@@ -697,7 +803,14 @@ function StoreTabs({
             className={`relative pb-3 transition ${
               isActive ? "text-primary" : "hover:text-primary"
             }`}
-            href={categoryHref(tab.id, locale, includeLocalePrefix)}
+            href={shopFilterHref({
+              category: tab.id,
+              craftCategory: activeCraftCategory,
+              includeLocalePrefix,
+              locale,
+              series: activeSeries,
+              seriesBranch: activeSeriesBranch,
+            })}
             key={tab.id}
           >
             {tab.label}
@@ -712,30 +825,59 @@ function StoreTabs({
 }
 
 function DerivativeSubcategoryTabs({
+  activeCraftCategory,
+  activeSeries,
+  activeSeriesBranch,
   activeSubcategory,
   includeLocalePrefix,
   locale,
 }: {
+  activeCraftCategory?: CraftCategory | null;
+  activeSeries?: string | null;
+  activeSeriesBranch?: string | null;
   activeSubcategory?: ProductSubcategory | null;
   includeLocalePrefix: boolean;
   locale: Locale;
 }) {
+  const allLabel = locale === "zh" ? "全部" : "All";
+
   return (
-    <nav className="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-muted-token">
+    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
+      <Link
+        className={`relative shrink-0 pb-3 transition ${
+          !activeSubcategory ? "text-primary" : "hover:text-primary"
+        }`}
+        href={shopFilterHref({
+          category: "derivatives",
+          craftCategory: activeCraftCategory,
+          includeLocalePrefix,
+          locale,
+          series: activeSeries,
+          seriesBranch: activeSeriesBranch,
+        })}
+      >
+        {allLabel}
+        {!activeSubcategory ? (
+          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+        ) : null}
+      </Link>
       {derivativeSubcategories.map((item) => {
         const isActive = activeSubcategory === item.id;
 
         return (
           <Link
-            className={`relative pb-3 transition ${
+            className={`relative shrink-0 pb-3 transition ${
               isActive ? "text-primary" : "hover:text-primary"
             }`}
-            href={categoryHref(
-              "derivatives",
-              locale,
+            href={shopFilterHref({
+              category: "derivatives",
+              craftCategory: activeCraftCategory,
               includeLocalePrefix,
-              item.id,
-            )}
+              locale,
+              series: activeSeries,
+              seriesBranch: activeSeriesBranch,
+              subcategory: item.id,
+            })}
             key={item.id}
           >
             {locale === "zh" ? item.labelZh : item.labelEn}
@@ -749,42 +891,219 @@ function DerivativeSubcategoryTabs({
   );
 }
 
-function ArtworkCategoryTabs({
-  activeArtworkCategory,
+function CraftCategoryTabs({
+  activeCategory,
+  activeCraftCategory,
+  activeSeries,
+  activeSeriesBranch,
+  activeSubcategory,
   includeLocalePrefix,
   locale,
 }: {
-  activeArtworkCategory?: string | null;
+  activeCategory: StoreCategory;
+  activeCraftCategory?: CraftCategory | null;
+  activeSeries?: string | null;
+  activeSeriesBranch?: string | null;
+  activeSubcategory?: ProductSubcategory | null;
   includeLocalePrefix: boolean;
   locale: Locale;
 }) {
-  const allLabel = locale === "zh" ? "\u5168\u90e8" : "All";
+  const allLabel = locale === "zh" ? "全部" : "All";
 
   return (
     <nav className="mt-6 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
       <Link
         className={`relative shrink-0 pb-3 transition ${
-          !activeArtworkCategory ? "text-primary" : "hover:text-primary"
+          !activeCraftCategory ? "text-primary" : "hover:text-primary"
         }`}
-        href={artworkCategoryHref(locale, includeLocalePrefix)}
+        href={shopFilterHref({
+          category: activeCategory,
+          includeLocalePrefix,
+          locale,
+          series: activeSeries,
+          seriesBranch: activeSeriesBranch,
+          subcategory: activeSubcategory,
+        })}
       >
         {allLabel}
-        {!activeArtworkCategory ? (
+        {!activeCraftCategory ? (
           <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
         ) : null}
       </Link>
-      {artworkProductCategories.map((category) => {
-        const isActive = activeArtworkCategory === category;
+      {craftCategoryOptions.map((item) => {
+        const isActive = activeCraftCategory === item.id;
 
         return (
           <Link
             className={`relative shrink-0 pb-3 transition ${
               isActive ? "text-primary" : "hover:text-primary"
             }`}
-            href={artworkCategoryHref(locale, includeLocalePrefix, category)}
-            key={category}
+            href={shopFilterHref({
+              category: activeCategory,
+              craftCategory: item.id,
+              includeLocalePrefix,
+              locale,
+              series: activeSeries,
+              seriesBranch: activeSeriesBranch,
+              subcategory: activeSubcategory,
+            })}
+            key={item.id}
           >
-            {category}
+            {locale === "zh" ? item.labelZh : item.labelEn}
+            {isActive ? (
+              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+            ) : null}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function SeriesTabs({
+  activeCategory,
+  activeCraftCategory,
+  activeSeries,
+  activeSubcategory,
+  includeLocalePrefix,
+  locale,
+  seriesItems,
+}: {
+  activeCategory: StoreCategory;
+  activeCraftCategory?: CraftCategory | null;
+  activeSeries?: string | null;
+  activeSubcategory?: ProductSubcategory | null;
+  includeLocalePrefix: boolean;
+  locale: Locale;
+  seriesItems: ShopSeries[];
+}) {
+  const allLabel = locale === "zh" ? "全部系列" : "All Series";
+
+  return (
+    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
+      <Link
+        className={`relative shrink-0 pb-3 transition ${
+          !activeSeries ? "text-primary" : "hover:text-primary"
+        }`}
+        href={shopFilterHref({
+          category: activeCategory,
+          craftCategory: activeCraftCategory,
+          includeLocalePrefix,
+          locale,
+          subcategory: activeSubcategory,
+        })}
+      >
+        {allLabel}
+        {!activeSeries ? (
+          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+        ) : null}
+      </Link>
+      {seriesItems.map((item) => {
+        const slug = compactText(item.slug);
+        const title = compactText(item.title) || compactText(item.titleZh);
+        const isActive = activeSeries === slug;
+
+        if (!slug || !title) {
+          return null;
+        }
+
+        return (
+          <Link
+            className={`relative shrink-0 pb-3 transition ${
+              isActive ? "text-primary" : "hover:text-primary"
+            }`}
+            href={shopFilterHref({
+              category: activeCategory,
+              craftCategory: activeCraftCategory,
+              includeLocalePrefix,
+              locale,
+              series: slug,
+              subcategory: activeSubcategory,
+            })}
+            key={item._id}
+          >
+            {title}
+            {isActive ? (
+              <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+            ) : null}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function SeriesBranchTabs({
+  activeCategory,
+  activeCraftCategory,
+  activeSeries,
+  activeSeriesBranch,
+  activeSubcategory,
+  branches,
+  includeLocalePrefix,
+  locale,
+}: {
+  activeCategory: StoreCategory;
+  activeCraftCategory?: CraftCategory | null;
+  activeSeries: string;
+  activeSeriesBranch?: string | null;
+  activeSubcategory?: ProductSubcategory | null;
+  branches: ShopSeriesBranch[];
+  includeLocalePrefix: boolean;
+  locale: Locale;
+}) {
+  const allLabel = locale === "zh" ? "全部" : "All";
+
+  if (!branches.length) {
+    return null;
+  }
+
+  return (
+    <nav className="mt-4 flex gap-x-8 overflow-x-auto whitespace-nowrap pb-1 text-[13px] text-muted-token">
+      <Link
+        className={`relative shrink-0 pb-3 transition ${
+          !activeSeriesBranch ? "text-primary" : "hover:text-primary"
+        }`}
+        href={shopFilterHref({
+          category: activeCategory,
+          craftCategory: activeCraftCategory,
+          includeLocalePrefix,
+          locale,
+          series: activeSeries,
+          subcategory: activeSubcategory,
+        })}
+      >
+        {allLabel}
+        {!activeSeriesBranch ? (
+          <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
+        ) : null}
+      </Link>
+      {branches.map((branch) => {
+        const slug = compactText(branch.slug);
+        const title = compactText(branch.title) || compactText(branch.titleZh);
+        const isActive = activeSeriesBranch === slug;
+
+        if (!slug || !title) {
+          return null;
+        }
+
+        return (
+          <Link
+            className={`relative shrink-0 pb-3 transition ${
+              isActive ? "text-primary" : "hover:text-primary"
+            }`}
+            href={shopFilterHref({
+              category: activeCategory,
+              craftCategory: activeCraftCategory,
+              includeLocalePrefix,
+              locale,
+              series: activeSeries,
+              seriesBranch: slug,
+              subcategory: activeSubcategory,
+            })}
+            key={branch._id}
+          >
+            {title}
             {isActive ? (
               <span className="absolute bottom-0 left-0 h-px w-full bg-primary" />
             ) : null}
@@ -805,6 +1124,7 @@ function mapProduct(item: ProductCollection): ProductCardItem {
         : item.productType === "derivatives"
           ? "derivative"
           : item.category,
+    craftCategories: normalizeCraftCategories(item.craftCategory, item.craftCategories),
     description: item.description,
     image: item.coverImage || item.galleryImages?.[0],
     order: item.order,
@@ -813,6 +1133,10 @@ function mapProduct(item: ProductCollection): ProductCardItem {
     productNumber: item.productNumber,
     slug: item.slug,
     subcategory: item.subcategory || item.derivativeCategory,
+    seriesBranchSlug: item.seriesBranchSlug,
+    seriesBranchTitle: item.seriesBranchTitle,
+    seriesSlug: item.seriesSlug,
+    seriesTitle: item.seriesTitle,
     title: item.title,
   };
 }
@@ -867,64 +1191,58 @@ function PackagingPageContent({
 export async function StoreOverview({
   activeCategory = "artworks",
   artworkCategory,
+  craftCategory,
   includeLocalePrefix = true,
   locale,
+  series,
+  seriesBranch,
   subcategory,
 }: StoreOverviewProps) {
-  const [
-    cmsProducts,
-    productDocuments,
-    artDerivativeDetails,
-    artworkDetailProducts,
-    packagingPage,
-  ] = await Promise.all([
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ProductCollection[]>(
-        productCollectionsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ProductCollection[]>(
-        productsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ProductCollection[]>(
-        artDerivativeDetailsForCardsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ProductCollection[]>(
-        productDetailsForCardsQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-    client
-      .withConfig({ useCdn: false })
-      .fetch<ArtDerivativePackagingPage | null>(
-        artDerivativePackagingPageQuery,
-        { locale },
-        { cache: "no-store" },
-      ),
-  ]);
+  const storeData = await client
+    .fetch<StoreOverviewData>(
+      storeOverviewQuery,
+      { locale },
+      { cache: "no-store" },
+    )
+    .catch(() => null);
+  const cmsProducts = storeData?.cmsProducts || [];
+  const productDocuments = storeData?.productDocuments || [];
+  const artDerivativeDetails = storeData?.artDerivativeDetails || [];
+  const artworkDetailProducts = storeData?.artworkDetailProducts || [];
+  const packagingPage = storeData?.packagingPage || null;
+  const seriesItems = storeData?.seriesItems || [];
   const labels = copy[locale];
   const activeSubcategory =
-    activeCategory === "derivatives"
-      ? isProductSubcategory(subcategory)
-        ? subcategory
-        : "vessel"
+    activeCategory === "derivatives" && isProductSubcategory(subcategory)
+      ? subcategory
       : null;
-  const activeArtworkCategory =
+  const activeCraftCategory = isCraftCategory(craftCategory) ? craftCategory : null;
+  const legacyArtworkBranch =
     activeCategory === "artworks" && isArtworkProductCategory(artworkCategory)
-      ? artworkCategory
+      ? normalizeArtworkProductCategory(artworkCategory)
       : null;
+  const requestedSeries = compactText(series);
+  const activeSeriesSlug =
+    requestedSeries ||
+    (legacyArtworkBranch && seriesItems.some((item) => item.slug === defaultSeriesSlug)
+      ? defaultSeriesSlug
+      : "");
+  const activeSeriesItem = seriesItems.find(
+    (item) => compactText(item.slug) === activeSeriesSlug,
+  );
+  const activeBranchFromLegacy = legacyArtworkBranch
+    ? (activeSeriesItem?.branches || []).find(
+        (branch) => compactText(branch.titleZh) === legacyArtworkBranch,
+      )
+    : null;
+  const requestedSeriesBranch = compactText(seriesBranch);
+  const activeSeriesBranchSlug =
+    activeSeriesItem &&
+    (activeSeriesItem.branches || []).some(
+      (branch) => compactText(branch.slug) === requestedSeriesBranch,
+    )
+      ? requestedSeriesBranch
+      : compactText(activeBranchFromLegacy?.slug);
   const source =
     activeCategory === "artworks"
       ? artworkDetailProducts
@@ -943,15 +1261,23 @@ export async function StoreOverview({
       return item.category === activeCollectionCategory;
     })
     .filter((item) =>
-      activeCategory === "derivatives" && activeSubcategory
-        ? item.subcategory === activeSubcategory
+      activeCraftCategory
+        ? normalizeCraftCategories(item.craftCategory, item.craftCategories).includes(
+            activeCraftCategory,
+          )
         : true,
     )
     .filter((item) =>
-      activeCategory === "artworks" && activeArtworkCategory
-        ? normalizeCategories(item.artworkCategory).includes(
-            activeArtworkCategory,
-          )
+      activeSeriesSlug ? compactText(item.seriesSlug) === activeSeriesSlug : true,
+    )
+    .filter((item) =>
+      activeSeriesSlug && activeSeriesBranchSlug
+        ? compactText(item.seriesBranchSlug) === activeSeriesBranchSlug
+        : true,
+    )
+    .filter((item) =>
+      activeCategory === "derivatives" && activeSubcategory
+        ? item.subcategory === activeSubcategory
         : true,
     )
     .sort((a, b) => {
@@ -1006,21 +1332,50 @@ export async function StoreOverview({
             </div>
             <StoreTabs
               activeCategory={activeCategory}
+              activeCraftCategory={activeCraftCategory}
+              activeSeries={activeSeriesSlug}
+              activeSeriesBranch={activeSeriesBranchSlug}
               includeLocalePrefix={includeLocalePrefix}
               locale={locale}
             />
           </div>
 
-          {activeCategory === "derivatives" ? (
-            <DerivativeSubcategoryTabs
+          <CraftCategoryTabs
+            activeCategory={activeCategory}
+            activeCraftCategory={activeCraftCategory}
+            activeSeries={activeSeriesSlug}
+            activeSeriesBranch={activeSeriesBranchSlug}
+            activeSubcategory={activeSubcategory}
+            includeLocalePrefix={includeLocalePrefix}
+            locale={locale}
+          />
+          <SeriesTabs
+            activeCategory={activeCategory}
+            activeCraftCategory={activeCraftCategory}
+            activeSeries={activeSeriesSlug}
+            activeSubcategory={activeSubcategory}
+            includeLocalePrefix={includeLocalePrefix}
+            locale={locale}
+            seriesItems={seriesItems}
+          />
+          {activeSeriesItem ? (
+            <SeriesBranchTabs
+              activeCategory={activeCategory}
+              activeCraftCategory={activeCraftCategory}
+              activeSeries={activeSeriesSlug}
+              activeSeriesBranch={activeSeriesBranchSlug}
               activeSubcategory={activeSubcategory}
+              branches={activeSeriesItem.branches || []}
               includeLocalePrefix={includeLocalePrefix}
               locale={locale}
             />
           ) : null}
-          {activeCategory === "artworks" ? (
-            <ArtworkCategoryTabs
-              activeArtworkCategory={activeArtworkCategory}
+          {activeCategory === "derivatives" ? (
+            <DerivativeSubcategoryTabs
+              activeCraftCategory={activeCraftCategory}
+              activeSeries={activeSeriesSlug}
+              activeSeriesBranch={activeSeriesBranchSlug}
+              activeSubcategory={activeSubcategory}
               includeLocalePrefix={includeLocalePrefix}
               locale={locale}
             />

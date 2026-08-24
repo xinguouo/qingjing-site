@@ -7,6 +7,7 @@ import { defineField, defineType } from "sanity";
 import { imageCaptionFields } from "./imageCaptionFields";
 
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
+import { shopTaxonomyFields } from "./shopTaxonomy";
 
 export const artworkProduct = defineType({
   name: "artworkProduct",
@@ -57,6 +58,7 @@ export const artworkProduct = defineType({
       type: "string",
       group: "basic",
     }),
+    ...shopTaxonomyFields("basic"),
     defineField({
       name: "images",
       title: "作品图片 / Artwork Images",

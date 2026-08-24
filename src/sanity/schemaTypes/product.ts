@@ -7,6 +7,7 @@ import { defineField, defineType } from "sanity";
 import { imageCaptionFields } from "./imageCaptionFields";
 
 import { artworkProductCategoryOptions } from "./artworkProductCategories";
+import { shopTaxonomyFields } from "./shopTaxonomy";
 
 export const product = defineType({
   name: "product",
@@ -102,6 +103,7 @@ export const product = defineType({
       hidden: ({ parent }) =>
         !["available-artworks", "artworks"].includes(parent?.productType),
     }),
+    ...shopTaxonomyFields("basic"),
     defineField({
       name: "coverImage",
       title: "封面图片 / Cover Image",

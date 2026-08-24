@@ -25,7 +25,7 @@ type SearchCandidate = {
   href: string;
   image?: SanityImageSource | null;
   primaryFields: Array<string | number | null | undefined>;
-  secondaryFields?: Array<string | number | null | undefined>;
+  secondaryFields?: Array<unknown>;
   descriptionFields?: Array<unknown>;
 };
 
@@ -393,6 +393,7 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
 
     const productNumber = getString(item, "productNumber");
     const category =
+      getString(item, "seriesBranchTitle") ||
       getString(item, "category") ||
       getString(item, "artworkCategory") ||
       getString(item, "derivativeCategory") ||
@@ -419,6 +420,10 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       secondaryFields: [
         productNumber,
         category,
+        item.craftCategory as string,
+        item.craftCategories,
+        item.seriesTitle as string,
+        item.seriesBranchTitle as string,
         item.artworkCategory as string,
         item.derivativeCategory as string,
         item.subcategory as string,
