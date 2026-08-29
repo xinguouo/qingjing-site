@@ -19,7 +19,6 @@ import {product} from './product'
 import {productCollection} from './productCollection'
 import {productDetail} from './productDetail'
 import {residencyPage} from './residencyPage'
-import {siteSettings} from './siteSettings'
 import {studyMasterclassPage} from './studyMasterclassPage'
 import {studyProgram} from './studyProgram'
 import {teamPage} from './teamPage'
@@ -27,7 +26,6 @@ import {teamMember} from './teamMember'
 import {shopSeries, shopSeriesBranch} from './shopTaxonomy'
 
 export const schemaTypes = [
-  siteSettings,
   homePage,
   aboutMissionPage,
   aboutContactPage,

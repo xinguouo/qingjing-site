@@ -8,7 +8,6 @@ export const homePage = defineType({
   type: "document",
   groups: [
     { name: "hero", title: "首页首屏 / Hero", default: true },
-    { name: "intro", title: "简介区 / Intro" },
     { name: "quick", title: "快速入口 / Quick Entries" },
     { name: "featured", title: "首页推荐 / Featured" },
     { name: "legacy", title: "旧字段 / Legacy" },
@@ -93,32 +92,6 @@ export const homePage = defineType({
           ],
         }),
       ],
-    }),
-    defineField({
-      name: "introTitleZh",
-      title: "介绍标题（中文） / Intro Title Zh",
-      type: "string",
-      group: "intro",
-    }),
-    defineField({
-      name: "introTitleEn",
-      title: "介绍标题（英文） / Intro Title En",
-      type: "string",
-      group: "intro",
-    }),
-    defineField({
-      name: "introTextZh",
-      title: "介绍正文（中文） / Intro Text Zh",
-      type: "text",
-      group: "intro",
-      rows: 4,
-    }),
-    defineField({
-      name: "introTextEn",
-      title: "介绍正文（英文） / Intro Text En",
-      type: "text",
-      group: "intro",
-      rows: 4,
     }),
     defineField({
       name: "quickEntries",

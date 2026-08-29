@@ -33,7 +33,6 @@ export default defineConfig({
     },
     newDocumentOptions: (prev) => {
       const singletonTemplateIds = new Set([
-        "siteSettings",
         "homePage",
         "aboutMissionPage",
         "aboutContactPage",

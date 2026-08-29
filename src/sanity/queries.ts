@@ -130,27 +130,6 @@ const productVideoFields = `
   }
 `;
 
-const siteSettingsFields = `
-  siteNameZh,
-  siteNameEn,
-  "siteName": ${localizedText("siteNameEn", "siteNameZh")},
-  logo{${imageFields}},
-  email,
-  phone,
-  addressZh,
-  addressEn,
-  "address": ${localizedText("addressEn", "addressZh")},
-  footerTextZh,
-  footerTextEn,
-  "footerText": ${localizedText("footerTextEn", "footerTextZh")},
-  socialLinks[]{
-    _key,
-    platform,
-    label,
-    url
-  }
-`;
-
 const studyProgramCardFields = `
   _id,
   titleZh,
@@ -807,13 +786,6 @@ const teamPageTitleZh =
 const teamPageTitleEn =
   'coalesce(*[_type == "teamPage" && _id == "teamPage"][0].pageTitleEn, *[_type == "teamPage" && _id == "teamPage"][0].titleEn)';
 
-export const siteSettingsQuery = defineQuery(`*[
-  _type == "siteSettings" &&
-  _id == "siteSettings"
-][0]{
-  ${siteSettingsFields}
-}`);
-
 export const homePageQuery = defineQuery(`*[
   _type == "homePage" &&
   _id == "homePage" &&
@@ -833,12 +805,6 @@ export const homePageQuery = defineQuery(`*[
     titleLogoBlack{${imageFields}},
     titleLogo{${imageFields}}
   },
-  introTitleZh,
-  introTitleEn,
-  "introTitle": ${localizedText("introTitleEn", "introTitleZh")},
-  introTextZh,
-  introTextEn,
-  "introText": ${localizedText("introTextEn", "introTextZh")},
   quickEntries[]{
     _key,
     titleZh,

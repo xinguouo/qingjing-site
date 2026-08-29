@@ -105,18 +105,6 @@ export const structure: StructureResolver = (S, context) => {
     .title('内容管理 / Content')
     .items([
       S.listItem()
-        .id('siteSettings')
-        .title('网站设置 / Site Settings')
-        .schemaType('siteSettings')
-        .child(
-          singleton({
-            id: 'siteSettingsDocument',
-            title: '网站设置 / Site Settings',
-            schemaType: 'siteSettings',
-            documentId: 'siteSettings',
-          }),
-        ),
-      S.listItem()
         .id('homePage')
         .title('首页 / Home Page')
         .schemaType('homePage')
