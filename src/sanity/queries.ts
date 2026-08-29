@@ -921,7 +921,10 @@ export const teamPageQuery = defineQuery(`{
 }`);
 
 export const teamMembersQuery =
-  defineQuery(`*[_type == "teamMember"] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  defineQuery(`*[
+  _type == "teamMember" &&
+  ${publishedDocumentFilter}
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   _id,
   nameZh,
   nameEn,
@@ -1658,7 +1661,7 @@ export const siteSearchContentQuery = defineQuery(`{
     _type == "teamMember" &&
     ${publishedDocumentFilter} &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     _id,
     nameZh,
     nameEn,
