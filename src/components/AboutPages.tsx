@@ -15,6 +15,7 @@ import {
 } from "@/sanity/queries";
 
 import { AppShell } from "./AppShell";
+import { MissionImageCarousel } from "./MissionImageCarousel";
 import { PageContainer } from "./PageContainer";
 import { PageHeader } from "./PageHeader";
 
@@ -23,6 +24,7 @@ type SanityImage = SanityImageSource | null | undefined;
 type AboutMissionPageData = {
   body?: string | null;
   image?: SanityImage;
+  missionImages?: SanityImage[] | null;
   pageTitleEn?: string | null;
   pageTitleZh?: string | null;
 };
@@ -251,6 +253,10 @@ export async function MissionVisionPage({ locale }: PageProps) {
   const titleZh = compactText(missionPage?.pageTitleZh) || labels.empty;
   const titleEn = compactText(missionPage?.pageTitleEn);
   const body = textOrEmpty(missionPage?.body, locale);
+  const missionImageItems = missionPage?.missionImages?.filter(Boolean) || [];
+  const missionImages = missionImageItems.length
+    ? missionImageItems
+    : [missionPage?.image].filter(Boolean);
 
   return (
     <AboutPageShell locale={locale}>
@@ -258,14 +264,14 @@ export async function MissionVisionPage({ locale }: PageProps) {
 
       <section className="mt-8 lg:mt-9">
         <div className="glass-card rounded-[16px] p-4 sm:p-5 lg:p-6">
-        <ImageFrame
-          alt={titleZh}
-          className="h-[220px] w-full sm:h-[320px] lg:h-[430px] xl:h-[460px]"
-          image={missionPage?.image}
-          label={labels.imagePending}
-          priority
-          width={1800}
-        />
+          <MissionImageCarousel
+            alt={titleZh}
+            className="h-[220px] w-full sm:h-[320px] lg:h-[430px] xl:h-[460px]"
+            images={missionImages}
+            label={labels.imagePending}
+            priority
+            width={1800}
+          />
         </div>
 
         <MissionContentSection text={body} />

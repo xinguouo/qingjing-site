@@ -90,19 +90,6 @@ export const homePage = defineType({
               options: { hotspot: false },
               hidden: true,
             }),
-            defineField({
-              name: "titleColorMode",
-              title: "标题颜色模式 / Title Color Mode",
-              type: "string",
-              initialValue: "black",
-              options: {
-                list: [
-                  { title: "黑色 / Black", value: "black" },
-                  { title: "白色 / White", value: "white" },
-                ],
-                layout: "radio",
-              },
-            }),
           ],
         }),
       ],

@@ -826,13 +826,12 @@ export const homePageQuery = defineQuery(`*[
   heroSubtitleEn,
   "heroSubtitle": ${localizedText("heroSubtitleEn", "heroSubtitleZh")},
   heroImage{${imageFields}},
-  heroImages[]{
+  "heroCarouselImages": heroImages[defined(asset)]{
     ${imageFields},
     alt,
     titleLogoWhite{${imageFields}},
     titleLogoBlack{${imageFields}},
-    titleLogo{${imageFields}},
-    titleColorMode
+    titleLogo{${imageFields}}
   },
   introTitleZh,
   introTitleEn,
@@ -889,7 +888,20 @@ export const aboutMissionPageQuery = defineQuery(`{
     $locale == "en" && defined(${aboutMissionBodyEn}) && ${aboutMissionBodyEn} != "" => ${aboutMissionBodyEn},
     ${aboutMissionBodyZh}
   ),
-  "image": *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].image{${imageFields}}
+  "missionImages": select(
+    count(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].missionImages[defined(asset)]) > 0 =>
+      *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].missionImages[defined(asset)]{${imageFields}},
+    defined(*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].image.asset) =>
+      [*[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].image{${imageFields}}],
+    defined(*[_type == "aboutPage" && _id == "aboutPage"][0].missionImage.asset) =>
+      [*[_type == "aboutPage" && _id == "aboutPage"][0].missionImage{${imageFields}}],
+    []
+  ),
+  "image": coalesce(
+    *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].missionImages[defined(asset)][0]{${imageFields}},
+    *[_type == "aboutMissionPage" && _id == "aboutMissionPage"][0].image{${imageFields}},
+    *[_type == "aboutPage" && _id == "aboutPage"][0].missionImage{${imageFields}}
+  )
 }`);
 
 export const contactPageQuery = defineQuery(`{

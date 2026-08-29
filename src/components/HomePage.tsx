@@ -62,8 +62,8 @@ type HomePageData = {
   featuredProducts?: HomeProduct[] | null;
   featuredStudyPrograms?: HomeCardItem[] | null;
   featuredStudyProgramsTitle?: string | null;
+  heroCarouselImages?: HeroBannerSlide[] | null;
   heroImage?: SanityImage;
-  heroImages?: HeroBannerSlide[] | null;
   heroSubtitle?: string | null;
   heroTitle?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
@@ -537,7 +537,7 @@ export async function HomePage({ locale }: HomePageProps) {
     );
   }
 
-  const heroSlides = homePage?.heroImages?.filter(Boolean) || [];
+  const heroSlides = homePage?.heroCarouselImages?.filter(Boolean) || [];
   const heroImage =
     heroSlides[0]?.image ||
     (heroSlides[0] as SanityImage) ||

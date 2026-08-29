@@ -31,11 +31,24 @@ export const aboutMissionPage = defineType({
       rows: 6,
     }),
     defineField({
+      name: 'missionImages',
+      title: '使命愿景图片 / Mission & Vision Images',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: imageCaptionFields,
+        },
+      ],
+    }),
+    defineField({
       name: 'image',
-      title: '图片 / Image',
+      title: '图片（旧字段，兼容） / Legacy Image',
       type: 'image',
       options: {hotspot: true},
       fields: imageCaptionFields,
+      hidden: true,
     }),
     defineField({
       name: 'order',
@@ -48,13 +61,14 @@ export const aboutMissionPage = defineType({
     select: {
       title: 'pageTitleZh',
       subtitle: 'pageTitleEn',
-      media: 'image',
+      media: 'missionImages.0',
+      legacyMedia: 'image',
     },
-    prepare({title, subtitle, media}) {
+    prepare({title, subtitle, media, legacyMedia}) {
       return {
         title: title || '使命愿景 / Mission & Vision',
         subtitle,
-        media,
+        media: media || legacyMedia,
       }
     },
   },

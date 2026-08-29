@@ -6,13 +6,13 @@ import {useEffect, useMemo, useState} from "react";
 
 import {urlForImage} from "@/sanity/image";
 import {glassStyle} from "../../styles/glassStyle";
+import {useTheme} from "./ThemeProvider";
 
 type SanityImage = SanityImageSource | null | undefined;
 
 export type HeroBannerSlide = {
   alt?: string | null;
   image?: SanityImage;
-  titleColorMode?: "white" | "black" | string | null;
   titleLogo?: SanityImage;
   titleLogoBlack?: SanityImage;
   titleLogoWhite?: SanityImage;
@@ -69,25 +69,13 @@ function hasSlideImageUrl(
 
 function getTitleLogo(
   slide: HeroBannerSlideWithUrls | undefined,
-  logoTitleOnly = false,
+  isDarkTheme: boolean,
 ) {
   if (!slide) {
     return {className: "", url: null};
   }
 
-  const colorMode = slide.titleColorMode === "white" ? "white" : "black";
-
-  if (logoTitleOnly) {
-    return {
-      className: "",
-      url:
-        colorMode === "white"
-          ? slide.titleLogoWhiteUrl
-          : slide.titleLogoBlackUrl,
-    };
-  }
-
-  if (colorMode === "white") {
+  if (isDarkTheme) {
     if (slide.titleLogoWhiteUrl) {
       return {className: "", url: slide.titleLogoWhiteUrl};
     }
@@ -127,32 +115,48 @@ export function HeroBanner({
   subtitle,
   title,
 }: HeroBannerProps) {
+  const {mode} = useTheme();
+  const isDarkTheme = mode === "dark";
   const heroSlides = useMemo(
     () => {
-      const sourceSlides: HeroBannerSlide[] =
+      const withUrls = (sourceSlides: HeroBannerSlide[]) =>
+        sourceSlides
+          .map((slide) => ({
+            ...slide,
+            imageUrl: imageUrl(slide.image, 1800),
+            titleLogoBlackUrl: imageUrl(slide.titleLogoBlack, 1000),
+            titleLogoUrl: imageUrl(slide.titleLogo, 1000),
+            titleLogoWhiteUrl: imageUrl(slide.titleLogoWhite, 1000),
+          }))
+          .filter(hasSlideImageUrl);
+      const slideItems =
         slides?.filter(Boolean).map((slide) => ({
           ...slide,
           image: slide.image || (slide as SanityImage),
-        })) ||
-        images?.filter(Boolean).map((item) => ({image: item} satisfies HeroBannerSlide)) ||
-        (image ? [{image} satisfies HeroBannerSlide] : []);
+        })) || [];
+      const imageItems =
+        images?.filter(Boolean).map(
+          (item) => ({image: item}) satisfies HeroBannerSlide,
+        ) || [];
+      const fallbackItems = image ? [{image} satisfies HeroBannerSlide] : [];
+      const candidates = [slideItems, imageItems, fallbackItems];
 
-      return sourceSlides
-        .map((slide) => ({
-          ...slide,
-          imageUrl: imageUrl(slide.image, 1800),
-          titleLogoBlackUrl: imageUrl(slide.titleLogoBlack, 1000),
-          titleLogoUrl: imageUrl(slide.titleLogo, 1000),
-          titleLogoWhiteUrl: imageUrl(slide.titleLogoWhite, 1000),
-        }))
-        .filter(hasSlideImageUrl);
+      for (const candidate of candidates) {
+        const validSlides = withUrls(candidate);
+
+        if (validSlides.length) {
+          return validSlides;
+        }
+      }
+
+      return [];
     },
     [image, images, slides],
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const hasCarousel = heroSlides.length > 1;
   const currentSlide = heroSlides[currentIndex];
-  const titleLogo = getTitleLogo(currentSlide, logoTitleOnly);
+  const titleLogo = getTitleLogo(currentSlide, isDarkTheme);
 
   useEffect(() => {
     setCurrentIndex(0);
