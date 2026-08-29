@@ -66,7 +66,6 @@ type LinkedArtist = {
 
 type TeamMember = {
   _id: string;
-  bio?: string | null;
   linkedArtist?: LinkedArtist | null;
   name?: string | null;
   portrait?: SanityImage;
@@ -290,7 +289,6 @@ function TeamMemberCard({
   const labels = copy[locale];
   const name = compactText(member.name) || labels.empty;
   const role = compactText(member.role);
-  const bio = compactText(member.bio);
   const detailSlug = compactText(member.slug) || compactText(member.linkedArtist?.slug);
   const href = detailSlug ? `/${locale}/about/team/${detailSlug}` : null;
   const content = (
@@ -308,11 +306,6 @@ function TeamMemberCard({
         </h2>
         {role ? (
           <p className="mt-1 text-[11px] leading-4 text-muted-token">{role}</p>
-        ) : null}
-        {bio ? (
-          <p className="mt-1.5 line-clamp-3 text-[12px] leading-[1.55] text-secondary">
-            {bio}
-          </p>
         ) : null}
       </div>
     </>

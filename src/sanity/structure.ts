@@ -157,10 +157,12 @@ export const structure: StructureResolver = (S, context) => {
                             documentId: 'teamPage',
                           }),
                         ),
-                      typedListItem({
+                      orderableDocumentListDeskItem({
+                        type: 'teamMember',
                         id: 'aboutTeamMembersListItem',
                         title: '团队成员列表 / Team Member List',
-                        schemaType: 'teamMember',
+                        S,
+                        context,
                       }),
                     ]),
                 ),

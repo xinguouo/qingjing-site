@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
 
@@ -23,6 +24,7 @@ export const teamMember = defineType({
     },
   ],
   fields: [
+    orderRankField({type: 'teamMember', hidden: true}),
     defineField({
       name: 'nameZh',
       title: '\u59d3\u540d\uff08\u4e2d\u6587\uff09 / Name (Chinese)',
@@ -282,6 +284,7 @@ export const teamMember = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: '\u6392\u5e8f / Order',
       name: 'orderAsc',

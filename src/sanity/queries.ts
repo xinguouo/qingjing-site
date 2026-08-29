@@ -921,7 +921,7 @@ export const teamPageQuery = defineQuery(`{
 }`);
 
 export const teamMembersQuery =
-  defineQuery(`*[_type == "teamMember"] | order(order asc) {
+  defineQuery(`*[_type == "teamMember"] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   _id,
   nameZh,
   nameEn,
@@ -930,16 +930,6 @@ export const teamMembersQuery =
   roleZh,
   roleEn,
   "role": ${localizedText("roleEn", "roleZh")},
-  shortBioZh,
-  shortBioEn,
-  bioZh,
-  bioEn,
-  "bio": select(
-    $locale == "en" && defined(shortBioEn) && shortBioEn != "" => shortBioEn,
-    defined(shortBioZh) && shortBioZh != "" => shortBioZh,
-    $locale == "en" && defined(bioEn) && bioEn != "" => bioEn,
-    bioZh
-  ),
   portrait{${imageFields}},
   linkedArtist->{_id, nameZh, nameEn, "name": ${localizedText("nameEn", "nameZh")}, "slug": slug.current},
   order
@@ -1668,7 +1658,7 @@ export const siteSearchContentQuery = defineQuery(`{
     _type == "teamMember" &&
     ${publishedDocumentFilter} &&
     defined(slug.current)
-  ] | order(order asc) {
+  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
     _id,
     nameZh,
     nameEn,
