@@ -234,7 +234,7 @@ function TextBlock({
 
 function MissionContentSection({ text }: { text: string }) {
   return (
-    <section className="mt-8 w-full text-left sm:mt-9 lg:mt-10">
+    <section className="w-full text-left">
       <TextBlock
         className="text-[20px] leading-[2] text-secondary"
         text={text}
@@ -263,7 +263,9 @@ export async function MissionVisionPage({ locale }: PageProps) {
       <PageHeader titleEn={titleEn} titleZh={titleZh} />
 
       <section className="mt-8 lg:mt-9">
-        <div className="glass-card mx-auto w-fit max-w-full rounded-[16px] p-4 sm:p-5 lg:p-6">
+        <MissionContentSection text={body} />
+
+        <div className="mt-10 flex justify-center lg:mt-12">
           <MissionImageCarousel
             alt={titleZh}
             className="w-fit max-w-full"
@@ -273,8 +275,6 @@ export async function MissionVisionPage({ locale }: PageProps) {
             width={1800}
           />
         </div>
-
-        <MissionContentSection text={body} />
       </section>
     </AboutPageShell>
   );
