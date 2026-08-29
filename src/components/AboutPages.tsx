@@ -263,10 +263,10 @@ export async function MissionVisionPage({ locale }: PageProps) {
       <PageHeader titleEn={titleEn} titleZh={titleZh} />
 
       <section className="mt-8 lg:mt-9">
-        <div className="glass-card rounded-[16px] p-4 sm:p-5 lg:p-6">
+        <div className="glass-card mx-auto w-fit max-w-full rounded-[16px] p-4 sm:p-5 lg:p-6">
           <MissionImageCarousel
             alt={titleZh}
-            className="h-[220px] w-full sm:h-[320px] lg:h-[430px] xl:h-[460px]"
+            className="w-fit max-w-full"
             images={missionImages}
             label={labels.imagePending}
             priority

@@ -69,13 +69,14 @@ export function MissionImageCarousel({
 
   return (
     <div
-      className={`image-placeholder relative flex items-center justify-center overflow-hidden rounded-[14px] ${className}`}
+      className={`relative grid max-w-full place-items-center overflow-hidden rounded-[14px] ${className}`}
     >
       {slides.length ? (
         slides.map((slide, index) => (
           <img
-            alt={alt}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-out ${
+            alt={index === currentIndex ? alt : ""}
+            aria-hidden={index !== currentIndex}
+            className={`col-start-1 row-start-1 h-auto max-h-[min(72vh,760px)] w-auto max-w-full object-contain transition-opacity duration-1000 ease-out ${
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
             key={`${slide.src}-${index}`}
