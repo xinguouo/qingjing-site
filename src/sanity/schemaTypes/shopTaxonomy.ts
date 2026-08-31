@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SHOP_CRAFT_CATEGORIES} from '../../config/shopCraftCategories'
 
 type ShopTaxonomyHiddenCallback = (context: {
   document?: Record<string, unknown>
@@ -11,13 +12,10 @@ type ShopTaxonomyFieldOptions = {
 }
 
 export const shopCraftCategoryOptions = [
-  {title: '玻璃铸造 / Glass Casting', value: 'glass-casting'},
-  {title: '玻璃吹制 / Glass Blowing', value: 'glass-blowing'},
-  {title: '玻璃灯工 / Lampworking', value: 'lampworking'},
-  {title: '玻璃冷加工 / Cold Working', value: 'cold-working'},
-  {title: '玻璃马赛克 / Glass Mosaic', value: 'glass-mosaic'},
-  {title: '玻璃镶嵌 / Stained Glass', value: 'stained-glass'},
-  {title: '玻璃绘画 / Glass Painting', value: 'glass-painting'},
+  ...SHOP_CRAFT_CATEGORIES.map((item) => ({
+    title: `${item.labelZh} / ${item.labelEn}`,
+    value: item.value,
+  })),
 ]
 
 export const shopSeries = defineType({
@@ -124,12 +122,11 @@ export function shopCraftCategoryField(group = 'basic') {
   return defineField({
     name: 'craftCategory',
     title: '玻璃工艺 / Craft Category',
-    type: 'array',
+    type: 'string',
     group,
-    of: [{type: 'string'}],
     options: {
       list: shopCraftCategoryOptions,
-      layout: 'tags',
+      layout: 'dropdown',
     },
   })
 }

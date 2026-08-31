@@ -4,6 +4,11 @@ import { notFound } from "next/navigation";
 import type { ComponentProps } from "react";
 
 import type { Locale } from "@/config/navigation";
+import {
+  normalizeShopCraftCategoryId,
+  SHOP_CRAFT_CATEGORIES,
+  type ShopCraftCategoryId,
+} from "@/config/shopCraftCategories";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
@@ -350,17 +355,9 @@ const derivativeSubcategories: Array<{
   { id: "packaging", labelEn: "Packaging", labelZh: "包装" },
 ];
 
-const craftCategoryOptions = [
-  { id: "glass-casting", labelEn: "Glass Casting", labelZh: "玻璃铸造" },
-  { id: "glass-blowing", labelEn: "Glass Blowing", labelZh: "玻璃吹制" },
-  { id: "lampworking", labelEn: "Lampworking", labelZh: "玻璃灯工" },
-  { id: "cold-working", labelEn: "Cold Working", labelZh: "玻璃冷加工" },
-  { id: "glass-mosaic", labelEn: "Glass Mosaic", labelZh: "玻璃马赛克" },
-  { id: "stained-glass", labelEn: "Stained Glass", labelZh: "玻璃镶嵌" },
-  { id: "glass-painting", labelEn: "Glass Painting", labelZh: "玻璃绘画" },
-] as const;
+const craftCategoryOptions = SHOP_CRAFT_CATEGORIES;
 
-type CraftCategory = (typeof craftCategoryOptions)[number]["id"];
+type CraftCategory = ShopCraftCategoryId;
 
 const artworkProductCategories = [
   "\u88ab\u5b50\u690d\u7269",
@@ -634,10 +631,12 @@ function normalizeCraftCategories(
   const values = Array.isArray(projected) && projected.length ? projected : value;
 
   if (Array.isArray(values)) {
-    return values.map(compactText).filter(Boolean);
+    return values
+      .map((item) => normalizeShopCraftCategoryId(compactText(item)))
+      .filter(Boolean);
   }
 
-  const category = compactText(values);
+  const category = normalizeShopCraftCategoryId(compactText(values));
   return category ? [category] : [];
 }
 
