@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
+  type MouseEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -59,6 +61,7 @@ export function HomeCarouselSection({
   viewAllHref,
   viewAllLabel,
 }: HomeCarouselSectionProps) {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerViewDesktop);
@@ -125,6 +128,26 @@ export function HomeCarouselSection({
       resumeTimerRef.current = null;
     }, manualPauseDuration);
   }, [dispatchPause]);
+
+  const handleViewAllClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (
+        !viewAllHref ||
+        /^https?:\/\//.test(viewAllHref) ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        event.button !== 0
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      router.push(viewAllHref);
+    },
+    [router, viewAllHref],
+  );
 
   useEffect(() => {
     const updateItemsPerPage = () => {
@@ -213,12 +236,12 @@ export function HomeCarouselSection({
   }
 
   return (
-    <section className={className}>
-      <div className="mb-4 flex items-center justify-between gap-4 lg:mb-4">
+    <section className={`relative min-w-0 ${className}`}>
+      <div className="relative z-20 mb-4 flex items-center justify-between gap-4 lg:mb-4">
         <h2 className="font-title text-2xl font-normal leading-tight text-primary lg:text-[28px]">
           {sectionTitle}
         </h2>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="relative z-30 flex shrink-0 items-center gap-2">
           {canSlide ? (
             <div className="hidden items-center gap-1.5 md:flex">
               <button
@@ -249,6 +272,7 @@ export function HomeCarouselSection({
             <Link
               className="glass-button inline-flex items-center rounded-full px-3 py-1.5 text-xs text-secondary transition hover:text-primary"
               href={viewAllHref}
+              onClick={handleViewAllClick}
             >
               {viewAllLabel}
             </Link>
@@ -257,7 +281,7 @@ export function HomeCarouselSection({
       </div>
 
       <div
-        className="overflow-hidden"
+        className="relative z-0 overflow-hidden"
         onMouseEnter={() => dispatchPause(true)}
         onMouseLeave={() => dispatchPause(false)}
       >

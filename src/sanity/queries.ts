@@ -152,6 +152,7 @@ const studyProgramCardFields = `
 
 const eventCardFields = `
   _id,
+  "_type": _type,
   titleZh,
   titleEn,
   "title": ${localizedText("titleEn", "titleZh")},
@@ -168,6 +169,47 @@ const eventCardFields = `
   contentZh,
   contentEn,
   "content": ${localizedText("contentEn", "contentZh")},
+  order
+`;
+
+const homeEventReferenceFields = `
+  _id,
+  "_type": _type,
+  titleZh,
+  titleEn,
+  "title": ${localizedText("titleEn", "titleZh")},
+  "slug": slug.current,
+  "eventType": select(
+    _type == "experienceCourse" => "offline-experience",
+    eventType == "event" => "activity",
+    eventType
+  ),
+  "coverImage": select(
+    _type == "experienceCourse" => coalesce(coverImage{${imageFields}}, heroImage{${imageFields}}),
+    coverImage{${imageFields}}
+  ),
+  "posterImage": select(
+    _type == "experienceCourse" => coalesce(coverImage{${imageFields}}, heroImage{${imageFields}}),
+    posterImage{${imageFields}}
+  ),
+  courseIntroZh,
+  courseIntroEn,
+  "courseIntro": select(
+    _type == "experienceCourse" => ${localizedText("descriptionEn", "descriptionZh")},
+    ${localizedText("courseIntroEn", "courseIntroZh")}
+  ),
+  facultyZh,
+  facultyEn,
+  "faculty": select(
+    _type == "experienceCourse" => teacher,
+    ${localizedText("facultyEn", "facultyZh")}
+  ),
+  contentZh,
+  contentEn,
+  "content": select(
+    _type == "experienceCourse" => ${localizedText("descriptionEn", "descriptionZh")},
+    ${localizedText("contentEn", "contentZh")}
+  ),
   order
 `;
 
@@ -822,7 +864,7 @@ export const homePageQuery = defineQuery(`*[
   featuredEventsTitleZh,
   featuredEventsTitleEn,
   "featuredEventsTitle": ${localizedText("featuredEventsTitleEn", "featuredEventsTitleZh")},
-  featuredEvents[]->{${eventCardFields}},
+  featuredEvents[]->{${homeEventReferenceFields}},
   featuredPastEventsTitleZh,
   featuredPastEventsTitleEn,
   "featuredPastEventsTitle": ${localizedText("featuredPastEventsTitleEn", "featuredPastEventsTitleZh")},

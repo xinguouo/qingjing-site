@@ -203,8 +203,22 @@ export const event = defineType({
   preview: {
     select: {
       title: 'titleZh',
-      subtitle: 'eventType',
+      eventType: 'eventType',
       media: 'coverImage',
+    },
+    prepare({title, eventType, media}) {
+      const subtitles: Record<string, string> = {
+        'offline-experience': '线下体验 / Offline Experience',
+        'open-class': '艺术公开课 / Open Class',
+        activity: '活动 / Activity',
+        event: '活动 / Activity',
+      }
+
+      return {
+        title,
+        subtitle: subtitles[String(eventType || '')] || '活动 / Event',
+        media,
+      }
     },
   },
 })

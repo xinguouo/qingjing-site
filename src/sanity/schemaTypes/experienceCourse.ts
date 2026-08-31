@@ -135,8 +135,14 @@ export const experienceCourse = defineType({
   preview: {
     select: {
       title: 'titleZh',
-      subtitle: 'category',
       media: 'coverImage',
+    },
+    prepare({title, media}) {
+      return {
+        title,
+        subtitle: '线下体验 / Offline Experience',
+        media,
+      }
     },
   },
 })

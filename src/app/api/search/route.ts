@@ -198,16 +198,20 @@ function studyHref(item: Record<string, unknown>, locale: Locale) {
 
 function eventHref(item: Record<string, unknown>, locale: Locale) {
   const eventType = getString(item, "eventType");
+  const slug = getString(item, "slug");
 
   if (eventType === "open-class") {
-    return `/${locale}/events/open-class`;
+    return slug
+      ? `/${locale}/events/open-class/${slug}`
+      : `/${locale}/events/open-class`;
   }
 
   if (eventType === "activity") {
-    return `/${locale}/events/activity`;
+    return slug
+      ? `/${locale}/events/activity/${slug}`
+      : `/${locale}/events/activity`;
   }
 
-  const slug = getString(item, "slug");
   return slug
     ? `/${locale}/events/offline-experience/${slug}`
     : `/${locale}/events/offline-experience`;

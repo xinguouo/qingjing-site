@@ -326,11 +326,15 @@ function CourseCardPoster({
 export function CourseCard({
   href,
   locale,
+  metaLabel,
+  metaValue,
   program,
   hrefPrefix = "/study/masterclass",
 }: {
   href?: string | null;
   locale: Locale;
+  metaLabel?: string | null;
+  metaValue?: string | null;
   program: StudyProgram;
   hrefPrefix?: string;
 }) {
@@ -340,8 +344,12 @@ export function CourseCard({
     program.shortDescription || program.description || program.courseIntro,
   );
   const academicSupport = firstTextLine(
-    program.academicSupport || program.academicHost || program.faculty,
+    metaValue ||
+      program.academicSupport ||
+      program.academicHost ||
+      program.faculty,
   );
+  const academicSupportLabel = compactText(metaLabel) || labels.academicSupport;
   const cardHref =
     href === undefined
       ? program.slug
@@ -367,7 +375,7 @@ export function CourseCard({
         {academicSupport ? (
           <div className="mt-auto pt-3.5">
             <p className="text-[13px] leading-none text-muted-token">
-              {labels.academicSupport}
+              {academicSupportLabel}
             </p>
             <p className="mt-2 line-clamp-1 text-[14px] leading-[1.55] text-primary">
               {academicSupport}

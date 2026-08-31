@@ -111,7 +111,7 @@ export function FloatingThemeControl({ locale }: FloatingThemeControlProps) {
 
   return (
     <div
-      className="fixed right-4 top-1/2 z-[80] -translate-y-1/2 sm:right-5"
+      className="pointer-events-none fixed right-4 top-1/2 z-[80] -translate-y-1/2 sm:right-5"
       ref={panelRef}
     >
       <div className="flex items-center justify-end gap-3">
@@ -148,7 +148,7 @@ export function FloatingThemeControl({ locale }: FloatingThemeControlProps) {
         <button
           aria-expanded={open}
           aria-label={locale === "zh" ? "\u8c03\u6574\u754c\u9762\u4e3b\u9898" : "Adjust interface theme"}
-          className="theme-control-button glass-button group relative flex h-12 w-12 items-center justify-center rounded-full text-primary transition hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--border)]"
+          className="theme-control-button glass-button pointer-events-auto group relative flex h-12 w-12 items-center justify-center rounded-full text-primary transition hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--border)]"
           onClick={() => setOpen((value) => !value)}
           type="button"
         >

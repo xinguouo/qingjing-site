@@ -179,7 +179,12 @@ export const homePage = defineType({
       title: "精选活动 / Featured Events",
       type: "array",
       group: "featured",
-      of: [{ type: "reference", to: [{ type: "event" }] }],
+      of: [
+        {
+          type: "reference",
+          to: [{ type: "event" }, { type: "experienceCourse" }],
+        },
+      ],
     }),
     defineField({
       name: "featuredPastEventsTitleZh",

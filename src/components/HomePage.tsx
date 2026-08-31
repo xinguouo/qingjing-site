@@ -23,6 +23,7 @@ type SanityImage = SanityImageSource | null | undefined;
 
 type HomeCardItem = {
   _id?: string;
+  _type?: string;
   content?: string | null;
   coverImage?: SanityImage;
   courseIntro?: string | null;
@@ -156,17 +157,39 @@ function programHref(item: HomeCardItem, locale: Locale) {
 }
 
 function eventHref(item: HomeCardItem, locale: Locale) {
+  if (item._type === "experienceCourse") {
+    return item.slug
+      ? `/${locale}/events/offline-experience/${item.slug}`
+      : `/${locale}/events/offline-experience`;
+  }
+
   if (item.eventType === "open-class") {
-    return `/${locale}/events/open-class`;
+    return item.slug
+      ? `/${locale}/events/open-class/${item.slug}`
+      : `/${locale}/events/open-class`;
   }
 
   if (item.eventType === "activity") {
-    return `/${locale}/events/activity`;
+    return item.slug
+      ? `/${locale}/events/activity/${item.slug}`
+      : `/${locale}/events/activity`;
   }
 
   return item.slug
     ? `/${locale}/events/offline-experience/${item.slug}`
     : `/${locale}/events/offline-experience`;
+}
+
+function eventTypeLabel(item: HomeCardItem, locale: Locale) {
+  if (item.eventType === "open-class") {
+    return locale === "zh" ? "\u827a\u672f\u516c\u5f00\u8bfe" : "Art Open Class";
+  }
+
+  if (item.eventType === "activity") {
+    return locale === "zh" ? "\u827a\u672f\u6d3b\u52a8" : "Art Activity";
+  }
+
+  return locale === "zh" ? "\u7ebf\u4e0b\u4f53\u9a8c" : "Offline Experience";
 }
 
 function productHref(item: HomeProduct, locale: Locale) {
@@ -414,11 +437,16 @@ function CourseCarousel({
   title,
   viewAllHref,
   hrefForItem,
+  metaForItem,
 }: {
   cardVariant: "masterclass" | "event";
   hrefForItem: (item: HomeCardItem, locale: Locale) => string | null;
   items: HomeCardItem[];
   locale: Locale;
+  metaForItem?: (
+    item: HomeCardItem,
+    locale: Locale,
+  ) => { label: string; value: string } | null;
   syncLeader?: boolean;
   title: string;
   viewAllHref: string;
@@ -426,14 +454,20 @@ function CourseCarousel({
   const cards = items
     .filter((item) => compactText(item.title))
     .slice(0, 8)
-    .map((item, index) => (
-      <CourseCard
-        href={hrefForItem(item, locale)}
-        key={`${item._id || item.slug || cardVariant}-${index}`}
-        locale={locale}
-        program={mapHomeItemToCourseCard(item)}
-      />
-    ));
+    .map((item, index) => {
+      const meta = metaForItem?.(item, locale);
+
+      return (
+        <CourseCard
+          href={hrefForItem(item, locale)}
+          key={`${item._id || item.slug || cardVariant}-${index}`}
+          locale={locale}
+          metaLabel={meta?.label}
+          metaValue={meta?.value}
+          program={mapHomeItemToCourseCard(item)}
+        />
+      );
+    });
 
   return (
     <HomeCarouselSection
@@ -583,6 +617,10 @@ export async function HomePage({ locale }: HomePageProps) {
               hrefForItem={eventHref}
               items={homePage?.featuredEvents?.filter(Boolean) || []}
               locale={locale}
+              metaForItem={(item, itemLocale) => ({
+                label: itemLocale === "zh" ? "\u7c7b\u578b" : "Type",
+                value: eventTypeLabel(item, itemLocale),
+              })}
               title={sectionTitle(
                 homePage?.featuredEventsTitle,
                 homeCopy[locale].featuredEvents,

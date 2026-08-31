@@ -5,6 +5,7 @@ import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
+  eventBySlugQuery,
   experienceCourseBySlugQuery,
   experienceCoursesQuery,
   offlineExperiencePageQuery,
@@ -36,6 +37,19 @@ type ExperienceCourse = {
   suitableAudience?: string | null;
   supportTeacher?: string | null;
   teacher?: string | null;
+  title?: string | null;
+};
+
+type EventExperienceCourse = {
+  _id?: string;
+  content?: string | null;
+  courseIntro?: string | null;
+  coverImage?: SanityImage;
+  eventType?: string | null;
+  faculty?: string | null;
+  galleryImages?: SanityImage[] | null;
+  posterImage?: SanityImage;
+  slug?: string | null;
   title?: string | null;
 };
 
@@ -412,17 +426,46 @@ function detailFallback(locale: Locale, slug: string): ExperienceCourse {
   );
 }
 
+function eventToExperienceCourse(
+  event: EventExperienceCourse | null,
+): ExperienceCourse | null {
+  if (!event || event.eventType !== "offline-experience") {
+    return null;
+  }
+
+  return {
+    _id: event._id,
+    academicHost: event.faculty,
+    academicSupport: event.faculty,
+    coverImage: event.posterImage || event.coverImage,
+    description: event.courseIntro || event.content,
+    galleryImages: event.galleryImages,
+    heroImage: event.posterImage || event.coverImage,
+    slug: event.slug,
+    teacher: event.faculty,
+    title: event.title,
+  };
+}
+
 export async function ExperienceCourseDetailPage({
   locale,
   slug,
 }: ExperienceDetailPageProps) {
-  const course = await client.fetch<ExperienceCourse | null>(
-    experienceCourseBySlugQuery,
-    { locale, slug },
-    { cache: "no-store" },
-  );
+  const [course, event] = await Promise.all([
+    client.fetch<ExperienceCourse | null>(
+      experienceCourseBySlugQuery,
+      { locale, slug },
+      { cache: "no-store" },
+    ),
+    client.fetch<EventExperienceCourse | null>(
+      eventBySlugQuery,
+      { locale, slug },
+      { cache: "no-store" },
+    ),
+  ]);
   const labels = copy[locale];
-  const item = course || detailFallback(locale, slug);
+  const item =
+    course || eventToExperienceCourse(event) || detailFallback(locale, slug);
   const title = compactText(item.title) || labels.pageTitle;
   const heroSrc = imageUrl(item.heroImage || item.coverImage, 1600);
   const teacher = item.teacher || item.academicHost || item.academicSupport;
