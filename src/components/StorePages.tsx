@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 
 import type { Locale } from "@/config/navigation";
 import {
+  getShopCraftCategoryByInput,
   normalizeShopCraftCategoryId,
   SHOP_CRAFT_CATEGORIES,
   type ShopCraftCategoryId,
@@ -133,6 +134,7 @@ type ProductDetail = {
     dimensions?: string | null;
     material?: string | null;
   } | null;
+  craftCategory?: string | string[] | null;
   relatedProducts?: ProductDetailRelated[] | null;
   slug?: string | null;
 };
@@ -159,6 +161,7 @@ type ProductDetailRelated = {
 type ArtDerivativeDetail = {
   _id: string;
   category?: string | null;
+  craftCategory?: string | string[] | null;
   description?: string | null;
   descriptionEn?: string | null;
   descriptionZh?: string | null;
@@ -294,6 +297,7 @@ const copy = {
 const shopArtworkDetailCopy = {
   zh: {
     back: "\u8fd4\u56de\u5546\u5e97",
+    craft: "\u5de5\u827a",
     dimensions: "\u5546\u54c1\u89c4\u683c",
     emptyImage: "\u56fe\u7247\u5f85\u4e0a\u4f20",
     emptyTitle: "\u5546\u54c1\u8be6\u60c5",
@@ -302,6 +306,7 @@ const shopArtworkDetailCopy = {
   },
   en: {
     back: "Back to Shop",
+    craft: "Craft",
     dimensions: "Dimensions",
     emptyImage: "Image pending",
     emptyTitle: "Product Detail",
@@ -314,6 +319,7 @@ const artDerivativeDetailCopy = {
   zh: {
     back: "\u8fd4\u56de\u5546\u5e97",
     categoryFallback: "\u827a\u672f\u884d\u751f\u54c1",
+    craft: "\u5de5\u827a",
     dimensions: "\u5c3a\u5bf8",
     emptyImage: "\u56fe\u7247\u5f85\u4e0a\u4f20",
     emptyTitle: "\u827a\u672f\u884d\u751f\u54c1",
@@ -321,6 +327,7 @@ const artDerivativeDetailCopy = {
   en: {
     back: "Back to Shop",
     categoryFallback: "Art Derivatives",
+    craft: "Craft",
     dimensions: "Dimensions",
     emptyImage: "Image pending",
     emptyTitle: "Art Derivative",
@@ -638,6 +645,23 @@ function normalizeCraftCategories(
 
   const category = normalizeShopCraftCategoryId(compactText(values));
   return category ? [category] : [];
+}
+
+function craftCategoryLabel(
+  value: string | string[] | null | undefined,
+  locale: Locale,
+) {
+  const values = Array.isArray(value) ? value : [value];
+
+  for (const item of values) {
+    const category = getShopCraftCategoryByInput(compactText(item));
+
+    if (category) {
+      return locale === "zh" ? category.labelZh : category.labelEn;
+    }
+  }
+
+  return "";
 }
 
 function subcategoryLabel(
@@ -1632,6 +1656,7 @@ export async function DerivativeDetailPage({
   const categoryLabel =
     compactText(product.category) || labels.categoryFallback;
   const dimensions = compactText(product.dimensions);
+  const craft = craftCategoryLabel(product.craftCategory, locale);
   const description = compactText(product.description);
   const mainImage = product.mainImage || product.galleryImages?.[0];
   const backHref = `${routePrefix(locale, includeLocalePrefix)}/shop`;
@@ -1657,6 +1682,14 @@ export async function DerivativeDetailPage({
 
           <section className="mt-5 max-w-[760px]">
             {dimensions ? <p className="detail-meta">{dimensions}</p> : null}
+            {craft ? (
+              <div className="mt-8">
+                <p className="detail-meta">{labels.craft}</p>
+                <p className="mt-3 text-[16px] leading-none text-primary">
+                  {craft}
+                </p>
+              </div>
+            ) : null}
             {description ? (
               <p className="mt-9 whitespace-pre-line text-[15px] leading-[1.9] text-secondary">
                 {description}
@@ -1844,6 +1877,7 @@ export async function ShopArtworkDetailPage({
   const description = compactText(product.productInfo?.description);
   const dimensions = compactText(product.productInfo?.dimensions);
   const material = compactText(product.productInfo?.material);
+  const craft = craftCategoryLabel(product.craftCategory, locale);
   const price = formatYuanPrice(product.commerce?.price);
   const images = productDetailImages(product);
   const relatedProducts =
@@ -1896,6 +1930,14 @@ export async function ShopArtworkDetailPage({
                     <p className="detail-meta">{labels.material}</p>
                     <p className="mt-3 text-[16px] leading-none text-primary">
                       {material}
+                    </p>
+                  </div>
+                ) : null}
+                {craft ? (
+                  <div className="mt-8">
+                    <p className="detail-meta">{labels.craft}</p>
+                    <p className="mt-3 text-[16px] leading-none text-primary">
+                      {craft}
                     </p>
                   </div>
                 ) : null}

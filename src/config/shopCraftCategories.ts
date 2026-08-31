@@ -7,7 +7,7 @@ export const SHOP_CRAFT_CATEGORIES = [
   },
   {
     id: "glass-blowing",
-    labelEn: "Glass Blowing",
+    labelEn: "Glassblowing",
     labelZh: "玻璃吹制",
     value: "玻璃吹制",
   },
@@ -19,7 +19,7 @@ export const SHOP_CRAFT_CATEGORIES = [
   },
   {
     id: "cold-working",
-    labelEn: "Cold Working",
+    labelEn: "Glass Coldworking",
     labelZh: "玻璃冷加工",
     value: "玻璃冷加工",
   },
@@ -31,7 +31,7 @@ export const SHOP_CRAFT_CATEGORIES = [
   },
   {
     id: "stained-glass",
-    labelEn: "Stained Glass",
+    labelEn: "Glass Inlay",
     labelZh: "玻璃镶嵌",
     value: "玻璃镶嵌",
   },
