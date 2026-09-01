@@ -4,8 +4,10 @@ import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
   getNavigationHref,
+  getNavigationLabel,
   isNavigationItemActive,
   navigationGroupLabels,
   navigationGroupOrder,
@@ -17,6 +19,7 @@ import { Logo } from "./Logo";
 import { SidebarNavIcon } from "./SidebarNavIcon";
 
 type DesktopSidebarProps = {
+  artCategorySettings?: ArtCategoryTitleMap;
   locale: Locale;
   logo?: SanityImageSource | null;
   siteName?: string | null;
@@ -27,7 +30,12 @@ const labels = {
   preparingZh: "\u7b79\u5907\u4e2d",
 };
 
-export function DesktopSidebar({ locale, logo, siteName }: DesktopSidebarProps) {
+export function DesktopSidebar({
+  artCategorySettings,
+  locale,
+  logo,
+  siteName,
+}: DesktopSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -92,7 +100,7 @@ export function DesktopSidebar({ locale, logo, siteName }: DesktopSidebarProps) 
                             : "text-xs leading-tight"
                         }`}
                       >
-                        {locale === "zh" ? item.labelZh : item.labelEn}
+                        {getNavigationLabel(item, locale, artCategorySettings)}
                       </span>
 
                       {isComingSoon ? (

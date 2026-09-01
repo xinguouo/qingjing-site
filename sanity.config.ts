@@ -3,6 +3,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
+import {artCategoryFallbacks} from "./src/config/artCategories";
 import {
   apiVersion,
   dataset,
@@ -26,32 +27,32 @@ export default defineConfig({
       ...prev,
       {
         id: "artCategory-sculpture",
-        title: "玻璃架上艺术页面标题 / Glass Easel Art Page Title",
+        title: "sculpture 分类页面标题 / Art Category Page Title",
         schemaType: "artCategory",
         value: {
           categoryType: "sculpture",
-          titleZh: "玻璃架上艺术",
-          titleEn: "GLASS EASEL ART",
+          titleZh: artCategoryFallbacks.sculpture.titleZh,
+          titleEn: artCategoryFallbacks.sculpture.titleEn,
         },
       },
       {
         id: "artCategory-installation-art",
-        title: "玻璃装置艺术页面标题 / Glass Installation Art Page Title",
+        title: "installation-art 分类页面标题 / Art Category Page Title",
         schemaType: "artCategory",
         value: {
           categoryType: "installation-art",
-          titleZh: "玻璃装置艺术",
-          titleEn: "GLASS INSTALLATION ART",
+          titleZh: artCategoryFallbacks["installation-art"].titleZh,
+          titleEn: artCategoryFallbacks["installation-art"].titleEn,
         },
       },
       {
         id: "artCategory-public-art",
-        title: "玻璃公共艺术页面标题 / Glass Public Art Page Title",
+        title: "public-art 分类页面标题 / Art Category Page Title",
         schemaType: "artCategory",
         value: {
           categoryType: "public-art",
-          titleZh: "玻璃公共艺术",
-          titleEn: "GLASS PUBLIC ART",
+          titleZh: artCategoryFallbacks["public-art"].titleZh,
+          titleEn: artCategoryFallbacks["public-art"].titleEn,
         },
       },
     ],

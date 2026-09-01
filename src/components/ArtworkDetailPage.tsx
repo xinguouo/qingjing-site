@@ -3,13 +3,21 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 
 import type {Locale} from "@/config/navigation";
+import {
+  artCategorySettingsIds,
+  artCategorySlugs,
+  resolveArtCategoryTitle,
+  type ArtCategoryTitleSettings,
+} from "@/config/artCategories";
 import {getShopCraftCategoryByInput} from "@/config/shopCraftCategories";
 import {client} from "@/sanity/client";
 import {urlForImage} from "@/sanity/image";
-import {artWorkBySlugQuery} from "@/sanity/queries";
+import {
+  artCategoryPageSettingsByTypeQuery,
+  artWorkBySlugQuery,
+} from "@/sanity/queries";
 
 import {
-  artCategoryConfigs,
   fallbackArtworks,
   getArtworkImageSource,
   normalizeArtCategorySlug,
@@ -213,7 +221,7 @@ function findFallbackArtwork(
     );
   }
 
-  for (const categorySlug of Object.keys(artCategoryConfigs) as ArtCategorySlug[]) {
+  for (const categorySlug of artCategorySlugs) {
     const artwork = fallbackArtworks[categorySlug][locale].find(
       (item) => item.slug === slug,
     );
@@ -226,10 +234,12 @@ function findFallbackArtwork(
   return null;
 }
 
-function categoryLabel(category: ArtCategorySlug, locale: Locale) {
-  const config = artCategoryConfigs[category];
-
-  return locale === "en" ? config.titleEn : config.titleZh;
+function categoryLabel(
+  category: ArtCategorySlug,
+  locale: Locale,
+  settings?: ArtCategoryTitleSettings | null,
+) {
+  return resolveArtCategoryTitle(category, locale, settings);
 }
 
 function techniqueLabel(technique: string | null | undefined, locale: Locale) {
@@ -468,6 +478,7 @@ function ArtworkVideos({
 }
 
 export function ArtworkDetailLayout({
+  artCategorySettings,
   backHref,
   backLabel,
   categoryLabel,
@@ -480,6 +491,7 @@ export function ArtworkDetailLayout({
   secondaryTitle,
   videos,
 }: {
+  artCategorySettings?: ArtCategoryTitleSettings | null;
   backHref: string;
   backLabel: string;
   categoryLabel?: string;
@@ -493,7 +505,7 @@ export function ArtworkDetailLayout({
   videos?: ArtworkVideo[] | null;
 }) {
   return (
-    <AppShell locale={locale}>
+    <AppShell artCategorySettings={artCategorySettings} locale={locale}>
       <PageContainer className="pb-16 lg:pb-24">
         <ArtworkHeader
           backHref={backHref}
@@ -546,6 +558,17 @@ export async function ArtworkDetailPage({
   const labels = copy[locale];
   const categorySlug =
     normalizeCategory(artwork.category) || requestedCategory || "sculpture";
+  const categorySettings = await client
+    .fetch<ArtCategoryTitleSettings | null>(
+      artCategoryPageSettingsByTypeQuery,
+      {
+        locale,
+        categorySettingsId: artCategorySettingsIds[categorySlug],
+        categoryType: categorySlug,
+      },
+      {cache: "no-store"},
+    )
+    .catch(() => null);
   const titleZh = compactText(artwork.titleZh);
   const titleEn = compactText(artwork.titleEn);
   const localizedTitle = compactText(artwork.title) || labels.title;
@@ -566,13 +589,19 @@ export async function ArtworkDetailPage({
   );
   const prefix = includeLocalePrefix ? `/${locale}` : "";
   const backHref = `${prefix}/art-projects/${categorySlug}`;
-  const backLabel = `${labels.backPrefix} ${categoryLabel(categorySlug, locale)}`;
+  const resolvedCategoryLabel = categoryLabel(
+    categorySlug,
+    locale,
+    categorySettings,
+  );
+  const backLabel = `${labels.backPrefix} ${resolvedCategoryLabel}`;
 
   return (
     <ArtworkDetailLayout
       backHref={backHref}
       backLabel={backLabel}
-      categoryLabel={categoryLabel(categorySlug, locale)}
+      artCategorySettings={categorySettings}
+      categoryLabel={resolvedCategoryLabel}
       description={description}
       descriptionLabel={labels.description}
       images={galleryImages}

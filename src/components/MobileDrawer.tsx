@@ -2,8 +2,10 @@
 
 import { usePathname, useRouter } from "next/navigation";
 
+import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
   getNavigationHref,
+  getNavigationLabel,
   isNavigationItemActive,
   navigationGroupLabels,
   navigationGroupOrder,
@@ -14,6 +16,7 @@ import {
 import { SidebarNavIcon } from "./SidebarNavIcon";
 
 type MobileDrawerProps = {
+  artCategorySettings?: ArtCategoryTitleMap;
   isOpen: boolean;
   locale: Locale;
   onClose: () => void;
@@ -25,7 +28,12 @@ const labels = {
   preparingZh: "\u7b79\u5907\u4e2d",
 };
 
-export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
+export function MobileDrawer({
+  artCategorySettings,
+  isOpen,
+  locale,
+  onClose,
+}: MobileDrawerProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -123,7 +131,11 @@ export function MobileDrawer({ isOpen, locale, onClose }: MobileDrawerProps) {
                               : "text-[#444444] group-hover:text-[#333333] dark:text-[var(--soft-foreground)] dark:group-hover:text-[var(--foreground)]"
                           }`}
                         >
-                          {locale === "zh" ? item.labelZh : item.labelEn}
+                          {getNavigationLabel(
+                            item,
+                            locale,
+                            artCategorySettings,
+                          )}
                         </span>
                         {isComingSoon ? (
                           <span className="glass-control shrink-0 rounded-full px-2 py-1 text-[11px] text-muted-token">

@@ -1,11 +1,22 @@
 import {defineField, defineType} from 'sanity'
+import {
+  artCategoryFallbackLabel,
+  type ArtCategorySlug,
+} from '../../config/artCategories'
 import {imageCaptionFields} from './imageCaptionFields'
 
 const artCategoryTypeTitles: Record<string, string> = {
-  sculpture: '玻璃架上艺术 / Glass Easel Art',
-  'installation-art': '玻璃装置艺术 / Glass Installation Art',
-  'public-art': '玻璃公共艺术 / Glass Public Art',
+  sculpture: artCategoryFallbackLabel('sculpture'),
+  'installation-art': artCategoryFallbackLabel('installation-art'),
+  'public-art': artCategoryFallbackLabel('public-art'),
 }
+
+const artCategoryTypeOptions = (
+  ['sculpture', 'installation-art', 'public-art'] satisfies ArtCategorySlug[]
+).map((value) => ({
+  title: artCategoryFallbackLabel(value),
+  value,
+}))
 
 export const artCategory = defineType({
   name: 'artCategory',
@@ -37,11 +48,7 @@ export const artCategory = defineType({
       type: 'string',
       group: 'basic',
       options: {
-        list: [
-          {title: '玻璃架上艺术 / Glass Easel Art', value: 'sculpture'},
-          {title: '玻璃装置艺术 / Glass Installation Art', value: 'installation-art'},
-          {title: '玻璃公共艺术 / Glass Public Art', value: 'public-art'},
-        ],
+        list: artCategoryTypeOptions,
         layout: 'radio',
       },
       validation: (rule) => rule.required(),

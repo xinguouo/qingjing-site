@@ -266,10 +266,6 @@ const offlineExperiencePageFields = `
   pageTitleZh,
   pageTitleEn,
   "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
-  bannerTitleZh,
-  bannerTitleEn,
-  "bannerTitle": ${localizedText("bannerTitleEn", "bannerTitleZh")},
-  bannerImage{${imageFields}},
   courses[]{
     _key,
     titleZh,
@@ -885,7 +881,21 @@ export const homePageQuery = defineQuery(`*[
   featuredArtWorksTitleEn,
   "featuredArtWorksTitle": ${localizedText("featuredArtWorksTitleEn", "featuredArtWorksTitleZh")},
   featuredArtWorks[]->{${homeArtWorkCardFields}},
-  featuredProducts[]->{${homeProductReferenceFields}}
+  featuredProducts[]->{${homeProductReferenceFields}},
+  "artCategories": *[
+    _type == "artCategory" &&
+    categoryType in ["sculpture", "installation-art", "public-art"] &&
+    !(_id in path("drafts.**"))
+  ]{
+    "sortKey": select(
+      _id in ["artCategory-sculpture", "artCategory-installation-art", "artCategory-public-art"] => 0,
+      1
+    ),
+    _id,
+    titleZh,
+    titleEn,
+    categoryType
+  } | order(categoryType asc, sortKey asc, _updatedAt desc)
 }`);
 
 export const aboutMissionPageQuery = defineQuery(`{
@@ -1268,6 +1278,7 @@ export const artCategoryByTypeQuery = defineQuery(`*[
 
 export const artCategoryPageSettingsByTypeQuery = defineQuery(`*[
   _type == "artCategory" &&
+  !(_id in path("drafts.**")) &&
   (_id == $categorySettingsId || categoryType == $categoryType)
 ]{
   "sortKey": select(_id == $categorySettingsId => 0, 1),
@@ -1276,6 +1287,21 @@ export const artCategoryPageSettingsByTypeQuery = defineQuery(`*[
   titleEn,
   categoryType
 } | order(sortKey asc, _updatedAt desc)[0]`);
+
+export const artCategoryPageSettingsListQuery = defineQuery(`*[
+  _type == "artCategory" &&
+  categoryType in ["sculpture", "installation-art", "public-art"] &&
+  !(_id in path("drafts.**"))
+]{
+  "sortKey": select(
+    _id in ["artCategory-sculpture", "artCategory-installation-art", "artCategory-public-art"] => 0,
+    1
+  ),
+  _id,
+  titleZh,
+  titleEn,
+  categoryType
+} | order(categoryType asc, sortKey asc, _updatedAt desc)`);
 
 export const artCategoryArtworkBySlugQuery = defineQuery(`*[
   _type == "artCategory" &&
@@ -1558,6 +1584,20 @@ export const productDetailSlugsQuery = defineQuery(`*[
 }`);
 
 export const siteSearchContentQuery = defineQuery(`{
+  "artCategories": *[
+    _type == "artCategory" &&
+    categoryType in ["sculpture", "installation-art", "public-art"] &&
+    !(_id in path("drafts.**"))
+  ]{
+    "sortKey": select(
+      _id in ["artCategory-sculpture", "artCategory-installation-art", "artCategory-public-art"] => 0,
+      1
+    ),
+    _id,
+    titleZh,
+    titleEn,
+    categoryType
+  } | order(categoryType asc, sortKey asc, _updatedAt desc),
   "artworks": *[
     (_type == "artWork" || _type == "artProject") &&
     ${publishedDocumentFilter} &&

@@ -4,16 +4,27 @@ import {
 } from "@sanity/orderable-document-list";
 import { defineField, defineType } from "sanity";
 
+import {
+  artCategoryFallbackLabel,
+  type ArtCategorySlug,
+} from "../../config/artCategories";
 import { SHOP_CRAFT_CATEGORIES } from "../../config/shopCraftCategories";
 import { imageCaptionFields } from "./imageCaptionFields";
 
 import { ArtworkImagesInput } from "../components/ArtworkImagesInput";
 
 const artProjectCategoryTitles: Record<string, string> = {
-  sculpture: "玻璃架上艺术 / Glass Easel Art",
-  "installation-art": "玻璃装置艺术 / Glass Installation Art",
-  "public-art": "玻璃公共艺术 / Glass Public Art",
+  sculpture: artCategoryFallbackLabel("sculpture"),
+  "installation-art": artCategoryFallbackLabel("installation-art"),
+  "public-art": artCategoryFallbackLabel("public-art"),
 };
+
+const artProjectCategoryOptions = (
+  ["sculpture", "installation-art", "public-art"] satisfies ArtCategorySlug[]
+).map((value) => ({
+  title: artCategoryFallbackLabel(value),
+  value,
+}));
 
 const techniqueOptions = SHOP_CRAFT_CATEGORIES.map((item) => ({
   title: `${item.labelZh} / ${item.labelEn}`,
@@ -58,11 +69,7 @@ export const artProject = defineType({
       type: "string",
       group: "basic",
       options: {
-        list: [
-          { title: "玻璃架上艺术 / Glass Easel Art", value: "sculpture" },
-          { title: "玻璃装置艺术 / Glass Installation Art", value: "installation-art" },
-          { title: "玻璃公共艺术 / Glass Public Art", value: "public-art" },
-        ],
+        list: artProjectCategoryOptions,
         layout: "radio",
       },
     }),

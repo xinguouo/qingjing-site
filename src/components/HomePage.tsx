@@ -1,6 +1,7 @@
 import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
 
+import type {ArtCategoryTitleSettings} from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
@@ -55,6 +56,7 @@ type QuickEntry = {
 };
 
 type HomePageData = {
+  artCategories?: ArtCategoryTitleSettings[] | null;
   featuredArtWorks?: Artwork[] | null;
   featuredArtWorksTitle?: string | null;
   featuredEvents?: HomeCardItem[] | null;
@@ -84,7 +86,7 @@ const homeCopy = {
     pastReview: "往期回顾",
     featuredProducts: "商品",
     featuredStudyPrograms: "国际大师班",
-    masterclassEntryDescription: "专业导师带领的玻璃架上艺术与材料课程及创作研修。",
+    masterclassEntryDescription: "专业导师带领的玻璃材料课程及创作研修。",
     masterclassEntryTitle: "国际大师班",
     offlineEntryDescription: "亲手体验玻璃材料与工艺的创作过程。",
     offlineEntryTitle: "线下体验",
@@ -99,7 +101,7 @@ const homeCopy = {
     featuredProducts: "Products",
     featuredStudyPrograms: "International Masterclass",
     masterclassEntryDescription:
-      "Glass easel art and material courses and creative workshops led by professional mentors.",
+      "Glass material courses and creative workshops led by professional mentors.",
     masterclassEntryTitle: "International Masterclass",
     offlineEntryDescription:
       "Experience the creative process of glass materials and craft by hand.",
@@ -580,7 +582,10 @@ export async function HomePage({ locale }: HomePageProps) {
   const subtitle = compactText(homePage?.heroSubtitle);
 
   return (
-    <AppShell locale={locale}>
+    <AppShell
+      artCategorySettings={homePage?.artCategories}
+      locale={locale}
+    >
       <div className="page-surface">
         <HeroBanner
           compactDesktop

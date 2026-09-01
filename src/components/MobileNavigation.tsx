@@ -3,18 +3,21 @@
 import type { SanityImageSource } from "@sanity/image-url";
 import { useState } from "react";
 
+import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
 
 import { MobileDrawer } from "./MobileDrawer";
 import { MobileHeader } from "./MobileHeader";
 
 type MobileNavigationProps = {
+  artCategorySettings?: ArtCategoryTitleMap;
   locale: Locale;
   logo?: SanityImageSource | null;
   siteName?: string | null;
 };
 
 export function MobileNavigation({
+  artCategorySettings,
   locale,
   logo,
   siteName,
@@ -30,6 +33,7 @@ export function MobileNavigation({
         siteName={siteName}
       />
       <MobileDrawer
+        artCategorySettings={artCategorySettings}
         isOpen={isOpen}
         locale={locale}
         onClose={() => setIsOpen(false)}

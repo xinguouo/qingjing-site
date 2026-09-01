@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
+  getNavigationLabel,
   isNavigationItemActive,
   navigationItems,
   type Locale,
@@ -13,10 +15,15 @@ import { ThemeToggle } from "./ThemeToggle";
 import { SiteSearch } from "./SiteSearch";
 
 type TopBarProps = {
+  artCategorySettings?: ArtCategoryTitleMap;
   locale: Locale;
 };
 
-function getCurrentPageTitle(pathname: string, locale: Locale) {
+function getCurrentPageTitle(
+  pathname: string,
+  locale: Locale,
+  artCategorySettings?: ArtCategoryTitleMap,
+) {
   if (/^\/(zh|en)\/about\/(artists|team)\/[^/]+/.test(pathname)) {
     return locale === "zh" ? "\u56e2\u961f\u6210\u5458\u8be6\u60c5" : "Team Member Detail";
   }
@@ -26,7 +33,7 @@ function getCurrentPageTitle(pathname: string, locale: Locale) {
   );
 
   if (activeItem) {
-    return locale === "zh" ? activeItem.labelZh : activeItem.labelEn;
+    return getNavigationLabel(activeItem, locale, artCategorySettings);
   }
 
   return locale === "zh" ? "\u9996\u9875" : "Home";
@@ -46,9 +53,9 @@ function getLanguageHref(pathname: string, locale: Locale) {
   return `/${targetLocale}${pathname}`;
 }
 
-export function TopBar({ locale }: TopBarProps) {
+export function TopBar({ artCategorySettings, locale }: TopBarProps) {
   const pathname = usePathname();
-  const title = getCurrentPageTitle(pathname, locale);
+  const title = getCurrentPageTitle(pathname, locale, artCategorySettings);
   const languageHref = getLanguageHref(pathname, locale);
 
   return (

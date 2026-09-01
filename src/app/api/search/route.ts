@@ -2,7 +2,13 @@ import type {SanityImageSource} from "@sanity/image-url";
 import {NextRequest} from "next/server";
 
 import {
+  resolveArtCategorySettingsMap,
+  resolveArtCategoryTitle,
+  type ArtCategoryTitleMap,
+} from "@/config/artCategories";
+import {
   getNavigationHref,
+  getNavigationLabel,
   navigationGroupLabels,
   navigationItems,
   type Locale,
@@ -39,6 +45,7 @@ type SearchResult = {
 };
 
 type SearchContent = {
+  artCategories?: Array<Record<string, unknown>>;
   artworks?: Array<Record<string, unknown>>;
   events?: Array<Record<string, unknown>>;
   studyPrograms?: Array<Record<string, unknown>>;
@@ -51,12 +58,6 @@ type SearchContent = {
   artworkProducts?: Array<Record<string, unknown>>;
   teamMembers?: Array<Record<string, unknown>>;
   artists?: Array<Record<string, unknown>>;
-};
-
-const artCategoryLabels: Record<string, {zh: string; en: string}> = {
-  sculpture: {zh: "\u73bb\u7483\u67b6\u4e0a\u827a\u672f", en: "Glass Easel Art"},
-  "installation-art": {zh: "\u73bb\u7483\u88c5\u7f6e\u827a\u672f", en: "Glass Installation Art"},
-  "public-art": {zh: "\u73bb\u7483\u516c\u5171\u827a\u672f", en: "Glass Public Art"},
 };
 
 const typeLabels: Record<SearchKind, {zh: string; en: string}> = {
@@ -141,9 +142,20 @@ function typeLabel(kind: SearchKind, locale: Locale) {
   return locale === "zh" ? label.zh : label.en;
 }
 
-function artCategoryLabel(category: string, locale: Locale) {
-  const label = artCategoryLabels[category];
-  return label ? (locale === "zh" ? label.zh : label.en) : category;
+function artCategoryLabel(
+  category: string,
+  locale: Locale,
+  artCategoryTitles: ArtCategoryTitleMap,
+) {
+  if (
+    category === "sculpture" ||
+    category === "installation-art" ||
+    category === "public-art"
+  ) {
+    return resolveArtCategoryTitle(category, locale, artCategoryTitles);
+  }
+
+  return category;
 }
 
 function eventTypeLabel(eventType: string, locale: Locale) {
@@ -217,21 +229,26 @@ function eventHref(item: Record<string, unknown>, locale: Locale) {
     : `/${locale}/events/offline-experience`;
 }
 
-function pageCandidates(locale: Locale): SearchCandidate[] {
+function pageCandidates(
+  locale: Locale,
+  artCategoryTitles: ArtCategoryTitleMap,
+): SearchCandidate[] {
   const navPages = navigationItems.map((item) => {
     const groupLabel = navigationGroupLabels[item.group];
-    const title = locale === "zh" ? item.labelZh : item.labelEn;
+    const title = getNavigationLabel(item, locale, artCategoryTitles);
+    const titleZh = getNavigationLabel(item, "zh", artCategoryTitles);
+    const titleEn = getNavigationLabel(item, "en", artCategoryTitles);
     const group = locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn;
 
     return {
       id: `page:${item.href}`,
       kind: "page" as SearchKind,
       title,
-      titleZh: item.labelZh,
-      titleEn: item.labelEn,
+      titleZh,
+      titleEn,
       description: group,
       href: getNavigationHref(item, locale),
-      primaryFields: [item.labelZh, item.labelEn],
+      primaryFields: [titleZh, titleEn],
       secondaryFields: [groupLabel.labelZh, groupLabel.labelEn, item.group],
     };
   });
@@ -240,7 +257,12 @@ function pageCandidates(locale: Locale): SearchCandidate[] {
 }
 
 function candidatesFromContent(data: SearchContent, locale: Locale) {
-  const candidates: SearchCandidate[] = [...pageCandidates(locale)];
+  const artCategoryTitles = resolveArtCategorySettingsMap(
+    data.artCategories as Parameters<typeof resolveArtCategorySettingsMap>[0],
+  );
+  const candidates: SearchCandidate[] = [
+    ...pageCandidates(locale, artCategoryTitles),
+  ];
 
   (data.artworks || []).forEach((item) => {
     const category = getString(item, "category");
@@ -258,7 +280,7 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       titleEn: getString(item, "titleEn"),
       description: [getString(item, "artist"), getString(item, "year")]
         .filter(Boolean)
-        .join(" · ") || artCategoryLabel(category, locale),
+        .join(" · ") || artCategoryLabel(category, locale, artCategoryTitles),
       href: `/${locale}/art-projects/${category}/${slug}`,
       image: getImage(item, "coverImage"),
       primaryFields: [item.titleZh as string, item.titleEn as string],
@@ -266,8 +288,8 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
         item.artist as string,
         item.year as string,
         category,
-        artCategoryLabel(category, "zh"),
-        artCategoryLabel(category, "en"),
+        artCategoryLabel(category, "zh", artCategoryTitles),
+        artCategoryLabel(category, "en", artCategoryTitles),
       ],
       descriptionFields: [item.descriptionZh, item.descriptionEn, item.description],
     });

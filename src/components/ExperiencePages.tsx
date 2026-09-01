@@ -54,9 +54,6 @@ type EventExperienceCourse = {
 };
 
 type OfflineExperiencePageData = {
-  bannerImage?: SanityImage;
-  bannerTitleEn?: string | null;
-  bannerTitleZh?: string | null;
   courses?: ExperienceCourse[] | null;
   pageTitleEn?: string | null;
   pageTitleZh?: string | null;

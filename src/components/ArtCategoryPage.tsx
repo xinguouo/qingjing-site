@@ -1,5 +1,14 @@
 import type {SanityImageSource} from "@sanity/image-url";
 
+import {
+  artCategoryFallbacks,
+  isArtCategorySlug,
+  normalizeArtCategorySlug,
+  resolveArtCategoryPageTitles,
+  resolveArtCategoryTitle,
+  type ArtCategorySlug,
+  type ArtCategoryTitleSettings,
+} from "@/config/artCategories";
 import type {Locale} from "@/config/navigation";
 import {client} from "@/sanity/client";
 import {
@@ -12,6 +21,8 @@ import {BaseImageCard} from "./BaseImageCard";
 import {PageContainer} from "./PageContainer";
 import {PageHeader} from "./PageHeader";
 import {ArtCategorySortableGrid} from "./ArtCategorySortableGrid";
+
+export type {ArtCategorySlug};
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -44,11 +55,6 @@ export type ArtworkVideo = {
   } | null;
 };
 
-export type ArtCategorySlug =
-  | "sculpture"
-  | "installation-art"
-  | "public-art";
-
 export type Artwork = {
   _id?: string;
   _key?: string;
@@ -71,38 +77,13 @@ export type Artwork = {
   year?: number | string | null;
 };
 
-type ArtCategoryConfig = {
-  titleEn: string;
-  titleZh: string;
-};
-
-type ArtCategoryPageSettings = {
-  _id?: string;
-  categoryType?: ArtCategorySlug | null;
-  titleEn?: string | null;
-  titleZh?: string | null;
-};
-
 type ArtCategoryPageProps = {
   category: ArtCategorySlug;
   includeLocalePrefix?: boolean;
   locale: Locale;
 };
 
-export const artCategoryConfigs: Record<ArtCategorySlug, ArtCategoryConfig> = {
-  sculpture: {
-    titleEn: "GLASS EASEL ART",
-    titleZh: "玻璃架上艺术",
-  },
-  "installation-art": {
-    titleEn: "GLASS INSTALLATION ART",
-    titleZh: "玻璃装置艺术",
-  },
-  "public-art": {
-    titleEn: "GLASS PUBLIC ART",
-    titleZh: "玻璃公共艺术",
-  },
-};
+export const artCategoryConfigs = artCategoryFallbacks;
 
 const copy = {
   zh: {
@@ -208,23 +189,7 @@ export const fallbackArtworks: Record<ArtCategorySlug, Record<Locale, Artwork[]>
   },
 };
 
-export function isArtCategorySlug(value: string): value is ArtCategorySlug {
-  return value in artCategoryConfigs;
-}
-
-export function normalizeArtCategorySlug(
-  value: string | null | undefined,
-): ArtCategorySlug | null {
-  if (!value) {
-    return null;
-  }
-
-  if (value === "glass-art" || value === "sculpture-art") {
-    return "sculpture";
-  }
-
-  return isArtCategorySlug(value) ? value : null;
-}
+export {isArtCategorySlug, normalizeArtCategorySlug};
 
 export function getArtworkImageSource(image: ArtworkImageEntry): SanityImage {
   if (!image || typeof image !== "object") {
@@ -242,21 +207,6 @@ function compactText(value: string | null | undefined) {
   return value?.trim() || "";
 }
 
-function resolveCategoryPageTitles(
-  category: ArtCategorySlug,
-  locale: Locale,
-  settings?: ArtCategoryPageSettings | null,
-) {
-  const fallback = artCategoryConfigs[category];
-  const titleZh = compactText(settings?.titleZh) || fallback.titleZh;
-  const titleEn = compactText(settings?.titleEn) || fallback.titleEn;
-
-  return {
-    eyebrow: locale === "zh" ? titleEn : null,
-    title: locale === "en" ? titleEn : titleZh,
-  };
-}
-
 export function ArtworkCard({
   artwork,
   category,
@@ -272,10 +222,7 @@ export function ArtworkCard({
 }) {
   const labels = copy[locale];
   const title = compactText(artwork.title);
-  const categoryTitle =
-    locale === "en"
-      ? artCategoryConfigs[category].titleEn
-      : artCategoryConfigs[category].titleZh;
+  const categoryTitle = resolveArtCategoryTitle(category, locale);
   const prefix = includeLocalePrefix ? `/${locale}` : "";
   const href = artwork.slug
     ? `${prefix}/art-projects/${category}/${artwork.slug}`
@@ -316,7 +263,7 @@ export async function ArtCategoryPage({
       )
       .catch(() => []),
     client
-      .fetch<ArtCategoryPageSettings | null>(
+      .fetch<ArtCategoryTitleSettings | null>(
         artCategoryPageSettingsByTypeQuery,
         {
           locale,
@@ -328,10 +275,10 @@ export async function ArtCategoryPage({
       .catch(() => null),
   ]);
   const artworks = cmsArtworks.length ? cmsArtworks : fallbackArtworks[category][locale];
-  const titles = resolveCategoryPageTitles(category, locale, categorySettings);
+  const titles = resolveArtCategoryPageTitles(category, locale, categorySettings);
 
   return (
-    <AppShell locale={locale}>
+    <AppShell artCategorySettings={categorySettings} locale={locale}>
       <PageContainer className="pb-16 lg:pb-20">
         <div className="max-w-[1180px]">
           <PageHeader titleEn={titles.eyebrow} titleZh={titles.title} />

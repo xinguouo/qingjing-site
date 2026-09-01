@@ -1,3 +1,10 @@
+import {
+  artCategoryFallbacks,
+  resolveArtCategoryTitle,
+  type ArtCategorySlug,
+  type ArtCategoryTitleMap,
+} from "./artCategories";
+
 export type Locale = "zh" | "en";
 
 export type NavigationStatus = "live" | "comingSoon";
@@ -19,6 +26,7 @@ export type NavigationItem = {
   icon: string;
   group: NavigationGroup;
   status: NavigationStatus;
+  artCategory?: ArtCategorySlug;
   activePathPrefixes?: string[];
 };
 
@@ -164,30 +172,33 @@ export const navigationItems: NavigationItem[] = [
     status: "comingSoon",
   },
   {
-    labelZh: "\u73bb\u7483\u67b6\u4e0a\u827a\u672f",
-    labelEn: "Glass Easel Art",
+    labelZh: artCategoryFallbacks.sculpture.titleZh,
+    labelEn: artCategoryFallbacks.sculpture.titleEn,
     href: "/art-creation/sculpture",
     icon: "glass",
     group: "artCreation",
     status: "live",
+    artCategory: "sculpture",
     activePathPrefixes: ["/art-projects/sculpture"],
   },
   {
-    labelZh: "\u73bb\u7483\u88c5\u7f6e\u827a\u672f",
-    labelEn: "Glass Installation Art",
+    labelZh: artCategoryFallbacks["installation-art"].titleZh,
+    labelEn: artCategoryFallbacks["installation-art"].titleEn,
     href: "/art-creation/installation-art",
     icon: "install",
     group: "artCreation",
     status: "live",
+    artCategory: "installation-art",
     activePathPrefixes: ["/art-projects/installation-art"],
   },
   {
-    labelZh: "\u73bb\u7483\u516c\u5171\u827a\u672f",
-    labelEn: "Glass Public Art",
+    labelZh: artCategoryFallbacks["public-art"].titleZh,
+    labelEn: artCategoryFallbacks["public-art"].titleEn,
     href: "/art-creation/public-art",
     icon: "museum",
     group: "artCreation",
     status: "live",
+    artCategory: "public-art",
     activePathPrefixes: ["/art-projects/public-art"],
   },
   {
@@ -203,6 +214,22 @@ export const navigationItems: NavigationItem[] = [
 
 export function getNavigationHref(item: NavigationItem, locale: Locale) {
   return item.href === "/" ? `/${locale}` : `/${locale}${item.href}`;
+}
+
+export function getNavigationLabel(
+  item: NavigationItem,
+  locale: Locale,
+  artCategoryTitles?: ArtCategoryTitleMap,
+) {
+  if (item.artCategory) {
+    return resolveArtCategoryTitle(
+      item.artCategory,
+      locale,
+      artCategoryTitles,
+    );
+  }
+
+  return locale === "zh" ? item.labelZh : item.labelEn;
 }
 
 export function normalizePathForNavigation(pathname: string) {

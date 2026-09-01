@@ -8,7 +8,6 @@ export const offlineExperiencePage = defineType({
   type: "document",
   groups: [
     { name: "page", title: "页面标题 / Page Title", default: true },
-    { name: "banner", title: "Banner" },
     { name: "courses", title: "课程卡片 / Courses" },
     { name: "review", title: "往期回顾 / Past Review" },
   ],
@@ -24,26 +23,6 @@ export const offlineExperiencePage = defineType({
       title: "Page Title (English)",
       type: "string",
       group: "page",
-    }),
-    defineField({
-      name: "bannerImage",
-      title: "Banner 图片 / Banner Image",
-      type: "image",
-      group: "banner",
-      options: { hotspot: true },
-      fields: imageCaptionFields,
-    }),
-    defineField({
-      name: "bannerTitleZh",
-      title: "Banner 标题（中文） / Banner Title (Chinese)",
-      type: "string",
-      group: "banner",
-    }),
-    defineField({
-      name: "bannerTitleEn",
-      title: "Banner Title (English)",
-      type: "string",
-      group: "banner",
     }),
     defineField({
       name: "courses",
