@@ -19,15 +19,17 @@ export const artCategory = defineType({
   fields: [
     defineField({
       name: 'titleZh',
-      title: '分类标题（中文） / Title (Chinese)',
+      title: '分类页面中文标题 / Page Title (Chinese)',
       type: 'string',
       group: 'basic',
+      description: '用于前台艺术创作分类页标题；留空时使用默认分类名称。',
     }),
     defineField({
       name: 'titleEn',
-      title: 'Title (English)',
+      title: '分类页面英文标题 / Page Title (English)',
       type: 'string',
       group: 'basic',
+      description: '用于前台英文标题或中文页上方英文标题；留空时使用默认英文名称。',
     }),
     defineField({
       name: 'categoryType',

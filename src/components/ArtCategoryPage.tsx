@@ -2,7 +2,10 @@ import type {SanityImageSource} from "@sanity/image-url";
 
 import type {Locale} from "@/config/navigation";
 import {client} from "@/sanity/client";
-import {artWorksByTypeQuery} from "@/sanity/queries";
+import {
+  artCategoryPageSettingsByTypeQuery,
+  artWorksByTypeQuery,
+} from "@/sanity/queries";
 
 import {AppShell} from "./AppShell";
 import {BaseImageCard} from "./BaseImageCard";
@@ -60,6 +63,7 @@ export type Artwork = {
   quantity?: string | null;
   size?: string | null;
   slug?: string | null;
+  technique?: string | null;
   title?: string | null;
   titleEn?: string | null;
   titleZh?: string | null;
@@ -70,6 +74,13 @@ export type Artwork = {
 type ArtCategoryConfig = {
   titleEn: string;
   titleZh: string;
+};
+
+type ArtCategoryPageSettings = {
+  _id?: string;
+  categoryType?: ArtCategorySlug | null;
+  titleEn?: string | null;
+  titleZh?: string | null;
 };
 
 type ArtCategoryPageProps = {
@@ -231,6 +242,21 @@ function compactText(value: string | null | undefined) {
   return value?.trim() || "";
 }
 
+function resolveCategoryPageTitles(
+  category: ArtCategorySlug,
+  locale: Locale,
+  settings?: ArtCategoryPageSettings | null,
+) {
+  const fallback = artCategoryConfigs[category];
+  const titleZh = compactText(settings?.titleZh) || fallback.titleZh;
+  const titleEn = compactText(settings?.titleEn) || fallback.titleEn;
+
+  return {
+    eyebrow: locale === "zh" ? titleEn : null,
+    title: locale === "en" ? titleEn : titleZh,
+  };
+}
+
 export function ArtworkCard({
   artwork,
   category,
@@ -267,11 +293,8 @@ export function ArtworkCard({
       <p className="text-[11px] leading-none text-[#444] dark:text-white/58">
         {number}
       </p>
-      <p className="mt-3 line-clamp-1 min-h-[12px] text-[12px] leading-none text-[#555] dark:text-white/64">
-        {categoryTitle}
-      </p>
       {title ? (
-        <h3 className="mt-2 line-clamp-2 text-[15px] font-medium leading-snug">
+        <h3 className="mt-4 line-clamp-2 text-[15px] font-medium leading-snug">
           {title}
         </h3>
       ) : null}
@@ -284,21 +307,34 @@ export async function ArtCategoryPage({
   includeLocalePrefix = true,
   locale,
 }: ArtCategoryPageProps) {
-  const config = artCategoryConfigs[category];
-  const cmsArtworks = await client
-    .fetch<Artwork[]>(
-      artWorksByTypeQuery,
-      {locale, workType: category},
-      {cache: "no-store"},
-    )
-    .catch(() => []);
+  const [cmsArtworks, categorySettings] = await Promise.all([
+    client
+      .fetch<Artwork[]>(
+        artWorksByTypeQuery,
+        {locale, workType: category},
+        {cache: "no-store"},
+      )
+      .catch(() => []),
+    client
+      .fetch<ArtCategoryPageSettings | null>(
+        artCategoryPageSettingsByTypeQuery,
+        {
+          locale,
+          categorySettingsId: `artCategory-${category}`,
+          categoryType: category,
+        },
+        {cache: "no-store"},
+      )
+      .catch(() => null),
+  ]);
   const artworks = cmsArtworks.length ? cmsArtworks : fallbackArtworks[category][locale];
+  const titles = resolveCategoryPageTitles(category, locale, categorySettings);
 
   return (
     <AppShell locale={locale}>
       <PageContainer className="pb-16 lg:pb-20">
         <div className="max-w-[1180px]">
-          <PageHeader titleEn={config.titleEn} titleZh={config.titleZh} />
+          <PageHeader titleEn={titles.eyebrow} titleZh={titles.title} />
         </div>
 
         <ArtCategorySortableGrid

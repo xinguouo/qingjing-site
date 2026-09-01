@@ -949,11 +949,9 @@ function CraftCategoryTabs({
   locale: Locale;
 }) {
   const allLabel = locale === "zh" ? "全部" : "All";
-  const title = locale === "zh" ? "玻璃工艺" : "Glass Craft";
 
   return (
-    <div className="mt-7">
-      <FilterGroupTitle>{title}</FilterGroupTitle>
+    <div className="mt-5">
       <nav className="flex gap-3 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <Link
           className={`${craftButtonBaseClass} ${

@@ -4,6 +4,7 @@ import {
 } from "@sanity/orderable-document-list";
 import { defineField, defineType } from "sanity";
 
+import { SHOP_CRAFT_CATEGORIES } from "../../config/shopCraftCategories";
 import { imageCaptionFields } from "./imageCaptionFields";
 
 import { ArtworkImagesInput } from "../components/ArtworkImagesInput";
@@ -13,6 +14,11 @@ const artProjectCategoryTitles: Record<string, string> = {
   "installation-art": "玻璃装置艺术 / Glass Installation Art",
   "public-art": "玻璃公共艺术 / Glass Public Art",
 };
+
+const techniqueOptions = SHOP_CRAFT_CATEGORIES.map((item) => ({
+  title: `${item.labelZh} / ${item.labelEn}`,
+  value: item.value,
+}));
 
 export const artProject = defineType({
   name: "artProject",
@@ -252,15 +258,21 @@ export const artProject = defineType({
     }),
     defineField({
       name: "techniqueZh",
-      title: "作品工艺（中文） / Technique (Chinese)",
+      title: "工艺 / Technique",
       type: "string",
       group: "content",
+      hidden: ({ parent }) => parent?.category !== "sculpture",
+      options: {
+        list: techniqueOptions,
+        layout: "dropdown",
+      },
     }),
     defineField({
       name: "techniqueEn",
-      title: "作品工艺（英文） / Technique (English)",
+      title: "旧英文工艺（保留数据，不再用于前台） / Legacy Technique (English)",
       type: "string",
       group: "content",
+      hidden: true,
     }),
     defineField({
       name: "isFeatured",

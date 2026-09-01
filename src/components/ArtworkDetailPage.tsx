@@ -3,6 +3,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 
 import type {Locale} from "@/config/navigation";
+import {getShopCraftCategoryByInput} from "@/config/shopCraftCategories";
 import {client} from "@/sanity/client";
 import {urlForImage} from "@/sanity/image";
 import {artWorkBySlugQuery} from "@/sanity/queries";
@@ -44,6 +45,7 @@ const copy = {
     backPrefix: "返回",
     description: "作品描述",
     size: "尺寸",
+    technique: "工艺",
     title: "作品名称",
     year: "创作年份",
   },
@@ -52,6 +54,7 @@ const copy = {
     backPrefix: "Back to",
     description: "Artwork Description",
     size: "Size",
+    technique: "Technique",
     title: "Artwork Title",
     year: "Year",
   },
@@ -229,6 +232,16 @@ function categoryLabel(category: ArtCategorySlug, locale: Locale) {
   return locale === "en" ? config.titleEn : config.titleZh;
 }
 
+function techniqueLabel(technique: string | null | undefined, locale: Locale) {
+  const category = getShopCraftCategoryByInput(technique);
+
+  if (!category) {
+    return "";
+  }
+
+  return locale === "en" ? category.labelEn : category.labelZh;
+}
+
 function ArtworkHeader({
   backHref,
   backLabel,
@@ -280,7 +293,11 @@ function ArtworkMetaList({
   }
 
   return (
-    <dl className="mt-7 grid max-w-[760px] gap-x-10 gap-y-5 border-b border-[var(--border)] pb-7 sm:grid-cols-3">
+    <dl
+      className={`mt-7 grid max-w-[760px] gap-x-10 gap-y-5 border-b border-[var(--border)] pb-7 ${
+        visibleItems.length > 3 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"
+      }`}
+    >
       {visibleItems.map((item) => (
         <div key={item.label}>
           <dt className="text-[12px] leading-none text-muted-token">
@@ -539,6 +556,8 @@ export async function ArtworkDetailPage({
   const secondaryTitle =
     locale === "en" ? titleZh || "" : titleEn || "";
   const size = compactText(artwork.size || artwork.dimensions);
+  const technique =
+    categorySlug === "sculpture" ? techniqueLabel(artwork.technique, locale) : "";
   const description = compactText(artwork.description);
   const galleryImages = mergeArtworkImages(
     artwork.coverImage,
@@ -562,6 +581,7 @@ export async function ArtworkDetailPage({
         {label: labels.artist, value: artwork.artist},
         {label: labels.year, value: artwork.year},
         {label: labels.size, value: size},
+        {label: labels.technique, value: technique},
       ]}
       primaryTitle={primaryTitle}
       secondaryTitle={secondaryTitle}

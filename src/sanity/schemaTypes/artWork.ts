@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SHOP_CRAFT_CATEGORIES} from '../../config/shopCraftCategories'
 import {imageCaptionFields} from './imageCaptionFields'
 
 import {ArtworkImagesInput} from '../components/ArtworkImagesInput'
@@ -8,6 +9,11 @@ const artWorkCategoryTitles: Record<string, string> = {
   'installation-art': '玻璃装置艺术 / Glass Installation Art',
   'public-art': '玻璃公共艺术 / Glass Public Art',
 }
+
+const techniqueOptions = SHOP_CRAFT_CATEGORIES.map((item) => ({
+  title: `${item.labelZh} / ${item.labelEn}`,
+  value: item.value,
+}))
 
 export const artWork = defineType({
   name: 'artWork',
@@ -205,6 +211,17 @@ export const artWork = defineType({
       title: '尺寸 / Size',
       type: 'string',
       group: 'display',
+    }),
+    defineField({
+      name: 'techniqueZh',
+      title: '工艺 / Technique',
+      type: 'string',
+      group: 'display',
+      hidden: ({parent}) => parent?.workType !== 'sculpture',
+      options: {
+        list: techniqueOptions,
+        layout: 'dropdown',
+      },
     }),
     defineField({
       name: 'order',

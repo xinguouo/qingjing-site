@@ -22,6 +22,39 @@ export default defineConfig({
   plugins: [structureTool({ structure })],
   schema: {
     types: schemaTypes,
+    templates: (prev) => [
+      ...prev,
+      {
+        id: "artCategory-sculpture",
+        title: "玻璃架上艺术页面标题 / Glass Easel Art Page Title",
+        schemaType: "artCategory",
+        value: {
+          categoryType: "sculpture",
+          titleZh: "玻璃架上艺术",
+          titleEn: "GLASS EASEL ART",
+        },
+      },
+      {
+        id: "artCategory-installation-art",
+        title: "玻璃装置艺术页面标题 / Glass Installation Art Page Title",
+        schemaType: "artCategory",
+        value: {
+          categoryType: "installation-art",
+          titleZh: "玻璃装置艺术",
+          titleEn: "GLASS INSTALLATION ART",
+        },
+      },
+      {
+        id: "artCategory-public-art",
+        title: "玻璃公共艺术页面标题 / Glass Public Art Page Title",
+        schemaType: "artCategory",
+        value: {
+          categoryType: "public-art",
+          titleZh: "玻璃公共艺术",
+          titleEn: "GLASS PUBLIC ART",
+        },
+      },
+    ],
   },
   document: {
     actions: (prev, context) => {
@@ -38,6 +71,9 @@ export default defineConfig({
         "aboutContactPage",
         "contactPage",
         "residencyPage",
+        "artCategory-sculpture",
+        "artCategory-installation-art",
+        "artCategory-public-art",
       ]);
 
       return prev.filter(

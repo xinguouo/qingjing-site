@@ -312,6 +312,7 @@ const artWorkCardFields = `
   galleryImages[]{${imageFields}},
   artist,
   year,
+  "technique": coalesce(techniqueZh, technique),
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
@@ -1264,6 +1265,17 @@ export const artCategoryByTypeQuery = defineQuery(`*[
 ][0]{
   ${artCategoryFields}
 }`);
+
+export const artCategoryPageSettingsByTypeQuery = defineQuery(`*[
+  _type == "artCategory" &&
+  (_id == $categorySettingsId || categoryType == $categoryType)
+]{
+  "sortKey": select(_id == $categorySettingsId => 0, 1),
+  _id,
+  titleZh,
+  titleEn,
+  categoryType
+} | order(sortKey asc, _updatedAt desc)[0]`);
 
 export const artCategoryArtworkBySlugQuery = defineQuery(`*[
   _type == "artCategory" &&

@@ -80,6 +80,28 @@ export const structure: StructureResolver = (S, context) => {
       context,
     })
 
+  const artCategorySettingsListItem = ({
+    id,
+    title,
+    category,
+  }: {
+    id: string
+    title: string
+    category: string
+  }) =>
+    S.listItem()
+      .id(id)
+      .title(title)
+      .schemaType('artCategory')
+      .child(
+        S.document()
+          .id(`${id}Document`)
+          .schemaType('artCategory')
+          .documentId(`artCategory-${category}`)
+          .title(title)
+          .initialValueTemplate(`artCategory-${category}`),
+      )
+
   const orderableProductListItem = ({
     id,
     title,
@@ -287,6 +309,32 @@ export const structure: StructureResolver = (S, context) => {
             .id('artCreationPageEntries')
             .title('艺术创作 / Art Creation')
             .items([
+              S.listItem()
+                .id('artCreationCategorySettings')
+                .title('分类页面标题 / Category Page Titles')
+                .schemaType('artCategory')
+                .child(
+                  S.list()
+                    .id('artCreationCategorySettingsList')
+                    .title('分类页面标题 / Category Page Titles')
+                    .items([
+                      artCategorySettingsListItem({
+                        id: 'artCreationGlassEaselPageSettings',
+                        title: '玻璃架上艺术 / Glass Easel Art',
+                        category: 'sculpture',
+                      }),
+                      artCategorySettingsListItem({
+                        id: 'artCreationInstallationPageSettings',
+                        title: '玻璃装置艺术 / Glass Installation Art',
+                        category: 'installation-art',
+                      }),
+                      artCategorySettingsListItem({
+                        id: 'artCreationPublicPageSettings',
+                        title: '玻璃公共艺术 / Glass Public Art',
+                        category: 'public-art',
+                      }),
+                    ]),
+                ),
               orderableArtProjectListItem({
                 id: 'artCreationGlassEaselArt',
                 title: '玻璃架上艺术 / Glass Easel Art',
