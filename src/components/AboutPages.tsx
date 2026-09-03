@@ -59,14 +59,8 @@ type PageTitleData = {
   pageTitleZh?: string | null;
 };
 
-type LinkedArtist = {
-  name?: string | null;
-  slug?: string | null;
-};
-
 type TeamMember = {
   _id: string;
-  linkedArtist?: LinkedArtist | null;
   name?: string | null;
   portrait?: SanityImage;
   role?: string | null;
@@ -79,7 +73,6 @@ type TeamProfile = {
   bio?: string | null;
   detailPageTitleEn?: string | null;
   detailPageTitleZh?: string | null;
-  educationExperience?: string | null;
   exhibitions?: string | null;
   gender?: string | null;
   honors?: string | null;
@@ -117,6 +110,7 @@ const copy = {
     phone: "\u7535\u8bdd",
     publications: "\u51fa\u7248",
     team: "\u56e2\u961f\u6210\u5458",
+    teamBack: "\u8fd4\u56de\u56e2\u961f\u6210\u5458",
     teamEyebrow: "OUR TEAM",
     teamProfile: "\u56e2\u961f\u6210\u5458\u8be6\u60c5",
   },
@@ -137,6 +131,7 @@ const copy = {
     phone: "Phone",
     publications: "Publications",
     team: "Team Members",
+    teamBack: "Back to Team Members",
     teamEyebrow: "OUR TEAM",
     teamProfile: "Team Profile",
   },
@@ -289,7 +284,7 @@ function TeamMemberCard({
   const labels = copy[locale];
   const name = compactText(member.name) || labels.empty;
   const role = compactText(member.role);
-  const detailSlug = compactText(member.slug) || compactText(member.linkedArtist?.slug);
+  const detailSlug = compactText(member.slug);
   const href = detailSlug ? `/${locale}/about/team/${detailSlug}` : null;
   const content = (
     <>
@@ -437,18 +432,26 @@ export async function ArtistProfilePage({
 
   return (
     <AboutPageShell locale={locale}>
+      <Link
+        className="mb-8 inline-flex items-center gap-2 text-[14px] leading-none text-muted-token transition hover:text-primary"
+        href={`/${locale}/about/team`}
+      >
+        <span aria-hidden="true">&larr;</span>
+        <span>{labels.teamBack}</span>
+      </Link>
+
       <PageHeader titleEn={pageTitleEn} titleZh={pageTitleZh} />
 
-      <section className="mt-6 grid items-start gap-5 lg:mt-7 lg:grid-cols-[minmax(280px,300px)_minmax(0,1fr)] lg:gap-4 xl:grid-cols-[minmax(300px,320px)_minmax(0,1fr)] xl:gap-5">
+      <section className="mt-6 grid items-start gap-5 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)] lg:mt-7 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-5">
         <ImageFrame
           alt={name}
-          className="aspect-[4/5] w-full max-w-[300px] lg:max-w-[300px] xl:max-w-[320px]"
+          className="aspect-[4/5] w-full max-w-[300px] md:max-w-none"
           image={artist?.portrait}
           label={labels.imagePending}
           priority
           width={760}
         />
-        <article className="glass-card self-start rounded-[24px] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-7 shadow-[0_14px_34px_rgba(0,0,0,0.055),inset_0_1px_0_rgba(255,255,255,0.42)] backdrop-blur-xl sm:p-7 lg:p-8 dark:shadow-[0_18px_42px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <article className="glass-card min-w-0 w-full self-start rounded-[24px] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-7 shadow-[0_14px_34px_rgba(0,0,0,0.055),inset_0_1px_0_rgba(255,255,255,0.42)] backdrop-blur-xl sm:p-7 lg:p-8 dark:shadow-[0_18px_42px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.08)]">
           <h2 className="font-title text-[28px] font-normal leading-tight text-primary lg:text-[32px]">
             {name}
           </h2>
@@ -464,7 +467,7 @@ export async function ArtistProfilePage({
               ))}
             </div>
           ) : null}
-          <TextBlock className="mt-7 max-w-[760px]" text={bio} />
+          <TextBlock className="mt-7 max-w-full break-words" text={bio} />
         </article>
       </section>
 

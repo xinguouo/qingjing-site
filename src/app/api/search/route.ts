@@ -476,7 +476,7 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       image: getImage(item, "portrait"),
       primaryFields: [item.nameZh as string, item.nameEn as string],
       secondaryFields: [item.roleZh as string, item.roleEn as string],
-      descriptionFields: [item.shortBioZh, item.shortBioEn, item.bioZh, item.bioEn],
+      descriptionFields: [item.bioZh, item.bioEn],
     });
   });
 

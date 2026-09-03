@@ -761,40 +761,14 @@ const teamMemberDetailFields = `
   birthDateTextEn,
   "birthDateText": ${localizedText("birthDateTextEn", "birthDateTextZh")},
   "title": ${localizedText("roleEn", "roleZh")},
-  shortBioZh,
-  shortBioEn,
-  detailBioZh,
-  detailBioEn,
   bioZh,
   bioEn,
-  "bio": select(
-    $locale == "en" && defined(bioEn) && bioEn != "" => bioEn,
-    defined(bioZh) && bioZh != "" => bioZh,
-    $locale == "en" && defined(detailBioEn) && detailBioEn != "" => detailBioEn,
-    defined(detailBioZh) && detailBioZh != "" => detailBioZh,
-    $locale == "en" && defined(shortBioEn) && shortBioEn != "" => shortBioEn,
-    shortBioZh
-  ),
+  "bio": ${localizedText("bioEn", "bioZh")},
   portrait{${imageFields}},
-  educationExperienceZh,
-  educationExperienceEn,
-  "educationExperience": ${localizedText("educationExperienceEn", "educationExperienceZh")},
   honorsCollectionsZh,
   honorsCollectionsEn,
-  "honorsCollections": select(
-    $locale == "en" && defined(honorsCollectionsEn) && honorsCollectionsEn != "" => honorsCollectionsEn,
-    defined(honorsCollectionsZh) && honorsCollectionsZh != "" => honorsCollectionsZh,
-    $locale == "en" && defined(honorsEn) && honorsEn != "" => honorsEn,
-    honorsZh
-  ),
-  honorsZh,
-  honorsEn,
-  "honors": select(
-    $locale == "en" && defined(honorsCollectionsEn) && honorsCollectionsEn != "" => honorsCollectionsEn,
-    defined(honorsCollectionsZh) && honorsCollectionsZh != "" => honorsCollectionsZh,
-    $locale == "en" && defined(honorsEn) && honorsEn != "" => honorsEn,
-    honorsZh
-  ),
+  "honorsCollections": ${localizedText("honorsCollectionsEn", "honorsCollectionsZh")},
+  "honors": ${localizedText("honorsCollectionsEn", "honorsCollectionsZh")},
   researchProjectsZh,
   researchProjectsEn,
   "researchProjects": ${localizedText("researchProjectsEn", "researchProjectsZh")},
@@ -987,7 +961,6 @@ export const teamMembersQuery =
   roleEn,
   "role": ${localizedText("roleEn", "roleZh")},
   portrait{${imageFields}},
-  linkedArtist->{_id, nameZh, nameEn, "name": ${localizedText("nameEn", "nameZh")}, "slug": slug.current},
   order
 }`);
 
@@ -1764,16 +1737,9 @@ export const siteSearchContentQuery = defineQuery(`{
     roleZh,
     roleEn,
     "role": ${localizedText("roleEn", "roleZh")},
-    shortBioZh,
-    shortBioEn,
     bioZh,
     bioEn,
-    "bio": select(
-      $locale == "en" && defined(shortBioEn) && shortBioEn != "" => shortBioEn,
-      defined(shortBioZh) && shortBioZh != "" => shortBioZh,
-      $locale == "en" && defined(bioEn) && bioEn != "" => bioEn,
-      bioZh
-    ),
+    "bio": ${localizedText("bioEn", "bioZh")},
     portrait{${imageFields}}
   },
   "artists": *[
