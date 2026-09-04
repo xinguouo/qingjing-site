@@ -124,6 +124,11 @@ type PortableTextBlock = {
   children?: PortableTextSpan[];
   listItem?: string;
   level?: number;
+  markDefs?: Array<{
+    _key?: string;
+    _type?: string;
+    href?: string;
+  }>;
   style?: string;
 };
 
@@ -295,9 +300,14 @@ function renderPortableChildren(block: PortableTextBlock) {
   return (block.children || []).map((child, index) => {
     const text = child.text || "";
     const key = child._key || index;
+    const linkMark = child.marks
+      ?.map((mark) => block.markDefs?.find((definition) => definition._key === mark))
+      .find((definition) => definition?._type === "link" && definition.href);
+
+    let content = <span>{text}</span>;
 
     if (child.marks?.includes("strong")) {
-      return (
+      content = (
         <strong className="font-medium text-primary" key={key}>
           {text}
         </strong>
@@ -305,10 +315,24 @@ function renderPortableChildren(block: PortableTextBlock) {
     }
 
     if (child.marks?.includes("em")) {
-      return <em key={key}>{text}</em>;
+      content = <em>{text}</em>;
     }
 
-    return <span key={key}>{text}</span>;
+    if (linkMark?.href) {
+      return (
+        <Link
+          className="text-primary underline decoration-current/35 underline-offset-4 transition hover:decoration-current"
+          href={linkMark.href}
+          key={key}
+          rel="noreferrer"
+          target={linkMark.href.startsWith("http") ? "_blank" : undefined}
+        >
+          {content}
+        </Link>
+      );
+    }
+
+    return <span key={key}>{content}</span>;
   });
 }
 
