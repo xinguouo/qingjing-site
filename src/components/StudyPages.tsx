@@ -5,6 +5,7 @@ import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
+  advancedStudyPageQuery,
   advancedStudyProgramsQuery,
   internationalMasterclassProgramsQuery,
   studyMasterclassPageQuery,
@@ -133,6 +134,13 @@ type StudyPageProps = {
 };
 
 type StudyMasterclassPageData = {
+  pastReviewItems?: PastReviewItem[] | null;
+  pastReviewTitle?: string | null;
+};
+
+type AdvancedStudyPageData = {
+  pageTitleEn?: string | null;
+  pageTitleZh?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
   pastReviewTitle?: string | null;
 };
@@ -273,6 +281,14 @@ function portableChildrenText(block: PortableTextBlock) {
       .join("")
       .trim() || ""
   );
+}
+
+function hasDetailValue(value: DetailValue) {
+  if (Array.isArray(value)) {
+    return value.some((block) => compactText(portableChildrenText(block)));
+  }
+
+  return Boolean(compactText(value));
 }
 
 function renderPortableChildren(block: PortableTextBlock) {
@@ -1341,7 +1357,13 @@ function fileUrl(resource: FileResource) {
   return compactText(resource.externalUrl) || compactText(resource.file?.asset?.url);
 }
 
-function fileName(resource: FileResource, labels: (typeof copy)[Locale]) {
+type CourseFileLabels = {
+  downloadFile: string;
+  openFile: string;
+  resources: string;
+};
+
+function fileName(resource: FileResource, labels: CourseFileLabels) {
   return (
     compactText(resource.title) ||
     compactText(resource.file?.asset?.originalFilename) ||
@@ -1430,7 +1452,7 @@ function AdvancedStudyFiles({
   labels,
   resources,
 }: {
-  labels: (typeof copy)[Locale];
+  labels: CourseFileLabels;
   resources?: FileResource[] | null;
 }) {
   const items = (resources || [])
@@ -1499,34 +1521,94 @@ function AdvancedStudyFiles({
   );
 }
 
-export async function AdvancedStudyPage({ locale }: StudyPageProps) {
-  const programs = await client.fetch<StudyProgram[]>(
-    advancedStudyProgramsQuery,
-    { locale },
-    { cache: "no-store" },
+export function CourseDetailContent({
+  backHref,
+  backLabel,
+  content,
+  fileLabels,
+  images,
+  locale,
+  resources,
+  title,
+}: {
+  backHref: string;
+  backLabel: string;
+  content?: DetailValue;
+  fileLabels: CourseFileLabels;
+  images?: SanityImage[] | null;
+  locale: Locale;
+  resources?: FileResource[] | null;
+  title: string;
+}) {
+  return (
+    <PageContainer className="pb-16 lg:pb-20">
+      <Link
+        className="inline-flex items-center gap-2 text-[14px] leading-none text-muted-token transition hover:text-primary"
+        href={backHref}
+      >
+        <span aria-hidden="true">&larr;</span>
+        <span>{backLabel}</span>
+      </Link>
+
+      <article className="mt-10 max-w-[980px]">
+        <h1 className="font-title text-[34px] font-normal leading-tight text-primary lg:text-[48px]">
+          {title}
+        </h1>
+        {hasDetailValue(content) ? (
+          <DetailText
+            className="mt-8 max-w-[860px] text-[16px] leading-[1.95]"
+            text={content}
+          />
+        ) : null}
+        <AdvancedStudyImages images={images} locale={locale} title={title} />
+        <AdvancedStudyFiles labels={fileLabels} resources={resources} />
+      </article>
+    </PageContainer>
   );
+}
+
+export async function AdvancedStudyPage({ locale }: StudyPageProps) {
+  const [programs, pageData] = await Promise.all([
+    client.fetch<StudyProgram[]>(
+      advancedStudyProgramsQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
+    client.fetch<AdvancedStudyPageData | null>(
+      advancedStudyPageQuery,
+      { locale },
+      { cache: "no-store" },
+    ),
+  ]);
   const labels = copy[locale];
+  const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.advancedStudyTitle;
+  const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.advancedStudyEyebrow;
+  const pastReviewItems =
+    pageData?.pastReviewItems?.filter(Boolean) || masterclassPastReviewFallback(programs);
 
   return (
     <AppShell locale={locale}>
       <PageContainer>
         <PageHeader
-          titleEn={labels.advancedStudyEyebrow}
-          titleZh={labels.advancedStudyTitle}
+          titleEn={pageTitleEn}
+          titleZh={pageTitleZh}
         />
 
-        {programs.length > 0 ? (
-          <ProgramSection
-            hrefPrefix="/study/advanced-study"
-            locale={locale}
-            programs={programs}
-            title={labels.featuredCourses}
-          />
-        ) : (
-          <div className="glass-card mt-8 rounded-[18px] p-6 text-sm leading-7 text-muted-token">
-            {labels.empty}
-          </div>
-        )}
+        <ProgramSection
+          hrefPrefix="/study/advanced-study"
+          locale={locale}
+          programs={programs}
+          title={labels.featuredCourses}
+        />
+
+        <PastReviewCarousel
+          className="mt-10 lg:mt-12"
+          items={pastReviewItems}
+          itemsPerViewDesktop={3}
+          itemsPerViewMobile={1}
+          locale={locale}
+          title={compactText(pageData?.pastReviewTitle) || labels.pastReview}
+        />
       </PageContainer>
     </AppShell>
   );
@@ -1550,31 +1632,16 @@ export async function AdvancedStudyDetailPage({
 
   return (
     <AppShell locale={locale}>
-      <PageContainer className="pb-16 lg:pb-20">
-        <Link
-          className="inline-flex items-center gap-2 text-[14px] leading-none text-muted-token transition hover:text-primary"
-          href={`/${locale}/study/advanced-study`}
-        >
-          <span aria-hidden="true">&larr;</span>
-          <span>{labels.advancedStudyBack}</span>
-        </Link>
-
-        <article className="mt-10 max-w-[980px]">
-          <h1 className="font-title text-[34px] font-normal leading-tight text-primary lg:text-[48px]">
-            {title}
-          </h1>
-          <DetailText
-            className="mt-8 max-w-[860px] text-[16px] leading-[1.95]"
-            text={content || labels.empty}
-          />
-          <AdvancedStudyImages
-            images={item?.courseImages}
-            locale={locale}
-            title={title}
-          />
-          <AdvancedStudyFiles labels={labels} resources={item?.fileResources} />
-        </article>
-      </PageContainer>
+      <CourseDetailContent
+        backHref={`/${locale}/study/advanced-study`}
+        backLabel={labels.advancedStudyBack}
+        content={content}
+        fileLabels={labels}
+        images={item?.courseImages}
+        locale={locale}
+        resources={item?.fileResources}
+        title={title}
+      />
     </AppShell>
   );
 }

@@ -1,5 +1,4 @@
 import type { SanityImageSource } from "@sanity/image-url";
-import type { ReactNode } from "react";
 
 import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
@@ -15,7 +14,11 @@ import { AppShell } from "./AppShell";
 import { PageContainer } from "./PageContainer";
 import { PageHeader } from "./PageHeader";
 import { PastReviewCarousel, type PastReviewItem } from "./PastReviewCarousel";
-import { CourseCard, type StudyProgram } from "./StudyPages";
+import {
+  CourseCard,
+  CourseDetailContent,
+  type StudyProgram,
+} from "./StudyPages";
 
 type SanityImage = SanityImageSource | null | undefined;
 
@@ -26,10 +29,13 @@ type ExperienceCourse = {
   academicSupport?: string | null;
   category?: string | null;
   contact?: string | null;
+  content?: string | PortableTextBlock[] | null;
   coverImage?: SanityImage;
   description?: string | null;
+  fileResources?: FileResource[] | null;
   galleryImages?: SanityImage[] | null;
   heroImage?: SanityImage;
+  courseImages?: SanityImage[] | null;
   location?: string | null;
   schedule?: string | null;
   shortDescription?: string | null;
@@ -38,6 +44,34 @@ type ExperienceCourse = {
   supportTeacher?: string | null;
   teacher?: string | null;
   title?: string | null;
+};
+
+type PortableTextBlock = {
+  _key?: string;
+  _type?: string;
+  children?: Array<{
+    _key?: string;
+    marks?: string[];
+    text?: string;
+  }>;
+  listItem?: string;
+  style?: string;
+};
+
+type FileResource = {
+  _key?: string;
+  externalUrl?: string | null;
+  file?: {
+    asset?: {
+      _id?: string;
+      mimeType?: string | null;
+      originalFilename?: string | null;
+      size?: number | null;
+      url?: string | null;
+    } | null;
+  } | null;
+  title?: string | null;
+  type?: string | null;
 };
 
 type EventExperienceCourse = {
@@ -72,17 +106,21 @@ const copy = {
   zh: {
     academicSupport: "学术主持",
     audience: "招生对象",
+    backToOffline: "返回线下体验",
     book: "预约体验",
     contact: "联系方式",
     courseIntro: "课程介绍",
     detail: "了解详情",
+    downloadFile: "下载文件",
     empty: "内容待更新",
     gallery: "图片展示",
     heroTitle: "玻璃马赛克",
     imagePending: "图片待上传",
+    openFile: "查看文件",
     location: "授课地点",
     pageTitle: "线下体验",
     pastReview: "往期回顾",
+    resources: "课程资料",
     schedule: "教学内容",
     sectionEn: "ON-SITE EXPERIENCE EVENT",
     teacherTeam: "授课教师团队",
@@ -90,17 +128,21 @@ const copy = {
   en: {
     academicSupport: "Academic Host",
     audience: "Audience",
+    backToOffline: "Back to Offline Experience",
     book: "Book Experience",
     contact: "Contact",
     courseIntro: "Course Introduction",
     detail: "Learn More",
+    downloadFile: "Download File",
     empty: "Content pending",
     gallery: "Gallery",
     heroTitle: "Glass Mosaic",
     imagePending: "Image pending",
+    openFile: "View File",
     location: "Location",
     pageTitle: "Offline Experience",
     pastReview: "Past Review",
+    resources: "Course Resources",
     schedule: "Teaching Content",
     sectionEn: "ON-SITE EXPERIENCE EVENT",
     teacherTeam: "Teaching Team",
@@ -245,7 +287,7 @@ function mapToCourseCard(course: ExperienceCourse): StudyProgram {
     description: course.description,
     posterImage: course.coverImage,
     shortDescription: course.shortDescription || course.description,
-    slug: course.slug,
+    slug: course.slug || course.category,
     title: course.title,
   };
 }
@@ -287,10 +329,10 @@ export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
   ]);
   const labels = copy[locale];
   const pageCourses = pageData?.courses?.filter(Boolean) || [];
-  const items = pageCourses.length
-    ? pageCourses
-    : courseDocuments.length
-      ? courseDocuments
+  const items = courseDocuments.length
+    ? courseDocuments
+    : pageCourses.length
+      ? pageCourses
       : fallbackCourses[locale];
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.pageTitle;
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.sectionEn;
@@ -333,86 +375,6 @@ export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
         />
       </PageContainer>
     </AppShell>
-  );
-}
-
-function DetailSection({
-  children,
-  title,
-}: {
-  children: ReactNode;
-  title: string;
-}) {
-  return (
-    <section className="border-t border-[var(--border)] pt-7">
-      <h2 className="font-title text-[24px] font-normal leading-tight text-primary lg:text-[30px]">
-        {title}
-      </h2>
-      <div className="mt-4 text-[15px] leading-[1.85] text-secondary">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function DetailText({
-  empty,
-  text,
-}: {
-  empty: string;
-  text: string | null | undefined;
-}) {
-  const value = compactText(text);
-
-  if (!value) {
-    return <p className="text-muted-token">{empty}</p>;
-  }
-
-  return <p className="whitespace-pre-line">{value}</p>;
-}
-
-function Gallery({
-  images,
-  locale,
-  title,
-}: {
-  images: SanityImage[] | null | undefined;
-  locale: Locale;
-  title: string;
-}) {
-  const validImages = (images || [])
-    .map((image) => ({
-      caption: imageCaption(image, locale),
-      src: imageUrl(image, 900),
-    }))
-    .filter((item): item is {caption: string; src: string} =>
-      Boolean(item.src),
-    );
-
-  if (!validImages.length) {
-    return null;
-  }
-
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {validImages.map((item, index) => (
-        <figure key={item.src}>
-          <div className="image-placeholder aspect-[4/3] overflow-hidden rounded-[18px] bg-[rgba(255,255,255,0.58)] dark:bg-[rgba(255,255,255,0.06)]">
-            <img
-              alt={`${title} ${index + 1}`}
-              className="h-full w-full object-cover"
-              loading="lazy"
-              src={item.src}
-            />
-          </div>
-          {item.caption ? (
-            <figcaption className="mt-3 whitespace-pre-line text-[13px] leading-[1.8] text-secondary">
-              {item.caption}
-            </figcaption>
-          ) : null}
-        </figure>
-      ))}
-    </div>
   );
 }
 
@@ -464,97 +426,24 @@ export async function ExperienceCourseDetailPage({
   const item =
     course || eventToExperienceCourse(event) || detailFallback(locale, slug);
   const title = compactText(item.title) || labels.pageTitle;
-  const heroSrc = imageUrl(item.heroImage || item.coverImage, 1600);
-  const teacher = item.teacher || item.academicHost || item.academicSupport;
+  const content = item.content || item.description;
+  const images =
+    item.courseImages && item.courseImages.length
+      ? item.courseImages
+      : item.galleryImages;
 
   return (
     <AppShell locale={locale}>
-      <PageContainer className="pb-16 lg:pb-20">
-        <PageHeader titleEn={labels.sectionEn} titleZh={title} />
-
-        <section className="mt-8 max-w-[1280px] overflow-hidden rounded-[28px] border border-[var(--border)] bg-[rgba(255,255,255,0.82)] shadow-[0_16px_42px_rgba(0,0,0,0.055),inset_0_1px_0_rgba(255,255,255,0.58)] dark:border-[var(--glass-border)] dark:bg-[rgba(255,255,255,0.07)]">
-          <div className="grid gap-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.7fr)]">
-            <div className="image-placeholder min-h-[320px] bg-[rgba(255,255,255,0.58)] dark:bg-[rgba(255,255,255,0.05)] lg:min-h-[460px]">
-              {heroSrc ? (
-                <img
-                  alt={title}
-                  className="h-full w-full object-cover"
-                  src={heroSrc}
-                />
-              ) : (
-                <div className="flex h-full min-h-[320px] items-center justify-center text-sm text-muted-token">
-                  {labels.imagePending}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-              <h1 className="font-title text-[34px] font-normal leading-tight text-primary lg:text-[46px]">
-                {title}
-              </h1>
-              <p className="mt-5 whitespace-pre-line text-[15px] leading-[1.85] text-secondary">
-                {compactText(item.description) || labels.empty}
-              </p>
-              <div className="mt-8 grid gap-4 text-[14px] text-secondary sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {[
-                  [labels.academicSupport, teacher],
-                  [labels.schedule, item.schedule],
-                  [labels.audience, item.suitableAudience],
-                  [labels.location, item.location],
-                ].map(([label, value]) =>
-                  compactText(value) ? (
-                    <div
-                      className="rounded-[16px] border border-[var(--border)] bg-[rgba(255,255,255,0.48)] px-4 py-3 dark:border-[var(--glass-border)] dark:bg-[rgba(255,255,255,0.06)]"
-                      key={label}
-                    >
-                      <p className="text-[12px] text-muted-token">{label}</p>
-                      <p className="mt-1.5 whitespace-pre-line text-primary">
-                        {value}
-                      </p>
-                    </div>
-                  ) : null,
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="mt-10 grid max-w-[1280px] gap-9 lg:mt-12">
-          <DetailSection title={labels.courseIntro}>
-            <DetailText empty={labels.empty} text={item.description} />
-          </DetailSection>
-
-          <DetailSection title={labels.academicSupport}>
-            <DetailText empty={labels.empty} text={teacher} />
-          </DetailSection>
-
-          <DetailSection title={labels.teacherTeam}>
-            <DetailText empty={labels.empty} text={teacher} />
-          </DetailSection>
-
-          <DetailSection title={labels.schedule}>
-            <DetailText
-              empty={labels.empty}
-              text={item.schedule || item.description}
-            />
-          </DetailSection>
-
-          <DetailSection title={labels.gallery}>
-            <Gallery
-              images={item.galleryImages}
-              locale={locale}
-              title={title}
-            />
-          </DetailSection>
-
-          <DetailSection title={labels.audience}>
-            <DetailText empty={labels.empty} text={item.suitableAudience} />
-          </DetailSection>
-
-          <DetailSection title={labels.contact}>
-            <DetailText empty={labels.empty} text={item.contact} />
-          </DetailSection>
-        </div>
-      </PageContainer>
+      <CourseDetailContent
+        backHref={`/${locale}/events/offline-experience`}
+        backLabel={labels.backToOffline}
+        content={content}
+        fileLabels={labels}
+        images={images}
+        locale={locale}
+        resources={item.fileResources}
+        title={title}
+      />
     </AppShell>
   );
 }

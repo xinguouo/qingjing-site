@@ -225,15 +225,27 @@ export const structure: StructureResolver = (S, context) => {
       S.listItem()
         .id('study')
         .title('研学 / Study')
-        .schemaType('studyProgram')
+        .schemaType('advancedStudyPage')
         .child(
           S.list()
             .id('studyPageEntries')
             .title('研学 / Study')
             .items([
+              S.listItem()
+                .id('studyAdvancedStudyPage')
+                .title('页面标题与往期回顾 / Page Title & Past Review')
+                .schemaType('advancedStudyPage')
+                .child(
+                  singleton({
+                    id: 'studyAdvancedStudyPageDocument',
+                    title: '高级研学页面设置 / Advanced Study Page Settings',
+                    schemaType: 'advancedStudyPage',
+                    documentId: 'advancedStudyPage',
+                  }),
+                ),
               orderableProductListItem({
                 id: 'studyAdvancedStudy',
-                title: '高级研学 / Advanced Study',
+                title: '精选课程 / Featured Courses',
                 schemaType: 'studyProgram',
                 filter: '_type == "studyProgram" && programType == "advanced-study"',
               }),
@@ -253,12 +265,29 @@ export const structure: StructureResolver = (S, context) => {
                 .title('线下体验 / Offline Experience')
                 .schemaType('offlineExperiencePage')
                 .child(
-                  singleton({
-                    id: 'eventsOfflineExperienceDocument',
-                    title: '线下体验 / Offline Experience',
-                    schemaType: 'offlineExperiencePage',
-                    documentId: 'offlineExperiencePage',
-                  }),
+                  S.list()
+                    .id('eventsOfflineExperienceEntries')
+                    .title('线下体验 / Offline Experience')
+                    .items([
+                      S.listItem()
+                        .id('eventsOfflineExperienceDocument')
+                        .title('页面设置 / Page Settings')
+                        .schemaType('offlineExperiencePage')
+                        .child(
+                          singleton({
+                            id: 'eventsOfflineExperienceDocumentForm',
+                            title: '页面设置 / Page Settings',
+                            schemaType: 'offlineExperiencePage',
+                            documentId: 'offlineExperiencePage',
+                          }),
+                        ),
+                      orderableProductListItem({
+                        id: 'eventsOfflineExperienceCourses',
+                        title: '精选课程 / Featured Courses',
+                        schemaType: 'experienceCourse',
+                        filter: '_type == "experienceCourse"',
+                      }),
+                    ]),
                 ),
               typedListItem({
                 id: 'eventsOpenClass',

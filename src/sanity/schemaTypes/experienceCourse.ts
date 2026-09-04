@@ -1,5 +1,98 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
+
+const richTextField = (name: string, title: string, group: string) =>
+  defineField({
+    name,
+    title,
+    type: 'array',
+    group,
+    of: [
+      {
+        type: 'block',
+        styles: [
+          {title: 'Normal', value: 'normal'},
+          {title: 'Heading 2', value: 'h2'},
+          {title: 'Heading 3', value: 'h3'},
+        ],
+        lists: [
+          {title: 'Bullet', value: 'bullet'},
+          {title: 'Numbered', value: 'number'},
+        ],
+        marks: {
+          decorators: [
+            {title: 'Strong', value: 'strong'},
+            {title: 'Emphasis', value: 'em'},
+          ],
+        },
+      },
+    ],
+  })
+
+const fileResourceField = (group: string) =>
+  defineField({
+    name: 'fileResources',
+    title: '文件资源 / File Resources',
+    type: 'array',
+    group,
+    of: [
+      defineField({
+        name: 'fileResource',
+        title: '文件资源 / File Resource',
+        type: 'object',
+        fields: [
+          defineField({
+            name: 'titleZh',
+            title: '文件名称（中文） / Title (Chinese)',
+            type: 'string',
+          }),
+          defineField({
+            name: 'titleEn',
+            title: 'File Title (English)',
+            type: 'string',
+          }),
+          defineField({
+            name: 'file',
+            title: '上传文件 / Uploaded File',
+            type: 'file',
+          }),
+          defineField({
+            name: 'externalUrl',
+            title: '外部文件链接 / External File URL',
+            type: 'url',
+          }),
+          defineField({
+            name: 'type',
+            title: '文件类型 / File Type',
+            type: 'string',
+            options: {
+              list: [
+                {title: 'PDF', value: 'pdf'},
+                {title: 'PPT / PPTX', value: 'ppt'},
+                {title: 'DOC / DOCX', value: 'doc'},
+                {title: 'XLS / XLSX', value: 'xls'},
+                {title: 'Other', value: 'other'},
+              ],
+              layout: 'dropdown',
+            },
+          }),
+        ],
+        preview: {
+          select: {
+            title: 'titleZh',
+            subtitle: 'type',
+          },
+          prepare({title, subtitle}) {
+            return {
+              title: title || '文件资源 / File Resource',
+              subtitle,
+            }
+          },
+        },
+      }),
+    ],
+  })
 
 export const experienceCourse = defineType({
   name: 'experienceCourse',
@@ -13,6 +106,7 @@ export const experienceCourse = defineType({
     {name: 'admin', title: '后台管理 / Admin'},
   ],
   fields: [
+    orderRankField({type: 'experienceCourse', hidden: true}),
     defineField({
       name: 'titleZh',
       title: '课程名称（中文） / Title (Chinese)',
@@ -85,6 +179,16 @@ export const experienceCourse = defineType({
       group: 'content',
       rows: 5,
     }),
+    richTextField('contentZh', '正文（中文） / Content (Chinese)', 'content'),
+    richTextField('contentEn', 'Content (English)', 'content'),
+    defineField({
+      name: 'courseImages',
+      title: '课程图片 / Course Images',
+      type: 'array',
+      group: 'media',
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
+    }),
+    fileResourceField('content'),
     defineField({
       name: 'teacher',
       title: '学术主持 / Teacher',
@@ -126,6 +230,7 @@ export const experienceCourse = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: '排序 / Order',
       name: 'orderAsc',

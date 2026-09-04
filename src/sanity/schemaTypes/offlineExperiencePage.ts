@@ -46,6 +46,12 @@ export const offlineExperiencePage = defineType({
               type: "string",
             }),
             defineField({
+              name: "slug",
+              title: "链接标识 / Slug",
+              type: "slug",
+              options: { source: "titleEn", maxLength: 96 },
+            }),
+            defineField({
               name: "coverImage",
               title: "课程图片 / Cover Image",
               type: "image",

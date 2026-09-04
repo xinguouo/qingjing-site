@@ -266,10 +266,28 @@ const experienceCourseFields = `
   heroImage{${imageFields}},
   coverImage{${imageFields}},
   galleryImages[]{${imageFields}},
+  courseImages[]{${imageFields}},
   descriptionZh,
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
   "shortDescription": ${localizedText("descriptionEn", "descriptionZh")},
+  contentZh,
+  contentEn,
+  "content": select(
+    $locale == "en" && defined(contentEn[0]) => contentEn,
+    defined(contentZh[0]) => contentZh,
+    $locale == "en" && defined(descriptionEn) && descriptionEn != "" => descriptionEn,
+    descriptionZh
+  ),
+  fileResources[]{
+    _key,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    file{${fileAssetFields}},
+    externalUrl,
+    type
+  },
   teacher,
   academicSupport,
   "academicHost": coalesce(academicSupport, teacher),
@@ -278,6 +296,7 @@ const experienceCourseFields = `
   schedule,
   location,
   contact,
+  "orderRank": _orderRank,
   order
 `;
 
@@ -287,9 +306,11 @@ const offlineExperiencePageFields = `
   "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
   courses[]{
     _key,
+    _type,
     titleZh,
     titleEn,
     "title": ${localizedText("titleEn", "titleZh")},
+    "slug": slug.current,
     coverImage{${imageFields}},
     descriptionZh,
     descriptionEn,
@@ -299,6 +320,26 @@ const offlineExperiencePageFields = `
     "academicHost": supportTeacher,
     "academicSupport": supportTeacher
   },
+  pastReviewItems[]{
+    _key,
+    image{${imageFields}},
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    year,
+    descriptionZh,
+    descriptionEn,
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
+  }
+`;
+
+const advancedStudyPageFields = `
+  pageTitleZh,
+  pageTitleEn,
+  "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
+  pastReviewTitleZh,
+  pastReviewTitleEn,
+  "pastReviewTitle": ${localizedText("pastReviewTitleEn", "pastReviewTitleZh")},
   pastReviewItems[]{
     _key,
     image{${imageFields}},
@@ -1088,6 +1129,13 @@ export const advancedStudyProgramsQuery = defineQuery(`*[
   ${studyProgramCardFields}
 }`);
 
+export const advancedStudyPageQuery = defineQuery(`*[
+  _type == "advancedStudyPage" &&
+  _id == "advancedStudyPage"
+][0]{
+  ${advancedStudyPageFields}
+}`);
+
 export const studyProgramBySlugQuery = defineQuery(`*[
   _type == "studyProgram" &&
   slug.current == $slug
@@ -1214,7 +1262,7 @@ export const offlineWorkshopBySlugQuery = defineQuery(`*[
 
 export const experienceCoursesQuery = defineQuery(`*[
   _type == "experienceCourse"
-] | order(order asc) {
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   ${experienceCourseFields}
 }`);
 

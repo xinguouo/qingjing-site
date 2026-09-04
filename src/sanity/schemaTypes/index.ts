@@ -1,5 +1,6 @@
 import {aboutContactPage} from './aboutContactPage'
 import {aboutMissionPage} from './aboutMissionPage'
+import {advancedStudyPage} from './advancedStudyPage'
 import {artCategory} from './artCategory'
 import {artDerivativeDetail} from './artDerivativeDetail'
 import {artDerivativePackagingPage} from './artDerivativePackagingPage'
@@ -34,6 +35,7 @@ export const schemaTypes = [
   teamMember,
   artist,
   residencyPage,
+  advancedStudyPage,
   studyMasterclassPage,
   studyProgram,
   event,
