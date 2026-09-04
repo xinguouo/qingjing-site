@@ -3,12 +3,13 @@
 import type { SanityImageSource } from "@sanity/image-url";
 import type { Locale } from "@/config/navigation";
 
-import { Logo } from "./Logo";
+import { Logo, type SidebarLogoImages } from "./Logo";
 import { SiteSearch } from "./SiteSearch";
 
 type MobileHeaderProps = {
   locale: Locale;
   logo?: SanityImageSource | null;
+  logoImages?: SidebarLogoImages | null;
   onMenuClick: () => void;
   siteName?: string | null;
 };
@@ -20,6 +21,7 @@ const labels = {
 export function MobileHeader({
   locale,
   logo,
+  logoImages,
   onMenuClick,
   siteName,
 }: MobileHeaderProps) {
@@ -28,6 +30,7 @@ export function MobileHeader({
       <Logo
         className="shrink min-w-0"
         image={logo}
+        images={logoImages}
         locale={locale}
         siteName={siteName}
         variant="mobile"

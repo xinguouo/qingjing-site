@@ -15,13 +15,14 @@ import {
   type Locale,
 } from "@/config/navigation";
 
-import { Logo } from "./Logo";
+import { Logo, type SidebarLogoImages } from "./Logo";
 import { SidebarNavIcon } from "./SidebarNavIcon";
 
 type DesktopSidebarProps = {
   artCategorySettings?: ArtCategoryTitleMap;
   locale: Locale;
   logo?: SanityImageSource | null;
+  logoImages?: SidebarLogoImages | null;
   siteName?: string | null;
 };
 
@@ -34,6 +35,7 @@ export function DesktopSidebar({
   artCategorySettings,
   locale,
   logo,
+  logoImages,
   siteName,
 }: DesktopSidebarProps) {
   const pathname = usePathname();
@@ -41,7 +43,7 @@ export function DesktopSidebar({
   return (
     <aside className="sidebar-shell fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r lg:flex">
       <div className="flex h-[62px] items-center border-b border-[var(--border)] px-8">
-        <Logo image={logo} locale={locale} siteName={siteName} />
+        <Logo image={logo} images={logoImages} locale={locale} siteName={siteName} />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-8">

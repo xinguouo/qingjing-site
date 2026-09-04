@@ -8,11 +8,28 @@ export const homePage = defineType({
   type: "document",
   groups: [
     { name: "hero", title: "首页首屏 / Hero", default: true },
+    { name: "globalLogo", title: "全站 Logo / Global Logo" },
     { name: "quick", title: "快速入口 / Quick Entries" },
     { name: "featured", title: "首页推荐 / Featured" },
     { name: "legacy", title: "旧字段 / Legacy" },
   ],
   fields: [
+    defineField({
+      name: "whiteSidebarLogo",
+      title: "白色 Logo PNG / White Sidebar Logo",
+      type: "image",
+      group: "globalLogo",
+      description: "白色 Logo：用于深色主题 / Dark Theme",
+      options: { hotspot: false },
+    }),
+    defineField({
+      name: "blackSidebarLogo",
+      title: "黑色 Logo PNG / Black Sidebar Logo",
+      type: "image",
+      group: "globalLogo",
+      description: "黑色 Logo：用于浅色及其他明亮主题 / Light Themes",
+      options: { hotspot: false },
+    }),
     defineField({
       name: "heroTitleZh",
       title: "主标题（中文） / Hero Title Zh",

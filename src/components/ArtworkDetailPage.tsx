@@ -305,7 +305,13 @@ function ArtworkMetaList({
   return (
     <dl
       className={`mt-7 grid max-w-[760px] gap-x-10 gap-y-5 border-b border-[var(--border)] pb-7 ${
-        visibleItems.length > 3 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"
+        visibleItems.length === 1
+          ? ""
+          : visibleItems.length === 2
+            ? "sm:grid-cols-2"
+            : visibleItems.length > 3
+              ? "sm:grid-cols-2 lg:grid-cols-4"
+              : "sm:grid-cols-3"
       }`}
     >
       {visibleItems.map((item) => (

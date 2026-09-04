@@ -60,7 +60,6 @@ type PortableTextBlock = {
 
 type FileResource = {
   _key?: string;
-  externalUrl?: string | null;
   file?: {
     asset?: {
       _id?: string;
@@ -70,8 +69,6 @@ type FileResource = {
       url?: string | null;
     } | null;
   } | null;
-  title?: string | null;
-  type?: string | null;
 };
 
 type EventExperienceCourse = {

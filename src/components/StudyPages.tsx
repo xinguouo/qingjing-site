@@ -68,7 +68,6 @@ type StudyProgramDetail = StudyProgram & {
 
 type FileResource = {
   _key?: string;
-  externalUrl?: string | null;
   file?: {
     asset?: {
       _id?: string;
@@ -78,8 +77,6 @@ type FileResource = {
       url?: string | null;
     } | null;
   } | null;
-  title?: string | null;
-  type?: string | null;
 };
 
 type CourseModule = {
@@ -1378,7 +1375,7 @@ function ContactInfoSection({
 }
 
 function fileUrl(resource: FileResource) {
-  return compactText(resource.externalUrl) || compactText(resource.file?.asset?.url);
+  return compactText(resource.file?.asset?.url);
 }
 
 type CourseFileLabels = {
@@ -1388,31 +1385,11 @@ type CourseFileLabels = {
 };
 
 function fileName(resource: FileResource, labels: CourseFileLabels) {
-  return (
-    compactText(resource.title) ||
-    compactText(resource.file?.asset?.originalFilename) ||
-    labels.resources
-  );
-}
+  const originalFilename = compactText(resource.file?.asset?.originalFilename);
+  const url = compactText(resource.file?.asset?.url);
+  const urlFilename = url ? decodeURIComponent(url.split("?")[0].split("/").pop() || "") : "";
 
-function fileTypeLabel(resource: FileResource) {
-  const explicitType = compactText(resource.type).toUpperCase();
-  const mimeType = compactText(resource.file?.asset?.mimeType);
-  const name = compactText(resource.file?.asset?.originalFilename);
-
-  if (explicitType) {
-    return explicitType;
-  }
-
-  if (mimeType.includes("pdf") || name.toLowerCase().endsWith(".pdf")) {
-    return "PDF";
-  }
-
-  if (mimeType || name) {
-    return mimeType || name.split(".").pop()?.toUpperCase() || "FILE";
-  }
-
-  return "LINK";
+  return originalFilename || compactText(urlFilename) || labels.resources;
 }
 
 function AdvancedStudyImages({
@@ -1481,7 +1458,6 @@ function AdvancedStudyFiles({
       <div className="mt-5 space-y-5">
         {items.map(({ resource, url }, index) => {
           const title = fileName(resource, labels);
-          const type = fileTypeLabel(resource);
           const key = resource._key || `${url}-${index}`;
 
           return (
@@ -1491,9 +1467,6 @@ function AdvancedStudyFiles({
                   <h3 className="break-words text-[15px] font-medium leading-6 text-primary">
                     {title}
                   </h3>
-                  <p className="mt-1 text-[12px] uppercase tracking-[0.18em] text-muted-token">
-                    {type}
-                  </p>
                 </div>
                 <div className="flex shrink-0 gap-4 text-[13px] text-muted-token">
                   <Link

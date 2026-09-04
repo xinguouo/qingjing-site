@@ -6,13 +6,20 @@ import { useMemo, useState } from "react";
 
 import type { Locale } from "@/config/navigation";
 import { urlForImage } from "@/sanity/image";
+import { useTheme } from "./ThemeProvider";
 
 type LogoProps = {
   className?: string;
   image?: SanityImageSource | null;
+  images?: SidebarLogoImages | null;
   locale: Locale;
   siteName?: string | null;
   variant?: "desktop" | "mobile";
+};
+
+export type SidebarLogoImages = {
+  blackSidebarLogo?: SanityImageSource | null;
+  whiteSidebarLogo?: SanityImageSource | null;
 };
 
 const publicLogoSources = [
@@ -44,14 +51,37 @@ function getSanityLogoUrl(image: SanityImageSource | null | undefined) {
 export function Logo({
   className = "",
   image,
+  images,
   locale,
   siteName,
   variant = "desktop",
 }: LogoProps) {
-  const [sanityFailed, setSanityFailed] = useState(false);
+  const { mode, mounted } = useTheme();
+  const [failedSanityUrl, setFailedSanityUrl] = useState<string | null>(null);
   const [publicIndex, setPublicIndex] = useState(0);
-  const sanityUrl = useMemo(() => getSanityLogoUrl(image), [image]);
-  const shouldUseSanity = Boolean(sanityUrl && !sanityFailed);
+  const preferredLogo =
+    mounted && mode === "dark"
+      ? images?.whiteSidebarLogo
+      : images?.blackSidebarLogo;
+  const fallbackLogo =
+    mounted && mode === "dark"
+      ? images?.blackSidebarLogo
+      : images?.whiteSidebarLogo;
+  const preferredSanityUrl = useMemo(
+    () => getSanityLogoUrl(preferredLogo || image),
+    [image, preferredLogo],
+  );
+  const fallbackSanityUrl = useMemo(
+    () => getSanityLogoUrl(fallbackLogo),
+    [fallbackLogo],
+  );
+  const sanityUrl =
+    preferredSanityUrl && preferredSanityUrl !== failedSanityUrl
+      ? preferredSanityUrl
+      : fallbackSanityUrl && fallbackSanityUrl !== failedSanityUrl
+        ? fallbackSanityUrl
+        : null;
+  const shouldUseSanity = Boolean(sanityUrl);
   const publicSrc = publicLogoSources[publicIndex];
   const imageSrc = shouldUseSanity ? sanityUrl : publicSrc;
   const homeHref = locale === "en" ? "/en" : "/zh";
@@ -84,12 +114,12 @@ export function Logo({
       {imageSrc ? (
         <img
           alt={siteName?.trim() || labels.brandZh}
-          className={`w-auto object-contain transition-[filter] duration-200 dark:brightness-0 dark:contrast-200 dark:invert ${
+          className={`w-auto object-contain object-left ${
             variant === "mobile" ? "max-h-9 max-w-[190px]" : "max-h-9 max-w-[178px]"
           }`}
           onError={() => {
             if (shouldUseSanity) {
-              setSanityFailed(true);
+              setFailedSanityUrl(sanityUrl);
               return;
             }
 

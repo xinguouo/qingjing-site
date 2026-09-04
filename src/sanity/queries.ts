@@ -281,12 +281,7 @@ const experienceCourseFields = `
   ),
   fileResources[]{
     _key,
-    titleZh,
-    titleEn,
-    "title": ${localizedText("titleEn", "titleZh")},
-    file{${fileAssetFields}},
-    externalUrl,
-    type
+    file{${fileAssetFields}}
   },
   teacher,
   academicSupport,
@@ -864,6 +859,8 @@ export const homePageQuery = defineQuery(`*[
   _id == "homePage" &&
   !(_id in path("drafts.**"))
 ][0]{
+  whiteSidebarLogo{${imageFields}},
+  blackSidebarLogo{${imageFields}},
   heroTitleZh,
   heroTitleEn,
   "heroTitle": ${localizedText("heroTitleEn", "heroTitleZh")},
@@ -930,6 +927,15 @@ export const homePageQuery = defineQuery(`*[
     titleEn,
     categoryType
   } | order(categoryType asc, sortKey asc, _updatedAt desc)
+}`);
+
+export const sidebarLogoQuery = defineQuery(`*[
+  _type == "homePage" &&
+  _id == "homePage" &&
+  !(_id in path("drafts.**"))
+][0]{
+  whiteSidebarLogo{${imageFields}},
+  blackSidebarLogo{${imageFields}}
 }`);
 
 export const aboutMissionPageQuery = defineQuery(`{
@@ -1170,12 +1176,7 @@ export const studyProgramBySlugQuery = defineQuery(`*[
   courseImages[]{${imageFields}},
   fileResources[]{
     _key,
-    titleZh,
-    titleEn,
-    "title": ${localizedText("titleEn", "titleZh")},
-    file{${fileAssetFields}},
-    externalUrl,
-    type
+    file{${fileAssetFields}}
   },
   "relatedCourses": relatedCourses[]->{
     ${studyProgramCardFields}

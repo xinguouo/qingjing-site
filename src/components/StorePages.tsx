@@ -91,6 +91,7 @@ type DerivativeProduct = {
   _id: string;
   category?: string | null;
   coverImage?: SanityImage;
+  craftCategory?: string | string[] | null;
   description?: string | null;
   detail?: string | null;
   dimensions?: string | null;
@@ -1655,6 +1656,10 @@ export async function DerivativeDetailPage({
     compactText(product.category) || labels.categoryFallback;
   const dimensions = compactText(product.dimensions);
   const craft = craftCategoryLabel(product.craftCategory, locale);
+  const metaItems = [
+    { label: labels.dimensions, value: dimensions },
+    { label: labels.craft, value: craft },
+  ].filter((item) => compactText(item.value));
   const description = compactText(product.description);
   const mainImage = product.mainImage || product.galleryImages?.[0];
   const backHref = `${routePrefix(locale, includeLocalePrefix)}/shop`;
@@ -1679,14 +1684,23 @@ export async function DerivativeDetailPage({
           </header>
 
           <section className="mt-5 max-w-[760px]">
-            {dimensions ? <p className="detail-meta">{dimensions}</p> : null}
-            {craft ? (
-              <div className="mt-8">
-                <p className="detail-meta">{labels.craft}</p>
-                <p className="mt-3 text-[16px] leading-none text-primary">
-                  {craft}
-                </p>
-              </div>
+            {metaItems.length ? (
+              <dl
+                className={`grid gap-x-10 gap-y-5 border-b border-[var(--border)] pb-7 ${
+                  metaItems.length > 1 ? "sm:grid-cols-2" : ""
+                }`}
+              >
+                {metaItems.map((item) => (
+                  <div key={item.label}>
+                    <dt className="text-[12px] leading-none text-muted-token">
+                      {item.label}
+                    </dt>
+                    <dd className="mt-2 whitespace-pre-line text-[15px] leading-[1.7] text-primary">
+                      {item.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             ) : null}
             {description ? (
               <p className="mt-9 whitespace-pre-line text-[15px] leading-[1.9] text-secondary">
@@ -2133,10 +2147,12 @@ export async function DerivativeProductDetailPage({
   ].filter(Boolean);
   const specification =
     product.specification || product.dimensions || product.size;
+  const craft = craftCategoryLabel(product.craftCategory, locale);
   const backHref = `${routePrefix(locale, includeLocalePrefix)}/shop?category=derivatives`;
   const descriptionLabel =
     locale === "zh" ? "\u4ea7\u54c1\u63cf\u8ff0" : "Description";
   const sizeLabel = locale === "zh" ? "\u5c3a\u5bf8" : "Size";
+  const craftLabel = locale === "zh" ? "\u5de5\u827a" : "Craft";
 
   return (
     <ArtworkDetailLayout
@@ -2147,7 +2163,10 @@ export async function DerivativeProductDetailPage({
       descriptionLabel={descriptionLabel}
       images={images}
       locale={locale}
-      metaItems={[{ label: sizeLabel, value: specification }]}
+      metaItems={[
+        { label: sizeLabel, value: specification },
+        { label: craftLabel, value: craft },
+      ]}
       primaryTitle={title}
       secondaryTitle={secondaryTitle}
       videos={

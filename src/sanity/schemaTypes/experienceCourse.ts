@@ -57,50 +57,18 @@ const fileResourcesField = (group: string) =>
         type: 'object',
         fields: [
           defineField({
-            name: 'titleZh',
-            title: '文件标题（中文） / File Title (Chinese)',
-            type: 'string',
-          }),
-          defineField({
-            name: 'titleEn',
-            title: 'File Title (English)',
-            type: 'string',
-          }),
-          defineField({
             name: 'file',
             title: '上传文件 / Uploaded File',
             type: 'file',
           }),
-          defineField({
-            name: 'externalUrl',
-            title: '外部链接 / External URL',
-            type: 'url',
-          }),
-          defineField({
-            name: 'type',
-            title: '文件类型 / File Type',
-            type: 'string',
-            options: {
-              list: [
-                {title: 'PDF', value: 'pdf'},
-                {title: 'PPT / PPTX', value: 'ppt'},
-                {title: 'DOC / DOCX', value: 'doc'},
-                {title: 'XLS / XLSX', value: 'xls'},
-                {title: 'Other', value: 'other'},
-              ],
-              layout: 'dropdown',
-            },
-          }),
         ],
         preview: {
           select: {
-            title: 'titleZh',
-            subtitle: 'type',
+            title: 'file.asset.originalFilename',
           },
-          prepare({title, subtitle}) {
+          prepare({title}) {
             return {
               title: title || '文件资源 / File Resource',
-              subtitle,
             }
           },
         },
