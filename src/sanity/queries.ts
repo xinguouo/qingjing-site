@@ -130,6 +130,16 @@ const productVideoFields = `
   }
 `;
 
+const fileAssetFields = `
+  asset->{
+    _id,
+    url,
+    mimeType,
+    originalFilename,
+    size
+  }
+`;
+
 const studyProgramCardFields = `
   _id,
   titleZh,
@@ -138,15 +148,24 @@ const studyProgramCardFields = `
   "slug": slug.current,
   programType,
   courseSection,
-  "coverImage": select(defined(heroImage.asset) => heroImage{${imageFields}}, coverImage{${imageFields}}),
+  heroImage{${imageFields}},
+  "coverImage": select(defined(coverImage.asset) => coverImage{${imageFields}}, heroImage{${imageFields}}),
   "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
-  "description": ${localizedText("courseIntroEn", "courseIntroZh")},
+  "description": select(
+    $locale == "en" && defined(cardDescriptionEn) && cardDescriptionEn != "" => cardDescriptionEn,
+    defined(cardDescriptionZh) && cardDescriptionZh != "" => cardDescriptionZh,
+    $locale == "en" && defined(courseIntroEn) && courseIntroEn != "" => courseIntroEn,
+    courseIntroZh
+  ),
   "shortDescription": select(
+    $locale == "en" && defined(cardDescriptionEn) && cardDescriptionEn != "" => cardDescriptionEn,
+    defined(cardDescriptionZh) && cardDescriptionZh != "" => cardDescriptionZh,
     $locale == "en" && defined(courseIntroEn) && courseIntroEn != "" => courseIntroEn,
     courseIntroZh
   ),
   "academicHost": ${localizedText("academicHostEn", "academicHostZh")},
   "academicSupport": ${localizedText("academicHostEn", "academicHostZh")},
+  "orderRank": _orderRank,
   order
 `;
 
@@ -1024,21 +1043,21 @@ export const residencyPageQuery = defineQuery(`*[_type == "residencyPage"][0]{
 }`);
 
 export const studyProgramsQuery =
-  defineQuery(`*[_type == "studyProgram"] | order(order asc) {
+  defineQuery(`*[_type == "studyProgram"] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
 export const studyProgramsByTypeQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == $programType
-] | order(order asc) {
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
 export const internationalMasterclassProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == "international-masterclass"
-] | order(order asc) {
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
@@ -1062,10 +1081,10 @@ export const studyMasterclassPageQuery = defineQuery(`*[
   }
 }`);
 
-export const internationalStudyProgramsQuery = defineQuery(`*[
+export const advancedStudyProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
-  programType == "international-study"
-] | order(order asc) {
+  programType == "advanced-study"
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
@@ -1092,6 +1111,24 @@ export const studyProgramBySlugQuery = defineQuery(`*[
   "certificate": ${localizedText("certificateEn", "certificateZh")},
   "registrationPayment": ${localizedText("registrationPaymentEn", "registrationPaymentZh")},
   "contactInfo": ${localizedText("contactInfoEn", "contactInfoZh")},
+  contentZh,
+  contentEn,
+  "content": select(
+    $locale == "en" && defined(contentEn[0]) => contentEn,
+    defined(contentZh[0]) => contentZh,
+    $locale == "en" && defined(courseIntroEn) && courseIntroEn != "" => courseIntroEn,
+    courseIntroZh
+  ),
+  courseImages[]{${imageFields}},
+  fileResources[]{
+    _key,
+    titleZh,
+    titleEn,
+    "title": ${localizedText("titleEn", "titleZh")},
+    file{${fileAssetFields}},
+    externalUrl,
+    type
+  },
   "relatedCourses": relatedCourses[]->{
     ${studyProgramCardFields}
   }
@@ -1628,6 +1665,10 @@ export const siteSearchContentQuery = defineQuery(`{
     courseIntroZh,
     courseIntroEn,
     "courseIntro": ${localizedText("courseIntroEn", "courseIntroZh")},
+    cardDescriptionZh,
+    cardDescriptionEn,
+    contentZh,
+    contentEn,
     academicHostZh,
     academicHostEn,
     "academicHost": ${localizedText("academicHostEn", "academicHostZh")},

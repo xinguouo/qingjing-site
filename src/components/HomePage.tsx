@@ -151,8 +151,8 @@ function programHref(item: HomeCardItem, locale: Locale) {
   }
 
   const base =
-    item.programType === "international-study"
-      ? "international-study"
+    item.programType === "advanced-study"
+      ? "advanced-study"
       : "masterclass";
 
   return `/${locale}/study/${base}/${item.slug}`;

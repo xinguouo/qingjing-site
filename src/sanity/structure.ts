@@ -231,17 +231,11 @@ export const structure: StructureResolver = (S, context) => {
             .id('studyPageEntries')
             .title('研学 / Study')
             .items([
-              typedListItem({
-                id: 'studyInternationalMasterclass',
-                title: '国际大师班 / International Masterclass',
+              orderableProductListItem({
+                id: 'studyAdvancedStudy',
+                title: '高级研学 / Advanced Study',
                 schemaType: 'studyProgram',
-                filter: '_type == "studyProgram" && programType == "international-masterclass"',
-              }),
-              typedListItem({
-                id: 'studyInternationalStudy',
-                title: '国际研学（暂不上线） / International Study (Not Launched)',
-                schemaType: 'studyProgram',
-                filter: '_type == "studyProgram" && programType == "international-study"',
+                filter: '_type == "studyProgram" && programType == "advanced-study"',
               }),
             ]),
         ),

@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineField, defineType} from 'sanity'
 import {imageCaptionFields} from './imageCaptionFields'
 
@@ -8,6 +9,34 @@ const textField = (name: string, title: string, group: string, rows = 6) =>
     type: 'text',
     rows,
     group,
+  })
+
+const richTextField = (name: string, title: string, group: string) =>
+  defineField({
+    name,
+    title,
+    type: 'array',
+    group,
+    of: [
+      {
+        type: 'block',
+        styles: [
+          {title: 'Normal', value: 'normal'},
+          {title: 'Heading 2', value: 'h2'},
+          {title: 'Heading 3', value: 'h3'},
+        ],
+        lists: [
+          {title: 'Bullet', value: 'bullet'},
+          {title: 'Numbered', value: 'number'},
+        ],
+        marks: {
+          decorators: [
+            {title: 'Strong', value: 'strong'},
+            {title: 'Emphasis', value: 'em'},
+          ],
+        },
+      },
+    ],
   })
 
 export const studyProgram = defineType({
@@ -26,10 +55,12 @@ export const studyProgram = defineType({
     {name: 'certificate', title: '结业证书'},
     {name: 'registration', title: '报名及缴费方式'},
     {name: 'contact', title: '联系方式'},
+    {name: 'advancedDetail', title: '高级研学详情 / Advanced Study Detail'},
     {name: 'related', title: '更多课程'},
     {name: 'admin', title: '后台管理'},
   ],
   fields: [
+    orderRankField({type: 'studyProgram', hidden: true}),
     defineField({
       name: 'titleZh',
       title: '课程名称',
@@ -59,6 +90,16 @@ export const studyProgram = defineType({
       options: {hotspot: true},
       fields: imageCaptionFields,
     }),
+    defineField({
+      name: 'coverImage',
+      title: '卡片封面 / Cover Image',
+      type: 'image',
+      group: 'basic',
+      options: {hotspot: true},
+      fields: imageCaptionFields,
+    }),
+    textField('cardDescriptionZh', '卡片简介（中文） / Card Description (Chinese)', 'basic', 3),
+    textField('cardDescriptionEn', 'Card Description (English)', 'basic', 3),
 
     textField('courseIntroZh', '课程介绍（中文）', 'intro', 8),
     textField('courseIntroEn', 'Course Introduction (English)', 'intro', 8),
@@ -132,6 +173,78 @@ export const studyProgram = defineType({
     textField('contactInfoZh', '联系方式（中文）', 'contact', 5),
     textField('contactInfoEn', 'Contact Info (English)', 'contact', 5),
 
+    richTextField('contentZh', '正文（中文） / Content (Chinese)', 'advancedDetail'),
+    richTextField('contentEn', 'Content (English)', 'advancedDetail'),
+    defineField({
+      name: 'courseImages',
+      title: '课程图片 / Course Images',
+      type: 'array',
+      group: 'advancedDetail',
+      of: [{type: 'image', options: {hotspot: true}, fields: imageCaptionFields}],
+    }),
+    defineField({
+      name: 'fileResources',
+      title: '文件资源 / File Resources',
+      type: 'array',
+      group: 'advancedDetail',
+      of: [
+        defineField({
+          name: 'fileResource',
+          title: '文件资源 / File Resource',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'titleZh',
+              title: '文件名称（中文） / Title (Chinese)',
+              type: 'string',
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'File Title (English)',
+              type: 'string',
+            }),
+            defineField({
+              name: 'file',
+              title: '上传文件 / Uploaded File',
+              type: 'file',
+            }),
+            defineField({
+              name: 'externalUrl',
+              title: '外部文件链接 / External File URL',
+              type: 'url',
+            }),
+            defineField({
+              name: 'type',
+              title: '文件类型 / File Type',
+              type: 'string',
+              options: {
+                list: [
+                  {title: 'PDF', value: 'pdf'},
+                  {title: 'PPT / PPTX', value: 'ppt'},
+                  {title: 'DOC / DOCX', value: 'doc'},
+                  {title: 'XLS / XLSX', value: 'xls'},
+                  {title: 'Other', value: 'other'},
+                ],
+                layout: 'dropdown',
+              },
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'titleZh',
+              subtitle: 'type',
+            },
+            prepare({title, subtitle}) {
+              return {
+                title: title || '文件资源 / File Resource',
+                subtitle,
+              }
+            },
+          },
+        }),
+      ],
+    }),
+
     defineField({
       name: 'relatedCourses',
       title: '更多课程',
@@ -156,14 +269,15 @@ export const studyProgram = defineType({
       title: '项目类型',
       type: 'string',
       group: 'admin',
+      hidden: true,
       options: {
         list: [
           {title: '国际大师班', value: 'international-masterclass'},
-          {title: '国际研学', value: 'international-study'},
+          {title: '高级研学', value: 'advanced-study'},
         ],
         layout: 'radio',
       },
-      initialValue: 'international-masterclass',
+      initialValue: 'advanced-study',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -189,6 +303,7 @@ export const studyProgram = defineType({
     }),
   ],
   orderings: [
+    orderRankOrdering,
     {
       title: '排序',
       name: 'orderAsc',

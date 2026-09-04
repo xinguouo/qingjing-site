@@ -5,6 +5,7 @@ import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
+  advancedStudyProgramsQuery,
   internationalMasterclassProgramsQuery,
   studyMasterclassPageQuery,
   studyProgramBySlugQuery,
@@ -29,6 +30,7 @@ export type StudyProgram = {
   description?: string | null;
   faculty?: string | null;
   posterImage?: SanityImage;
+  programType?: string | null;
   slug?: string | null;
   shortDescription?: string | null;
   title?: string | null;
@@ -49,7 +51,10 @@ type StudyProgramDetail = StudyProgram & {
   academicAffairs?: string | null;
   certificate?: string | null;
   contactInfo?: string | null;
+  content?: DetailValue;
+  courseImages?: SanityImage[] | null;
   courseModules?: CourseModule[] | null;
+  fileResources?: FileResource[] | null;
   heroImage?: SanityImage;
   programType?: string | null;
   relatedCourses?: StudyProgram[] | null;
@@ -58,6 +63,22 @@ type StudyProgramDetail = StudyProgram & {
   teacherTeam?: string | null;
   titleEn?: string | null;
   titleZh?: string | null;
+};
+
+type FileResource = {
+  _key?: string;
+  externalUrl?: string | null;
+  file?: {
+    asset?: {
+      _id?: string;
+      mimeType?: string | null;
+      originalFilename?: string | null;
+      size?: number | null;
+      url?: string | null;
+    } | null;
+  } | null;
+  title?: string | null;
+  type?: string | null;
 };
 
 type CourseModule = {
@@ -143,7 +164,11 @@ const copy = {
     academicAffairs: "\u6559\u52a1\u4fe1\u606f",
     academicSupport: "\u5b66\u672f\u652f\u6301",
     accommodation: "\u98df\u5bbf\u53ca\u5176\u4ed6",
+    advancedStudyBack: "\u8fd4\u56de\u9ad8\u7ea7\u7814\u5b66",
+    advancedStudyEyebrow: "ADVANCED STUDY",
+    advancedStudyTitle: "\u9ad8\u7ea7\u7814\u5b66",
     assistant: "\u8bfe\u7a0b\u52a9\u6559",
+    downloadFile: "\u4e0b\u8f7d\u6587\u4ef6",
     empty: "\u5185\u5bb9\u5f85\u66f4\u65b0",
     courseName: "\u8bfe\u7a0b\u540d\u79f0",
     educationInfo: "\u6559\u80b2\u4fe1\u606f",
@@ -161,6 +186,7 @@ const copy = {
     classSize: "\u62db\u751f\u4eba\u6570",
     gallery: "\u8bfe\u7a0b\u56fe\u7247",
     imagePending: "\u56fe\u7247\u5f85\u4e0a\u4f20",
+    openFile: "\u67e5\u770b\u6587\u4ef6",
     masterclassEyebrow: "INTERNATIONAL MASTERCLASS",
     masterclassTitle: "\u56fd\u9645\u5927\u5e08\u73ed",
     pastCourses: "\u5f80\u671f\u8bfe\u7a0b",
@@ -170,6 +196,7 @@ const copy = {
     registrationPayment: "\u62a5\u540d\u53ca\u7f34\u8d39\u65b9\u5f0f",
     registrationQr: "\u62a5\u540d\u4e8c\u7ef4\u7801",
     relatedCourses: "\u66f4\u591a\u8bfe\u7a0b",
+    resources: "\u8bfe\u7a0b\u8d44\u6599",
     schedule: "\u6559\u5b66\u5b89\u6392",
     targetAudience: "\u9002\u5408\u4eba\u7fa4",
     teacherTeam: "\u6388\u8bfe\u6559\u5e08\u56e2\u961f",
@@ -181,6 +208,9 @@ const copy = {
     academicAffairs: "Academic Affairs",
     academicSupport: "Academic Support",
     accommodation: "Accommodation and Others",
+    advancedStudyBack: "Back to Advanced Study",
+    advancedStudyEyebrow: "ADVANCED STUDY",
+    advancedStudyTitle: "Advanced Study",
     assistant: "Assistant",
     contact: "Contact",
     courseModules: "Course Setting",
@@ -191,12 +221,14 @@ const copy = {
     courseDuration: "Course Duration",
     classSize: "Class Size",
     courseName: "Course Name",
+    downloadFile: "Download File",
     educationInfo: "Education Info",
     empty: "Content pending",
     featuredCourses: "Featured Courses",
     gallery: "Course Gallery",
     instructorLabel: "Academic Host / Faculty",
     imagePending: "Image pending",
+    openFile: "View File",
     location: "Location",
     masterclassEyebrow: "INTERNATIONAL MASTERCLASS",
     masterclassTitle: "International Masterclass",
@@ -207,6 +239,7 @@ const copy = {
     registrationPayment: "Registration and Payment",
     registrationQr: "Registration QR Code",
     relatedCourses: "More Courses",
+    resources: "Course Resources",
     schedule: "Schedule",
     targetAudience: "Target Audience",
     teacher: "Teacher",
@@ -240,6 +273,27 @@ function portableChildrenText(block: PortableTextBlock) {
       .join("")
       .trim() || ""
   );
+}
+
+function renderPortableChildren(block: PortableTextBlock) {
+  return (block.children || []).map((child, index) => {
+    const text = child.text || "";
+    const key = child._key || index;
+
+    if (child.marks?.includes("strong")) {
+      return (
+        <strong className="font-medium text-primary" key={key}>
+          {text}
+        </strong>
+      );
+    }
+
+    if (child.marks?.includes("em")) {
+      return <em key={key}>{text}</em>;
+    }
+
+    return <span key={key}>{text}</span>;
+  });
 }
 
 function firstTextLine(value: string | null | undefined) {
@@ -397,10 +451,12 @@ export function CourseCard({
 }
 
 function ProgramSection({
+  hrefPrefix,
   locale,
   programs,
   title,
 }: {
+  hrefPrefix?: string;
   locale: Locale;
   programs: StudyProgram[];
   title: string;
@@ -416,7 +472,12 @@ function ProgramSection({
       </h2>
       <div className="mt-5 grid max-w-[1280px] gap-5 md:grid-cols-2 xl:grid-cols-3">
         {programs.map((program) => (
-          <CourseCard key={program._id} locale={locale} program={program} />
+          <CourseCard
+            hrefPrefix={hrefPrefix}
+            key={program._id}
+            locale={locale}
+            program={program}
+          />
         ))}
       </div>
     </section>
@@ -471,34 +532,37 @@ function DetailText({
         className={`space-y-3 text-[15px] leading-[1.85] text-secondary ${className}`}
       >
         {blocks.map((block, index) => {
-          const value = portableChildrenText(block);
+          const children = renderPortableChildren(block);
 
           if (block.listItem) {
+            const marker =
+              block.listItem === "number" ? `${index + 1}.` : "-";
+
             return (
               <p
                 className="pl-5 [text-indent:-1.25rem]"
                 key={block._key || index}
               >
-                <span className="pr-2">·</span>
-                {value}
+                <span className="pr-2">{marker}</span>
+                {children}
               </p>
             );
           }
 
-          if (block.style === "h3" || block.style === "h4") {
+          if (block.style === "h2" || block.style === "h3" || block.style === "h4") {
             return (
               <h3
                 className="pt-2 text-[16px] font-medium leading-7 text-primary"
                 key={block._key || index}
               >
-                {value}
+                {children}
               </h3>
             );
           }
 
           return (
             <p className="whitespace-pre-line" key={block._key || index}>
-              {value}
+              {children}
             </p>
           );
         })}
@@ -1271,6 +1335,248 @@ function ContactInfoSection({
   value: DetailValue;
 }) {
   return <CourseDetailTextSection title={labels.contact} value={value} />;
+}
+
+function fileUrl(resource: FileResource) {
+  return compactText(resource.externalUrl) || compactText(resource.file?.asset?.url);
+}
+
+function fileName(resource: FileResource, labels: (typeof copy)[Locale]) {
+  return (
+    compactText(resource.title) ||
+    compactText(resource.file?.asset?.originalFilename) ||
+    labels.resources
+  );
+}
+
+function fileTypeLabel(resource: FileResource) {
+  const explicitType = compactText(resource.type).toUpperCase();
+  const mimeType = compactText(resource.file?.asset?.mimeType);
+  const name = compactText(resource.file?.asset?.originalFilename);
+
+  if (explicitType) {
+    return explicitType;
+  }
+
+  if (mimeType.includes("pdf") || name.toLowerCase().endsWith(".pdf")) {
+    return "PDF";
+  }
+
+  if (mimeType || name) {
+    return mimeType || name.split(".").pop()?.toUpperCase() || "FILE";
+  }
+
+  return "LINK";
+}
+
+function isPdfResource(resource: FileResource) {
+  const url = fileUrl(resource).toLowerCase();
+  const type = compactText(resource.type).toLowerCase();
+  const mimeType = compactText(resource.file?.asset?.mimeType).toLowerCase();
+  const name = compactText(resource.file?.asset?.originalFilename).toLowerCase();
+
+  return (
+    type === "pdf" ||
+    mimeType.includes("pdf") ||
+    name.endsWith(".pdf") ||
+    url.includes(".pdf")
+  );
+}
+
+function AdvancedStudyImages({
+  images,
+  locale,
+  title,
+}: {
+  images?: SanityImage[] | null;
+  locale: Locale;
+  title: string;
+}) {
+  const visibleImages = (images || [])
+    .map((image) => ({
+      caption: imageCaption(image, locale),
+      src: imageUrl(image, 1400),
+    }))
+    .filter((item): item is { caption: string; src: string } =>
+      Boolean(item.src),
+    );
+
+  if (!visibleImages.length) {
+    return null;
+  }
+
+  return (
+    <section className="mt-10 space-y-8 lg:mt-12">
+      {visibleImages.map((item, index) => (
+        <figure className="mx-auto max-w-full text-center" key={`${item.src}-${index}`}>
+          <img
+            alt={`${title} ${index + 1}`}
+            className="mx-auto h-auto max-w-full rounded-[14px] border border-[var(--border)] bg-[var(--card)]"
+            loading="lazy"
+            src={item.src}
+          />
+          {item.caption ? (
+            <figcaption className="mx-auto mt-3 max-w-[760px] whitespace-pre-line text-left text-[13px] leading-[1.8] text-secondary">
+              {item.caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      ))}
+    </section>
+  );
+}
+
+function AdvancedStudyFiles({
+  labels,
+  resources,
+}: {
+  labels: (typeof copy)[Locale];
+  resources?: FileResource[] | null;
+}) {
+  const items = (resources || [])
+    .map((resource) => ({ resource, url: fileUrl(resource) }))
+    .filter((item) => item.url);
+
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <section className="mt-10 border-t border-[var(--border)] pt-8 lg:mt-12">
+      <h2 className="font-title text-[24px] font-normal leading-tight text-primary">
+        {labels.resources}
+      </h2>
+      <div className="mt-5 space-y-5">
+        {items.map(({ resource, url }, index) => {
+          const title = fileName(resource, labels);
+          const type = fileTypeLabel(resource);
+          const key = resource._key || `${url}-${index}`;
+          const shouldPreview = isPdfResource(resource);
+
+          return (
+            <article className="rounded-[16px] border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5" key={key}>
+              {shouldPreview ? (
+                <iframe
+                  className="mb-4 h-[520px] w-full rounded-[12px] border border-[var(--border)] bg-white"
+                  src={url}
+                  title={title}
+                />
+              ) : null}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <h3 className="break-words text-[15px] font-medium leading-6 text-primary">
+                    {title}
+                  </h3>
+                  <p className="mt-1 text-[12px] uppercase tracking-[0.18em] text-muted-token">
+                    {type}
+                  </p>
+                </div>
+                <div className="flex shrink-0 gap-4 text-[13px] text-muted-token">
+                  <Link
+                    className="transition hover:text-primary"
+                    href={url}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {labels.openFile}
+                  </Link>
+                  {resource.file?.asset?.url ? (
+                    <Link
+                      className="transition hover:text-primary"
+                      download
+                      href={resource.file.asset.url}
+                    >
+                      {labels.downloadFile}
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+export async function AdvancedStudyPage({ locale }: StudyPageProps) {
+  const programs = await client.fetch<StudyProgram[]>(
+    advancedStudyProgramsQuery,
+    { locale },
+    { cache: "no-store" },
+  );
+  const labels = copy[locale];
+
+  return (
+    <AppShell locale={locale}>
+      <PageContainer>
+        <PageHeader
+          titleEn={labels.advancedStudyEyebrow}
+          titleZh={labels.advancedStudyTitle}
+        />
+
+        {programs.length > 0 ? (
+          <ProgramSection
+            hrefPrefix="/study/advanced-study"
+            locale={locale}
+            programs={programs}
+            title={labels.featuredCourses}
+          />
+        ) : (
+          <div className="glass-card mt-8 rounded-[18px] p-6 text-sm leading-7 text-muted-token">
+            {labels.empty}
+          </div>
+        )}
+      </PageContainer>
+    </AppShell>
+  );
+}
+
+export async function AdvancedStudyDetailPage({
+  locale,
+  slug,
+}: StudyPageProps & {
+  slug: string;
+}) {
+  const program = await client.fetch<StudyProgramDetail | null>(
+    studyProgramBySlugQuery,
+    { locale, slug },
+    { cache: "no-store" },
+  );
+  const labels = copy[locale];
+  const item = program?.programType === "advanced-study" ? program : null;
+  const title = compactText(item?.title) || labels.empty;
+  const content = item?.content || item?.courseIntro || item?.description;
+
+  return (
+    <AppShell locale={locale}>
+      <PageContainer className="pb-16 lg:pb-20">
+        <Link
+          className="inline-flex items-center gap-2 text-[14px] leading-none text-muted-token transition hover:text-primary"
+          href={`/${locale}/study/advanced-study`}
+        >
+          <span aria-hidden="true">&larr;</span>
+          <span>{labels.advancedStudyBack}</span>
+        </Link>
+
+        <article className="mt-10 max-w-[980px]">
+          <h1 className="font-title text-[34px] font-normal leading-tight text-primary lg:text-[48px]">
+            {title}
+          </h1>
+          <DetailText
+            className="mt-8 max-w-[860px] text-[16px] leading-[1.95]"
+            text={content || labels.empty}
+          />
+          <AdvancedStudyImages
+            images={item?.courseImages}
+            locale={locale}
+            title={title}
+          />
+          <AdvancedStudyFiles labels={labels} resources={item?.fileResources} />
+        </article>
+      </PageContainer>
+    </AppShell>
+  );
 }
 
 export async function MasterclassPage({ locale }: StudyPageProps) {

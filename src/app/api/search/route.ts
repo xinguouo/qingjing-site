@@ -203,9 +203,17 @@ function studyHref(item: Record<string, unknown>, locale: Locale) {
     return null;
   }
 
-  return getString(item, "programType") === "international-study"
-    ? `/${locale}/study/international-study/${slug}`
-    : `/${locale}/study/masterclass/${slug}`;
+  const programType = getString(item, "programType");
+
+  if (programType === "advanced-study") {
+    return `/${locale}/study/advanced-study/${slug}`;
+  }
+
+  if (programType === "international-study") {
+    return null;
+  }
+
+  return `/${locale}/study/masterclass/${slug}`;
 }
 
 function eventHref(item: Record<string, unknown>, locale: Locale) {
@@ -348,7 +356,14 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
         item.teacherTeamZh as string,
         item.teacherTeamEn as string,
       ],
-      descriptionFields: [item.courseIntroZh, item.courseIntroEn],
+      descriptionFields: [
+        item.cardDescriptionZh,
+        item.cardDescriptionEn,
+        item.courseIntroZh,
+        item.courseIntroEn,
+        item.contentZh,
+        item.contentEn,
+      ],
     });
   });
 

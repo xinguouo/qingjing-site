@@ -1,5 +1,5 @@
-import { AdvancedStudyComingSoon } from "@/app/coming-soon-pages";
+import { AdvancedStudyPage } from "@/components/StudyPages";
 
-export default function Page() {
-  return <AdvancedStudyComingSoon />;
+export default async function Page() {
+  return <AdvancedStudyPage locale="en" />;
 }
