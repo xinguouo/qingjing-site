@@ -461,13 +461,8 @@ export function CourseCard({
         <h3 className="font-title line-clamp-2 text-[19px] font-normal leading-snug text-primary sm:text-[21px]">
           {title}
         </h3>
-        {intro ? (
-          <p className="mt-2.5 overflow-hidden text-[13px] leading-[1.55] text-secondary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
-            {intro}
-          </p>
-        ) : null}
         {academicSupport ? (
-          <div className="mt-auto pt-3.5">
+          <div className="mt-3">
             <p className="text-[13px] leading-none text-muted-token">
               {academicSupportLabel}
             </p>
@@ -475,6 +470,11 @@ export function CourseCard({
               {academicSupport}
             </p>
           </div>
+        ) : null}
+        {intro ? (
+          <p className="mt-auto overflow-hidden pt-4 text-[13px] leading-[1.6] text-secondary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
+            {intro}
+          </p>
         ) : null}
       </div>
     </>
@@ -1415,20 +1415,6 @@ function fileTypeLabel(resource: FileResource) {
   return "LINK";
 }
 
-function isPdfResource(resource: FileResource) {
-  const url = fileUrl(resource).toLowerCase();
-  const type = compactText(resource.type).toLowerCase();
-  const mimeType = compactText(resource.file?.asset?.mimeType).toLowerCase();
-  const name = compactText(resource.file?.asset?.originalFilename).toLowerCase();
-
-  return (
-    type === "pdf" ||
-    mimeType.includes("pdf") ||
-    name.endsWith(".pdf") ||
-    url.includes(".pdf")
-  );
-}
-
 function AdvancedStudyImages({
   images,
   locale,
@@ -1497,17 +1483,9 @@ function AdvancedStudyFiles({
           const title = fileName(resource, labels);
           const type = fileTypeLabel(resource);
           const key = resource._key || `${url}-${index}`;
-          const shouldPreview = isPdfResource(resource);
 
           return (
             <article className="rounded-[16px] border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5" key={key}>
-              {shouldPreview ? (
-                <iframe
-                  className="mb-4 h-[520px] w-full rounded-[12px] border border-[var(--border)] bg-white"
-                  src={url}
-                  title={title}
-                />
-              ) : null}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <h3 className="break-words text-[15px] font-medium leading-6 text-primary">
@@ -1521,7 +1499,7 @@ function AdvancedStudyFiles({
                   <Link
                     className="transition hover:text-primary"
                     href={url}
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     target="_blank"
                   >
                     {labels.openFile}
