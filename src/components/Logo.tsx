@@ -82,8 +82,13 @@ export function Logo({
         ? fallbackSanityUrl
         : null;
   const shouldUseSanity = Boolean(sanityUrl);
+  const logoRequestFinished = images !== undefined;
   const publicSrc = publicLogoSources[publicIndex];
-  const imageSrc = shouldUseSanity ? sanityUrl : publicSrc;
+  const imageSrc = shouldUseSanity
+    ? sanityUrl
+    : logoRequestFinished
+      ? publicSrc
+      : null;
   const homeHref = locale === "en" ? "/en" : "/zh";
 
   const textFallback = (
@@ -111,7 +116,14 @@ export function Logo({
       className={`flex min-w-0 items-center ${className}`}
       href={homeHref}
     >
-      {imageSrc ? (
+      {!imageSrc && !logoRequestFinished ? (
+        <span
+          aria-hidden="true"
+          className={`block ${
+            variant === "mobile" ? "h-9 w-[190px]" : "h-9 w-[178px]"
+          }`}
+        />
+      ) : imageSrc ? (
         <img
           alt={siteName?.trim() || labels.brandZh}
           className={`w-auto object-contain object-left ${

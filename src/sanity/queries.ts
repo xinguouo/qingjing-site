@@ -165,7 +165,7 @@ const studyProgramCardFields = `
   ),
   "academicHost": ${localizedText("academicHostEn", "academicHostZh")},
   "academicSupport": ${localizedText("academicHostEn", "academicHostZh")},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -291,7 +291,7 @@ const experienceCourseFields = `
   schedule,
   location,
   contact,
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -316,9 +316,6 @@ const advancedStudyPageFields = `
   pageTitleZh,
   pageTitleEn,
   "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
-  pastReviewTitleZh,
-  pastReviewTitleEn,
-  "pastReviewTitle": ${localizedText("pastReviewTitleEn", "pastReviewTitleZh")},
   pastReviewItems[]{
     _key,
     image{${imageFields}},
@@ -359,7 +356,7 @@ const artWorkCardFields = `
   importSource,
   needsReview,
   importNotes,
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -440,7 +437,7 @@ const productCardFields = `
   needsReview,
   importNotes,
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -532,7 +529,7 @@ const homeProductReferenceFields = `
   needsReview,
   importNotes,
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -555,7 +552,7 @@ const artworkProductFields = `
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -623,7 +620,7 @@ const productCollectionFields = `
   status,
   needsReview,
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -672,7 +669,7 @@ const productDetailFields = `
     },
     ${shopTaxonomyFields}
   },
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -692,7 +689,7 @@ const artDerivativeDetailFields = `
   packagingImages[]{${imageFields}},
   video{${productVideoFields}},
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -730,7 +727,7 @@ const artDerivativeDetailCardFields = `
   descriptionEn,
   "description": ${localizedText("descriptionEn", "descriptionZh")},
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 `;
 
@@ -1074,21 +1071,21 @@ export const residencyPageQuery = defineQuery(`*[_type == "residencyPage"][0]{
 }`);
 
 export const studyProgramsQuery =
-  defineQuery(`*[_type == "studyProgram"] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  defineQuery(`*[_type == "studyProgram"] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
 export const studyProgramsByTypeQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == $programType
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
 export const internationalMasterclassProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == "international-masterclass"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
@@ -1115,8 +1112,8 @@ export const studyMasterclassPageQuery = defineQuery(`*[
 export const advancedStudyProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
   programType == "advanced-study" &&
-  !(_id in path("drafts.**"))
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc) {
+  ${publishedDocumentFilter}
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${studyProgramCardFields}
 }`);
 
@@ -1249,7 +1246,7 @@ export const offlineWorkshopBySlugQuery = defineQuery(`*[
 export const experienceCoursesQuery = defineQuery(`*[
   _type == "experienceCourse" &&
   !(_id in path("drafts.**"))
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc) {
   ${experienceCourseFields}
 }`);
 
@@ -1270,7 +1267,7 @@ export const offlineExperiencePageQuery = defineQuery(`*[
 export const artWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter}
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`);
 
@@ -1278,7 +1275,7 @@ export const artWorksByTypeQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == $workType
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`);
 
@@ -1286,7 +1283,7 @@ export const sculptureWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "sculpture"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`);
 
@@ -1294,7 +1291,7 @@ export const installationArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "installation-art"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`);
 
@@ -1302,7 +1299,7 @@ export const publicArtWorksQuery = defineQuery(`*[
   (_type == "artWork" || _type == "artProject") &&
   ${publishedArtWorkFilter} &&
   coalesce(category, workType, projectType) == "public-art"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artWorkCardFields}
 }`);
 
@@ -1375,7 +1372,7 @@ export const artCategoryArtworkBySlugQuery = defineQuery(`*[
 export const productsQuery = defineQuery(`*[
   _type == "product" &&
   coalesce(needsReview, false) != true
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${productCardFields}
 }`);
 
@@ -1389,7 +1386,7 @@ export const productsByTypeQuery = defineQuery(`*[
     ($productType == "derivatives" && productType in ["derivatives", "art-derivatives", "art-merchandise"]) ||
     ($productType == "art-derivatives" && productType in ["derivatives", "art-derivatives", "art-merchandise"])
   )
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${productCardFields}
 }`);
 
@@ -1398,7 +1395,7 @@ export const productsByDerivativeCategoryQuery = defineQuery(`*[
   coalesce(needsReview, false) != true &&
   productType in ["derivatives", "art-derivatives", "art-merchandise"] &&
   derivativeCategory == $derivativeCategory
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${productCardFields}
 }`);
 
@@ -1426,13 +1423,13 @@ export const artDerivativeDetailsForCardsQuery = defineQuery(`*[
   _type == "artDerivativeDetail" &&
   coalesce(needsReview, false) != true &&
   defined(slug.current)
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artDerivativeDetailCardFields}
 }`);
 
 export const artworkProductsQuery = defineQuery(`*[
   _type == "artworkProduct"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${artworkProductFields}
 }`);
 
@@ -1446,7 +1443,7 @@ export const artworkProductBySlugQuery = defineQuery(`*[
 export const derivativeProductsQuery = defineQuery(`*[
   _type == "derivativeProduct" &&
   coalesce(needsReview, false) != true
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${derivativeProductFields}
 }`);
 
@@ -1468,7 +1465,7 @@ export const productCollectionsQuery = defineQuery(`*[
   _type == "productCollection" &&
   coalesce(needsReview, false) != true &&
   coalesce(status, "visible") != "hidden"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   ${productCollectionFields}
 }`);
 
@@ -1510,25 +1507,25 @@ export const storeOverviewQuery = defineQuery(`{
     _type == "productCollection" &&
     coalesce(needsReview, false) != true &&
     coalesce(status, "visible") != "hidden"
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${productCollectionFields}
   },
   "productDocuments": *[
     _type == "product" &&
     coalesce(needsReview, false) != true
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${productCardFields}
   },
   "artDerivativeDetails": *[
     _type == "artDerivativeDetail" &&
     coalesce(needsReview, false) != true &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${artDerivativeDetailCardFields}
   },
   "artworkDetailProducts": *[
     ${canonicalProductDetailFilter}
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     _id,
     "category": "artwork",
     "productType": "artworks",
@@ -1547,7 +1544,7 @@ export const storeOverviewQuery = defineQuery(`{
     "price": commerce.price,
     "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
     ${shopTaxonomyFields},
-    "orderRank": _orderRank,
+    "orderRank": orderRank,
     order
   },
   "packagingPage": *[
@@ -1599,7 +1596,7 @@ export const productDetailBySlugQuery = defineQuery(`*[
 
 export const productDetailsForCardsQuery = defineQuery(`*[
   ${canonicalProductDetailFilter}
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
   _id,
   "category": "artwork",
   "productType": "artworks",
@@ -1618,7 +1615,7 @@ export const productDetailsForCardsQuery = defineQuery(`*[
   "price": commerce.price,
   "title": ${localizedText("basicInfo.titleEn", "basicInfo.titleZh")},
   ${shopTaxonomyFields},
-  "orderRank": _orderRank,
+  "orderRank": orderRank,
   order
 }`);
 
@@ -1648,7 +1645,7 @@ export const siteSearchContentQuery = defineQuery(`{
     ${publishedDocumentFilter} &&
     ${publishedArtWorkFilter} &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     _id,
     "_type": _type,
     titleZh,
@@ -1753,7 +1750,7 @@ export const siteSearchContentQuery = defineQuery(`{
   },
   "productDetails": *[
     ${canonicalProductDetailFilter}
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     _id,
     "slug": slug.current,
     "productType": "artworks",
@@ -1773,7 +1770,7 @@ export const siteSearchContentQuery = defineQuery(`{
     ${publishedDocumentFilter} &&
     coalesce(needsReview, false) != true &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${productCardFields}
   },
   "derivativeProducts": *[
@@ -1790,14 +1787,14 @@ export const siteSearchContentQuery = defineQuery(`{
     ${publishedDocumentFilter} &&
     coalesce(needsReview, false) != true &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${artDerivativeDetailCardFields}
   },
   "artworkProducts": *[
     _type == "artworkProduct" &&
     ${publishedDocumentFilter} &&
     defined(slug.current)
-  ] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  ] | order(coalesce(orderRank, "zzzzzzzzzz") asc, order asc) {
     ${artworkProductFields}
   },
   "teamMembers": *[

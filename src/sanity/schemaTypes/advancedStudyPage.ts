@@ -8,7 +8,7 @@ export const advancedStudyPage = defineType({
   type: 'document',
   groups: [
     {name: 'page', title: '页面标题 / Page Title', default: true},
-    {name: 'review', title: '往期回顾 / Past Review'},
+    {name: 'review', title: '往期回顾图片 / Past Review Images'},
   ],
   fields: [
     defineField({
@@ -22,19 +22,6 @@ export const advancedStudyPage = defineType({
       title: 'Page Title (English)',
       type: 'string',
       group: 'page',
-    }),
-    defineField({
-      name: 'pastReviewTitleZh',
-      title: '往期回顾标题（中文） / Past Review Title Zh',
-      type: 'string',
-      group: 'review',
-    }),
-    defineField({
-      name: 'pastReviewTitleEn',
-      title: 'Past Review Title En',
-      type: 'string',
-      group: 'review',
-      description: 'If empty, fallback to Chinese content.',
     }),
     defineField({
       name: 'pastReviewItems',

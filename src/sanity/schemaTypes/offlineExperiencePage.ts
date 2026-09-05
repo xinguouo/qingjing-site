@@ -8,7 +8,7 @@ export const offlineExperiencePage = defineType({
   type: "document",
   groups: [
     { name: "page", title: "页面标题 / Page Title", default: true },
-    { name: "review", title: "往期回顾 / Past Review" },
+    { name: "review", title: "往期回顾图片 / Past Review Images" },
   ],
   fields: [
     defineField({

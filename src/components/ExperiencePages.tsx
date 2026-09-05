@@ -333,11 +333,7 @@ export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.sectionEn;
   const featuredTitle =
     locale === "zh" ? "\u7cbe\u9009\u8bfe\u7a0b" : "Featured Courses";
-  const configuredPastReviews =
-    pageData?.pastReviewItems?.filter(Boolean) || [];
-  const pastReviewItems = configuredPastReviews.length
-    ? configuredPastReviews
-    : experiencePastReviewFallback(items);
+  const pastReviewItems = pageData?.pastReviewItems?.filter(Boolean) || [];
 
   return (
     <AppShell locale={locale}>

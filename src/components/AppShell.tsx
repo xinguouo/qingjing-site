@@ -19,13 +19,21 @@ type AppShellProps = {
     | ArtCategoryTitleMap
     | null;
   children: ReactNode;
+  initialLogoImages?: SidebarLogoImages | null;
   locale: Locale;
 };
 
-export function AppShell({ artCategorySettings, children, locale }: AppShellProps) {
+export function AppShell({
+  artCategorySettings,
+  children,
+  initialLogoImages,
+  locale,
+}: AppShellProps) {
   const resolvedArtCategorySettings =
     useArtCategorySettings(artCategorySettings);
-  const [logoImages, setLogoImages] = useState<SidebarLogoImages | null>(null);
+  const [logoImages, setLogoImages] = useState<
+    SidebarLogoImages | null | undefined
+  >(initialLogoImages);
 
   useEffect(() => {
     let active = true;

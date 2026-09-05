@@ -4,9 +4,10 @@ import { client } from "@/sanity/client";
 import { sidebarLogoQuery } from "@/sanity/queries";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
-  const logos = await client.fetch(
+  const logos = await client.withConfig({ useCdn: false }).fetch(
     sidebarLogoQuery,
     {},
     { cache: "no-store" },

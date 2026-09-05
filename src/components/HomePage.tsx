@@ -1,7 +1,13 @@
 import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
 
-import type {ArtCategoryTitleSettings} from "@/config/artCategories";
+import {
+  isArtCategorySlug,
+  resolveArtCategorySettingsMap,
+  resolveArtCategoryTitle,
+  type ArtCategoryTitleMap,
+  type ArtCategoryTitleSettings,
+} from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
@@ -10,7 +16,6 @@ import { homePageQuery } from "@/sanity/queries";
 import { AppShell } from "./AppShell";
 import {
   getArtworkImageSource,
-  isArtCategorySlug,
   type Artwork,
 } from "./ArtCategoryPage";
 import { HeroBanner, type HeroBannerSlide } from "./HeroBanner";
@@ -28,6 +33,7 @@ type HomeCardItem = {
   content?: string | null;
   coverImage?: SanityImage;
   courseIntro?: string | null;
+  description?: string | null;
   eventType?: string | null;
   faculty?: string | null;
   posterImage?: SanityImage;
@@ -39,12 +45,14 @@ type HomeCardItem = {
 type HomeProduct = {
   _id?: string;
   coverImage?: SanityImage;
+  derivativeCategory?: string | null;
   description?: string | null;
   galleryImages?: SanityImage[] | null;
   images?: SanityImage[] | null;
   price?: string | number | null;
   productType?: string | null;
   slug?: string | null;
+  subcategory?: string | null;
   title?: string | null;
 };
 
@@ -57,6 +65,7 @@ type QuickEntry = {
 
 type HomePageData = {
   artCategories?: ArtCategoryTitleSettings[] | null;
+  blackSidebarLogo?: SanityImage;
   featuredArtWorks?: Artwork[] | null;
   featuredArtWorksTitle?: string | null;
   featuredEvents?: HomeCardItem[] | null;
@@ -71,6 +80,7 @@ type HomePageData = {
   heroTitle?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
   quickEntries?: QuickEntry[] | null;
+  whiteSidebarLogo?: SanityImage;
 };
 
 type HomePageProps = {
@@ -222,8 +232,12 @@ function artworkHref(item: Artwork, locale: Locale) {
 
 function mapHomeItemToCourseCard(item: HomeCardItem): StudyProgram {
   const description =
-    compactText(item.courseIntro) || compactText(item.content) || null;
-  const academicSupport = compactText(item.faculty) || null;
+    compactText(item.description) ||
+    compactText(item.courseIntro) ||
+    compactText(item.content) ||
+    null;
+  const academicSupport =
+    item.programType === "advanced-study" ? null : compactText(item.faculty) || null;
 
   return {
     _id: item._id || item.slug || "home-featured-card",
@@ -238,6 +252,46 @@ function mapHomeItemToCourseCard(item: HomeCardItem): StudyProgram {
     slug: item.slug,
     title: compactText(item.title) || null,
   };
+}
+
+function derivativeTypeLabel(value: string | null | undefined, locale: Locale) {
+  const key = compactText(value);
+  const labels: Record<string, { en: string; zh: string }> = {
+    vessel: { en: "Vessel", zh: "\u5668\u7269" },
+    "\u5668\u7269": { en: "Vessel", zh: "\u5668\u7269" },
+    wearable: { en: "Wearable", zh: "\u8096\u7269" },
+    "\u8096\u7269": { en: "Wearable", zh: "\u8096\u7269" },
+    toy: { en: "Toy", zh: "\u73a9\u7269" },
+    "\u73a9\u7269": { en: "Toy", zh: "\u73a9\u7269" },
+    ornament: { en: "Ornament", zh: "\u9970\u7269" },
+    "\u9970\u7269": { en: "Ornament", zh: "\u9970\u7269" },
+    object: { en: "Object", zh: "\u5883\u7269" },
+    "\u5883\u7269": { en: "Object", zh: "\u5883\u7269" },
+    packaging: { en: "Packaging", zh: "\u5305\u88c5" },
+    "\u5305\u88c5": { en: "Packaging", zh: "\u5305\u88c5" },
+  };
+  const label = labels[key];
+
+  return label ? label[locale] : key;
+}
+
+function productTypeLabel(item: HomeProduct, locale: Locale) {
+  if (item.productType === "derivatives") {
+    return (
+      derivativeTypeLabel(item.subcategory || item.derivativeCategory, locale) ||
+      (locale === "zh" ? "\u827a\u672f\u884d\u751f\u54c1" : "Art Derivatives")
+    );
+  }
+
+  if (item.productType === "artworks") {
+    return locale === "zh" ? "\u5728\u552e\u827a\u672f\u5546\u54c1" : "Available Art Goods";
+  }
+
+  if (item.productType === "cultural") {
+    return locale === "zh" ? "\u6587\u521b\u54c1" : "Cultural Products";
+  }
+
+  return compactText(item.productType);
 }
 
 function defaultQuickEntries(locale: Locale): QuickEntry[] {
@@ -389,13 +443,10 @@ function HomeProductCard({
   locale: Locale;
 }) {
   const labels = homeCopy[locale];
+
   return (
     <HomeFeatureCard
-      description={
-        compactText(item.description) ||
-        compactText(item.price) ||
-        labels.productFallbackDescription
-      }
+      description={productTypeLabel(item, locale)}
       href={productHref(item, locale)}
       image={item.coverImage || item.galleryImages?.[0] || item.images?.[0]}
       locale={locale}
@@ -406,9 +457,11 @@ function HomeProductCard({
 
 function HomeArtworkFeatureCard({
   artwork,
+  artCategorySettings,
   locale,
 }: {
   artwork: Artwork;
+  artCategorySettings?: ArtCategoryTitleMap | null;
   locale: Locale;
 }) {
   const title =
@@ -416,9 +469,10 @@ function HomeArtworkFeatureCard({
     compactText(locale === "zh" ? artwork.titleZh : artwork.titleEn) ||
     compactText(artwork.titleZh) ||
     compactText(artwork.titleEn);
-  const description =
-    compactText(artwork.description) ||
-    compactText(artwork.dimensions || artwork.size);
+  const category = artwork.category || artwork.workType || "";
+  const description = isArtCategorySlug(category)
+    ? resolveArtCategoryTitle(category, locale, artCategorySettings)
+    : compactText(category);
 
   return (
     <HomeFeatureCard
@@ -488,10 +542,12 @@ function CourseCarousel({
 }
 
 function ArtworkCarousel({
+  artCategorySettings,
   artworks,
   locale,
   title,
 }: {
+  artCategorySettings?: ArtCategoryTitleMap | null;
   artworks: Artwork[];
   locale: Locale;
   title: string;
@@ -503,6 +559,7 @@ function ArtworkCarousel({
     .slice(0, 8)
     .map((artwork, index) => (
       <HomeArtworkFeatureCard
+        artCategorySettings={artCategorySettings}
         artwork={artwork}
         key={`${artwork._id || artwork.slug || "home-artwork"}-${index}`}
         locale={locale}
@@ -561,7 +618,7 @@ export async function HomePage({ locale }: HomePageProps) {
   let homePage: HomePageData | null = null;
 
   try {
-    homePage = await client.fetch<HomePageData | null>(
+    homePage = await client.withConfig({ useCdn: false }).fetch<HomePageData | null>(
       homePageQuery,
       { locale },
       { cache: "no-store" },
@@ -580,10 +637,21 @@ export async function HomePage({ locale }: HomePageProps) {
     homePage?.heroImage;
   const title = compactText(homePage?.heroTitle);
   const subtitle = compactText(homePage?.heroSubtitle);
+  const artCategorySettingsMap = resolveArtCategorySettingsMap(
+    homePage?.artCategories,
+  );
 
   return (
     <AppShell
-      artCategorySettings={homePage?.artCategories}
+      artCategorySettings={artCategorySettingsMap}
+      initialLogoImages={
+        homePage
+          ? {
+              blackSidebarLogo: homePage.blackSidebarLogo,
+              whiteSidebarLogo: homePage.whiteSidebarLogo,
+            }
+          : undefined
+      }
       locale={locale}
     >
       <div className="page-surface">
@@ -634,6 +702,7 @@ export async function HomePage({ locale }: HomePageProps) {
             />
 
             <ArtworkCarousel
+              artCategorySettings={artCategorySettingsMap}
               artworks={homePage?.featuredArtWorks?.filter(Boolean) || []}
               locale={locale}
               title={sectionTitle(

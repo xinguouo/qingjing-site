@@ -144,7 +144,6 @@ type AdvancedStudyPageData = {
   pageTitleEn?: string | null;
   pageTitleZh?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
-  pastReviewTitle?: string | null;
 };
 
 function masterclassPastReviewFallback(
@@ -1562,8 +1561,7 @@ export async function AdvancedStudyPage({ locale }: StudyPageProps) {
   const labels = copy[locale];
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.advancedStudyTitle;
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.advancedStudyEyebrow;
-  const pastReviewItems =
-    pageData?.pastReviewItems?.filter(Boolean) || masterclassPastReviewFallback(programs);
+  const pastReviewItems = pageData?.pastReviewItems?.filter(Boolean) || [];
 
   return (
     <AppShell locale={locale}>
@@ -1586,7 +1584,7 @@ export async function AdvancedStudyPage({ locale }: StudyPageProps) {
           itemsPerViewDesktop={3}
           itemsPerViewMobile={1}
           locale={locale}
-          title={compactText(pageData?.pastReviewTitle) || labels.pastReview}
+          title={labels.pastReview}
         />
       </PageContainer>
     </AppShell>
