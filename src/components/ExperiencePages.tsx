@@ -85,7 +85,6 @@ type EventExperienceCourse = {
 };
 
 type OfflineExperiencePageData = {
-  courses?: ExperienceCourse[] | null;
   pageTitleEn?: string | null;
   pageTitleZh?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
@@ -313,24 +312,23 @@ function experiencePastReviewFallback(
 
 export async function ExperienceCoursePage({ locale }: ExperiencePageProps) {
   const [pageData, courseDocuments] = await Promise.all([
-    client.fetch<OfflineExperiencePageData | null>(
-      offlineExperiencePageQuery,
-      { locale },
-      { cache: "no-store" },
-    ),
-    client.fetch<ExperienceCourse[]>(
-      experienceCoursesQuery,
-      { locale },
-      { cache: "no-store" },
-    ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<OfflineExperiencePageData | null>(
+        offlineExperiencePageQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<ExperienceCourse[]>(
+        experienceCoursesQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
   ]);
   const labels = copy[locale];
-  const pageCourses = pageData?.courses?.filter(Boolean) || [];
-  const items = courseDocuments.length
-    ? courseDocuments
-    : pageCourses.length
-      ? pageCourses
-      : fallbackCourses[locale];
+  const items = courseDocuments.filter(Boolean);
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.pageTitle;
   const pageTitleEn = compactText(pageData?.pageTitleEn) || labels.sectionEn;
   const featuredTitle =

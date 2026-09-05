@@ -1544,16 +1544,20 @@ export function CourseDetailContent({
 
 export async function AdvancedStudyPage({ locale }: StudyPageProps) {
   const [programs, pageData] = await Promise.all([
-    client.fetch<StudyProgram[]>(
-      advancedStudyProgramsQuery,
-      { locale },
-      { cache: "no-store" },
-    ),
-    client.fetch<AdvancedStudyPageData | null>(
-      advancedStudyPageQuery,
-      { locale },
-      { cache: "no-store" },
-    ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<StudyProgram[]>(
+        advancedStudyProgramsQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<AdvancedStudyPageData | null>(
+        advancedStudyPageQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
   ]);
   const labels = copy[locale];
   const pageTitleZh = compactText(pageData?.pageTitleZh) || labels.advancedStudyTitle;

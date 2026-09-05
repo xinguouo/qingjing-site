@@ -299,22 +299,6 @@ const offlineExperiencePageFields = `
   pageTitleZh,
   pageTitleEn,
   "pageTitle": ${localizedText("pageTitleEn", "pageTitleZh")},
-  courses[]{
-    _key,
-    _type,
-    titleZh,
-    titleEn,
-    "title": ${localizedText("titleEn", "titleZh")},
-    "slug": slug.current,
-    coverImage{${imageFields}},
-    descriptionZh,
-    descriptionEn,
-    "description": ${localizedText("descriptionEn", "descriptionZh")},
-    "shortDescription": ${localizedText("descriptionEn", "descriptionZh")},
-    supportTeacher,
-    "academicHost": supportTeacher,
-    "academicSupport": supportTeacher
-  },
   pastReviewItems[]{
     _key,
     image{${imageFields}},
@@ -1130,8 +1114,9 @@ export const studyMasterclassPageQuery = defineQuery(`*[
 
 export const advancedStudyProgramsQuery = defineQuery(`*[
   _type == "studyProgram" &&
-  programType == "advanced-study"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  programType == "advanced-study" &&
+  !(_id in path("drafts.**"))
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc) {
   ${studyProgramCardFields}
 }`);
 
@@ -1262,8 +1247,9 @@ export const offlineWorkshopBySlugQuery = defineQuery(`*[
 }`);
 
 export const experienceCoursesQuery = defineQuery(`*[
-  _type == "experienceCourse"
-] | order(coalesce(_orderRank, "zzzzzzzzzz") asc, order asc) {
+  _type == "experienceCourse" &&
+  !(_id in path("drafts.**"))
+] | order(coalesce(_orderRank, "zzzzzzzzzz") asc) {
   ${experienceCourseFields}
 }`);
 
