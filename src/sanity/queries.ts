@@ -842,6 +842,8 @@ export const homePageQuery = defineQuery(`*[
 ][0]{
   whiteSidebarLogo{${imageFields}},
   blackSidebarLogo{${imageFields}},
+  "whiteSidebarLogoUrl": whiteSidebarLogo.asset->url,
+  "blackSidebarLogoUrl": blackSidebarLogo.asset->url,
   heroTitleZh,
   heroTitleEn,
   "heroTitle": ${localizedText("heroTitleEn", "heroTitleZh")},
@@ -916,7 +918,9 @@ export const sidebarLogoQuery = defineQuery(`*[
   !(_id in path("drafts.**"))
 ][0]{
   whiteSidebarLogo{${imageFields}},
-  blackSidebarLogo{${imageFields}}
+  blackSidebarLogo{${imageFields}},
+  "whiteSidebarLogoUrl": whiteSidebarLogo.asset->url,
+  "blackSidebarLogoUrl": blackSidebarLogo.asset->url
 }`);
 
 export const aboutMissionPageQuery = defineQuery(`{

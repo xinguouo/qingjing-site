@@ -39,15 +39,15 @@ export function AppShell({
     let active = true;
 
     fetch("/api/sidebar-logo", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : null))
+      .then((response) => (response.ok ? response.json() : undefined))
       .then((data: SidebarLogoImages | null) => {
-        if (active) {
+        if (active && data !== undefined) {
           setLogoImages(data);
         }
       })
       .catch(() => {
-        if (active) {
-          setLogoImages(null);
+        if (active && initialLogoImages !== undefined) {
+          setLogoImages(initialLogoImages);
         }
       });
 

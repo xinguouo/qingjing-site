@@ -66,6 +66,7 @@ type QuickEntry = {
 type HomePageData = {
   artCategories?: ArtCategoryTitleSettings[] | null;
   blackSidebarLogo?: SanityImage;
+  blackSidebarLogoUrl?: string | null;
   featuredArtWorks?: Artwork[] | null;
   featuredArtWorksTitle?: string | null;
   featuredEvents?: HomeCardItem[] | null;
@@ -81,6 +82,7 @@ type HomePageData = {
   pastReviewItems?: PastReviewItem[] | null;
   quickEntries?: QuickEntry[] | null;
   whiteSidebarLogo?: SanityImage;
+  whiteSidebarLogoUrl?: string | null;
 };
 
 type HomePageProps = {
@@ -379,17 +381,23 @@ function HomeFeatureCard({
   href,
   image,
   locale,
+  metaLabel,
+  metaValue,
   title,
 }: {
   description?: string | number | null;
   href?: string | null;
   image?: SanityImage;
   locale: Locale;
+  metaLabel?: string | null;
+  metaValue?: string | null;
   title?: string | null;
 }) {
   const labels = homeCopy[locale];
   const cardTitle = compactText(title);
   const cardDescription = compactText(description);
+  const cardMetaLabel = compactText(metaLabel);
+  const cardMetaValue = compactText(metaValue);
   const src = imageUrl(image, 720);
   const content = (
     <article
@@ -416,6 +424,16 @@ function HomeFeatureCard({
           <h3 className="font-title line-clamp-2 text-[19px] font-normal leading-snug text-primary sm:text-[21px]">
             {cardTitle}
           </h3>
+        ) : null}
+        {cardMetaLabel && cardMetaValue ? (
+          <div className="mt-3">
+            <p className="text-[13px] leading-none text-muted-token">
+              {cardMetaLabel}
+            </p>
+            <p className="mt-2 line-clamp-1 text-[14px] leading-[1.55] text-primary">
+              {cardMetaValue}
+            </p>
+          </div>
         ) : null}
         {cardDescription ? (
           <p className="mt-2.5 overflow-hidden text-[13px] leading-[1.55] text-secondary [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
@@ -446,10 +464,11 @@ function HomeProductCard({
 
   return (
     <HomeFeatureCard
-      description={productTypeLabel(item, locale)}
       href={productHref(item, locale)}
       image={item.coverImage || item.galleryImages?.[0] || item.images?.[0]}
       locale={locale}
+      metaLabel={locale === "zh" ? "\u7c7b\u578b" : "Type"}
+      metaValue={productTypeLabel(item, locale)}
       title={compactText(item.title) || labels.featuredProducts}
     />
   );
@@ -470,16 +489,17 @@ function HomeArtworkFeatureCard({
     compactText(artwork.titleZh) ||
     compactText(artwork.titleEn);
   const category = artwork.category || artwork.workType || "";
-  const description = isArtCategorySlug(category)
+  const typeValue = isArtCategorySlug(category)
     ? resolveArtCategoryTitle(category, locale, artCategorySettings)
     : compactText(category);
 
   return (
     <HomeFeatureCard
-      description={description}
       href={artworkHref(artwork, locale)}
       image={artwork.coverImage || getArtworkImageSource(artwork.images?.[0])}
       locale={locale}
+      metaLabel={locale === "zh" ? "\u7c7b\u578b" : "Type"}
+      metaValue={typeValue}
       title={title}
     />
   );
@@ -648,7 +668,9 @@ export async function HomePage({ locale }: HomePageProps) {
         homePage
           ? {
               blackSidebarLogo: homePage.blackSidebarLogo,
+              blackSidebarLogoUrl: homePage.blackSidebarLogoUrl,
               whiteSidebarLogo: homePage.whiteSidebarLogo,
+              whiteSidebarLogoUrl: homePage.whiteSidebarLogoUrl,
             }
           : undefined
       }

@@ -165,7 +165,6 @@ export const experienceCourse = defineType({
     prepare({title, media}) {
       return {
         title,
-        subtitle: '线下体验 / Offline Experience',
         media,
       }
     },

@@ -2,7 +2,7 @@
 
 import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import type { Locale } from "@/config/navigation";
 import { urlForImage } from "@/sanity/image";
@@ -19,7 +19,9 @@ type LogoProps = {
 
 export type SidebarLogoImages = {
   blackSidebarLogo?: SanityImageSource | null;
+  blackSidebarLogoUrl?: string | null;
   whiteSidebarLogo?: SanityImageSource | null;
+  whiteSidebarLogoUrl?: string | null;
 };
 
 const publicLogoSources = [
@@ -57,37 +59,33 @@ export function Logo({
   variant = "desktop",
 }: LogoProps) {
   const { mode, mounted } = useTheme();
-  const [failedSanityUrl, setFailedSanityUrl] = useState<string | null>(null);
-  const [publicIndex, setPublicIndex] = useState(0);
-  const preferredLogo =
-    mounted && mode === "dark"
-      ? images?.whiteSidebarLogo
-      : images?.blackSidebarLogo;
-  const fallbackLogo =
-    mounted && mode === "dark"
-      ? images?.blackSidebarLogo
-      : images?.whiteSidebarLogo;
+  const shouldUseWhiteLogo = mounted ? mode === "dark" : true;
+  const preferredLogo = shouldUseWhiteLogo
+    ? images?.whiteSidebarLogo
+    : images?.blackSidebarLogo;
+  const fallbackLogo = shouldUseWhiteLogo
+    ? images?.blackSidebarLogo
+    : images?.whiteSidebarLogo;
+  const preferredLogoUrl = shouldUseWhiteLogo
+    ? images?.whiteSidebarLogoUrl
+    : images?.blackSidebarLogoUrl;
+  const fallbackLogoUrl = shouldUseWhiteLogo
+    ? images?.blackSidebarLogoUrl
+    : images?.whiteSidebarLogoUrl;
   const preferredSanityUrl = useMemo(
-    () => getSanityLogoUrl(preferredLogo || image),
-    [image, preferredLogo],
+    () => preferredLogoUrl || getSanityLogoUrl(preferredLogo || image),
+    [image, preferredLogo, preferredLogoUrl],
   );
   const fallbackSanityUrl = useMemo(
-    () => getSanityLogoUrl(fallbackLogo),
-    [fallbackLogo],
+    () => fallbackLogoUrl || getSanityLogoUrl(fallbackLogo),
+    [fallbackLogo, fallbackLogoUrl],
   );
-  const sanityUrl =
-    preferredSanityUrl && preferredSanityUrl !== failedSanityUrl
-      ? preferredSanityUrl
-      : fallbackSanityUrl && fallbackSanityUrl !== failedSanityUrl
-        ? fallbackSanityUrl
-        : null;
-  const shouldUseSanity = Boolean(sanityUrl);
+  const sanityUrl = preferredSanityUrl || fallbackSanityUrl;
   const logoRequestFinished = images !== undefined;
-  const publicSrc = publicLogoSources[publicIndex];
-  const imageSrc = shouldUseSanity
+  const imageSrc = sanityUrl
     ? sanityUrl
     : logoRequestFinished
-      ? publicSrc
+      ? publicLogoSources[0]
       : null;
   const homeHref = locale === "en" ? "/en" : "/zh";
 
@@ -126,17 +124,9 @@ export function Logo({
       ) : imageSrc ? (
         <img
           alt={siteName?.trim() || labels.brandZh}
-          className={`w-auto object-contain object-left ${
-            variant === "mobile" ? "max-h-9 max-w-[190px]" : "max-h-9 max-w-[178px]"
+          className={`h-auto w-auto object-contain object-left ${
+            variant === "mobile" ? "max-h-10 max-w-[210px]" : "max-h-10 max-w-[188px]"
           }`}
-          onError={() => {
-            if (shouldUseSanity) {
-              setFailedSanityUrl(sanityUrl);
-              return;
-            }
-
-            setPublicIndex((index) => index + 1);
-          }}
           src={imageSrc}
         />
       ) : (
