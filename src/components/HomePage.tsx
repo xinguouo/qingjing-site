@@ -10,6 +10,10 @@ import {
 } from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
 import {
+  internalPageHref,
+  type InternalPageTarget,
+} from "@/config/internalPages";
+import {
   resolvePageTitle,
   type PageTitleMap,
 } from "@/config/pageTitles";
@@ -72,15 +76,23 @@ type HomePageData = {
   blackSidebarLogo?: SanityImage;
   blackSidebarLogoUrl?: string | null;
   featuredArtWorks?: Artwork[] | null;
+  featuredArtWorksExternalUrl?: string | null;
+  featuredArtWorksTargetPage?: InternalPageTarget | string | null;
   featuredArtWorksTitle?: string | null;
   featuredArtWorksViewAllHref?: string | null;
   featuredEvents?: HomeCardItem[] | null;
+  featuredEventsExternalUrl?: string | null;
+  featuredEventsTargetPage?: InternalPageTarget | string | null;
   featuredEventsTitle?: string | null;
   featuredEventsViewAllHref?: string | null;
   featuredPastEventsTitle?: string | null;
   featuredProducts?: HomeProduct[] | null;
+  featuredProductsExternalUrl?: string | null;
+  featuredProductsTargetPage?: InternalPageTarget | string | null;
   featuredProductsViewAllHref?: string | null;
   featuredStudyPrograms?: HomeCardItem[] | null;
+  featuredStudyProgramsExternalUrl?: string | null;
+  featuredStudyProgramsTargetPage?: InternalPageTarget | string | null;
   featuredStudyProgramsTitle?: string | null;
   featuredStudyProgramsViewAllHref?: string | null;
   heroCarouselImages?: HeroBannerSlide[] | null;
@@ -163,11 +175,19 @@ function normalizeHref(href: string | null | undefined, locale: Locale) {
 }
 
 function resolveViewAllHref(
-  configuredHref: string | null | undefined,
+  externalUrl: string | null | undefined,
+  targetPage: string | null | undefined,
+  legacyHref: string | null | undefined,
   fallbackHref: string,
   locale: Locale,
 ) {
-  return normalizeHref(configuredHref, locale) || normalizeHref(fallbackHref, locale) || `/${locale}`;
+  return (
+    normalizeHref(externalUrl, locale) ||
+    internalPageHref(targetPage, locale) ||
+    normalizeHref(legacyHref, locale) ||
+    normalizeHref(fallbackHref, locale) ||
+    `/${locale}`
+  );
 }
 
 function imageUrl(image: SanityImage, width: number) {
@@ -761,6 +781,8 @@ export async function HomePage({ locale }: HomePageProps) {
                 advancedStudyTitle || homeCopy[locale].featuredStudyPrograms,
               )}
               viewAllHref={resolveViewAllHref(
+                homePage?.featuredStudyProgramsExternalUrl,
+                homePage?.featuredStudyProgramsTargetPage,
                 homePage?.featuredStudyProgramsViewAllHref,
                 "/study/advanced-study",
                 locale,
@@ -781,6 +803,8 @@ export async function HomePage({ locale }: HomePageProps) {
                 offlineExperienceTitle || homeCopy[locale].featuredEvents,
               )}
               viewAllHref={resolveViewAllHref(
+                homePage?.featuredEventsExternalUrl,
+                homePage?.featuredEventsTargetPage,
                 homePage?.featuredEventsViewAllHref,
                 "/events/activity",
                 locale,
@@ -796,6 +820,8 @@ export async function HomePage({ locale }: HomePageProps) {
                 homeCopy[locale].artWorks,
               )}
               viewAllHref={resolveViewAllHref(
+                homePage?.featuredArtWorksExternalUrl,
+                homePage?.featuredArtWorksTargetPage,
                 homePage?.featuredArtWorksViewAllHref,
                 "/art-creation/sculpture",
                 locale,
@@ -806,6 +832,8 @@ export async function HomePage({ locale }: HomePageProps) {
               locale={locale}
               products={homePage?.featuredProducts?.filter(Boolean) || []}
               viewAllHref={resolveViewAllHref(
+                homePage?.featuredProductsExternalUrl,
+                homePage?.featuredProductsTargetPage,
                 homePage?.featuredProductsViewAllHref,
                 "/shop",
                 locale,

@@ -1,6 +1,29 @@
 import { defineField, defineType } from "sanity";
 
+import { internalPageTargetOptions } from "../../config/internalPages";
 import { imageCaptionFields } from "./imageCaptionFields";
+
+const viewAllTargetField = (name: string) =>
+  defineField({
+    name,
+    title: "跳转页面 / Target Page",
+    type: "string",
+    options: {
+      list: internalPageTargetOptions,
+      layout: "dropdown",
+    },
+    group: "featured",
+    description: "优先选择站内页面，前端会自动适配中文 / 英文路径。",
+  });
+
+const viewAllExternalUrlField = (name: string) =>
+  defineField({
+    name,
+    title: "外部 URL / External URL",
+    type: "url",
+    group: "featured",
+    description: "可选。填写后优先使用外部链接。",
+  });
 
 export const homePage = defineType({
   name: "homePage",
@@ -179,13 +202,16 @@ export const homePage = defineType({
       group: "featured",
       of: [{ type: "reference", to: [{ type: "studyProgram" }] }],
     }),
+    viewAllTargetField("featuredStudyProgramsTargetPage"),
+    viewAllExternalUrlField("featuredStudyProgramsExternalUrl"),
     defineField({
       name: "featuredStudyProgramsViewAllHref",
-      title: "全部按钮跳转 / View All Link",
+      title: "全部按钮跳转（旧字段） / View All Link Legacy",
       type: "string",
       group: "featured",
+      hidden: true,
       description:
-        "填写站内路径，例如 /study/advanced-study，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+        "旧版本兼容字段。新内容请使用 Target Page 或 External URL。",
     }),
     defineField({
       name: "featuredEventsTitleZh",
@@ -211,13 +237,16 @@ export const homePage = defineType({
         },
       ],
     }),
+    viewAllTargetField("featuredEventsTargetPage"),
+    viewAllExternalUrlField("featuredEventsExternalUrl"),
     defineField({
       name: "featuredEventsViewAllHref",
-      title: "全部按钮跳转 / View All Link",
+      title: "全部按钮跳转（旧字段） / View All Link Legacy",
       type: "string",
       group: "featured",
+      hidden: true,
       description:
-        "填写站内路径，例如 /events/offline-experience，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+        "旧版本兼容字段。新内容请使用 Target Page 或 External URL。",
     }),
     defineField({
       name: "featuredPastEventsTitleZh",
@@ -327,13 +356,16 @@ export const homePage = defineType({
         },
       ],
     }),
+    viewAllTargetField("featuredArtWorksTargetPage"),
+    viewAllExternalUrlField("featuredArtWorksExternalUrl"),
     defineField({
       name: "featuredArtWorksViewAllHref",
-      title: "全部按钮跳转 / View All Link",
+      title: "全部按钮跳转（旧字段） / View All Link Legacy",
       type: "string",
       group: "featured",
+      hidden: true,
       description:
-        "填写站内路径，例如 /art-creation/sculpture，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+        "旧版本兼容字段。新内容请使用 Target Page 或 External URL。",
     }),
     defineField({
       name: "featuredProducts",
@@ -355,13 +387,16 @@ export const homePage = defineType({
         },
       ],
     }),
+    viewAllTargetField("featuredProductsTargetPage"),
+    viewAllExternalUrlField("featuredProductsExternalUrl"),
     defineField({
       name: "featuredProductsViewAllHref",
-      title: "全部按钮跳转 / View All Link",
+      title: "全部按钮跳转（旧字段） / View All Link Legacy",
       type: "string",
       group: "featured",
+      hidden: true,
       description:
-        "填写站内路径，例如 /shop，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+        "旧版本兼容字段。新内容请使用 Target Page 或 External URL。",
     }),
     defineField({
       name: "featuredResidency",
