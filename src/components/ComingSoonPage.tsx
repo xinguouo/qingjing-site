@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import type { Locale } from "@/config/navigation";
 
@@ -13,6 +10,7 @@ type ComingSoonPageProps = {
   titleEn?: string;
   descriptionZh?: string;
   descriptionEn?: string;
+  locale?: Locale;
   pageTitleZh?: string;
   pageTitleEn?: string;
 };
@@ -29,10 +27,6 @@ const defaultCopy = {
   backHomeEn: "Back Home",
 };
 
-function getLocale(pathname: string): Locale {
-  return pathname === "/en" || pathname.startsWith("/en/") ? "en" : "zh";
-}
-
 function localizedHref(href: string, locale: Locale) {
   return href === "/" ? `/${locale}` : `/${locale}${href}`;
 }
@@ -40,13 +34,12 @@ function localizedHref(href: string, locale: Locale) {
 export function ComingSoonPage({
   descriptionEn,
   descriptionZh,
+  locale = "zh",
   pageTitleEn,
   pageTitleZh,
   titleEn,
   titleZh,
 }: ComingSoonPageProps) {
-  const pathname = usePathname();
-  const locale = getLocale(pathname);
   const resolvedTitleZh = titleZh || pageTitleZh || defaultCopy.titleZh;
   const resolvedTitleEn = titleEn || pageTitleEn || defaultCopy.titleEn;
   const title =

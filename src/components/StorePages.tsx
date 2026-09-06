@@ -28,7 +28,6 @@ import { AppShell } from "./AppShell";
 import { ArtworkDetailLayout } from "./ArtworkDetailPage";
 import { ArtworkVideoPlayer } from "./ArtworkVideoPlayer";
 import { BaseImageCard } from "./BaseImageCard";
-import { ComingSoonPage } from "./ComingSoonPage";
 import { PageContainer } from "./PageContainer";
 import { PageHeader } from "./PageHeader";
 import { glassStyle } from "../../styles/glassStyle";
@@ -2182,12 +2181,3 @@ export async function DerivativeProductDetailPage({
   );
 }
 
-export function CulturalProductComingSoonPage({
-  locale: _locale,
-}: {
-  locale?: Locale;
-} = {}) {
-  return (
-    <ComingSoonPage pageTitleEn="Cultural Products" pageTitleZh="文创品" />
-  );
-}

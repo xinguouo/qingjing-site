@@ -1,5 +1,5 @@
 import { OpenClassComingSoon } from "@/app/coming-soon-pages";
 
 export default function Page() {
-  return <OpenClassComingSoon />;
+  return <OpenClassComingSoon locale="en" />;
 }
