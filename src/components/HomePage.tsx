@@ -73,8 +73,6 @@ type QuickEntry = {
 
 type HomePageData = {
   artCategories?: ArtCategoryTitleSettings[] | null;
-  blackSidebarLogo?: SanityImage;
-  blackSidebarLogoUrl?: string | null;
   featuredArtWorks?: Artwork[] | null;
   featuredArtWorksExternalUrl?: string | null;
   featuredArtWorksTargetPage?: InternalPageTarget | string | null;
@@ -102,8 +100,6 @@ type HomePageData = {
   pastReviewItems?: PastReviewItem[] | null;
   pageTitles?: PageTitleMap | null;
   quickEntries?: QuickEntry[] | null;
-  whiteSidebarLogo?: SanityImage;
-  whiteSidebarLogoUrl?: string | null;
 };
 
 type HomePageProps = {
@@ -738,16 +734,6 @@ export async function HomePage({ locale }: HomePageProps) {
   return (
     <AppShell
       artCategorySettings={artCategorySettingsMap}
-      initialLogoImages={
-        homePage
-          ? {
-              blackSidebarLogo: homePage.blackSidebarLogo,
-              blackSidebarLogoUrl: homePage.blackSidebarLogoUrl,
-              whiteSidebarLogo: homePage.whiteSidebarLogo,
-              whiteSidebarLogoUrl: homePage.whiteSidebarLogoUrl,
-            }
-          : undefined
-      }
       initialPageTitles={pageTitles}
       locale={locale}
     >

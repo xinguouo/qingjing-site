@@ -1,17 +1,16 @@
-"use client";
+import type { ReactNode } from "react";
 
-import { useEffect, useState, type ReactNode } from "react";
-
-import type {ArtCategoryTitleMap, ArtCategoryTitleSettings} from "@/config/artCategories";
+import type {
+  ArtCategoryTitleMap,
+  ArtCategoryTitleSettings,
+} from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
 import type { PageTitleMap } from "@/config/pageTitles";
+import { client } from "@/sanity/client";
+import { pageTitlesQuery, sidebarLogoQuery } from "@/sanity/queries";
 
-import { DesktopSidebar } from "./DesktopSidebar";
-import { FloatingThemeControl } from "./FloatingThemeControl";
+import { AppShellClient } from "./AppShellClient";
 import type { SidebarLogoImages } from "./Logo";
-import { MobileNavigation } from "./MobileNavigation";
-import { TopBar } from "./TopBar";
-import {useArtCategorySettings} from "./useArtCategorySettings";
 
 type AppShellProps = {
   artCategorySettings?:
@@ -25,87 +24,56 @@ type AppShellProps = {
   locale: Locale;
 };
 
-export function AppShell({
+async function getGlobalLogoImages() {
+  try {
+    return await client
+      .withConfig({ useCdn: false })
+      .fetch<SidebarLogoImages | null>(
+        sidebarLogoQuery,
+        {},
+        { next: { revalidate: 60 } },
+      );
+  } catch (error) {
+    console.error("Failed to fetch global sidebar logo", error);
+    return null;
+  }
+}
+
+async function getGlobalPageTitles() {
+  try {
+    return await client
+      .withConfig({ useCdn: false })
+      .fetch<PageTitleMap | null>(
+        pageTitlesQuery,
+        {},
+        { next: { revalidate: 60 } },
+      );
+  } catch (error) {
+    console.error("Failed to fetch global page titles", error);
+    return null;
+  }
+}
+
+export async function AppShell({
   artCategorySettings,
   children,
   initialLogoImages,
   initialPageTitles,
   locale,
 }: AppShellProps) {
-  const resolvedArtCategorySettings =
-    useArtCategorySettings(artCategorySettings);
-  const [logoImages, setLogoImages] = useState<
-    SidebarLogoImages | null | undefined
-  >(initialLogoImages);
-  const [pageTitles, setPageTitles] = useState<PageTitleMap | null | undefined>(
-    initialPageTitles,
-  );
-
-  useEffect(() => {
-    let active = true;
-
-    fetch("/api/sidebar-logo", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : undefined))
-      .then((data: SidebarLogoImages | null) => {
-        if (active && data !== undefined) {
-          setLogoImages(data);
-        }
-      })
-      .catch(() => {
-        if (active && initialLogoImages !== undefined) {
-          setLogoImages(initialLogoImages);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    fetch("/api/page-titles", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : undefined))
-      .then((data: PageTitleMap | null) => {
-        if (active && data !== undefined) {
-          setPageTitles(data);
-        }
-      })
-      .catch(() => {
-        if (active && initialPageTitles !== undefined) {
-          setPageTitles(initialPageTitles);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+  const [globalLogoImages, globalPageTitles] = await Promise.all([
+    getGlobalLogoImages(),
+    getGlobalPageTitles(),
+  ]);
 
   return (
-    <div className="app-shell min-h-screen overflow-x-hidden">
-      <MobileNavigation
-        artCategorySettings={resolvedArtCategorySettings}
-        locale={locale}
-        logoImages={logoImages}
-        pageTitles={pageTitles}
-      />
-      <DesktopSidebar
-        artCategorySettings={resolvedArtCategorySettings}
-        locale={locale}
-        logoImages={logoImages}
-        pageTitles={pageTitles}
-      />
-      <div className="min-h-screen min-w-0 lg:ml-[232px]">
-        <TopBar
-          artCategorySettings={resolvedArtCategorySettings}
-          locale={locale}
-          pageTitles={pageTitles}
-        />
-        <main className="min-w-0 w-full max-w-full">{children}</main>
-      </div>
-      <FloatingThemeControl locale={locale} />
-    </div>
+    <AppShellClient
+      artCategorySettings={artCategorySettings}
+      initialLogoImages={globalLogoImages || initialLogoImages}
+      initialPageTitles={globalPageTitles || initialPageTitles}
+      locale={locale}
+    >
+      {children}
+    </AppShellClient>
   );
 }

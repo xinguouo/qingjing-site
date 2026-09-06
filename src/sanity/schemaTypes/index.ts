@@ -13,6 +13,7 @@ import {culturalProduct} from './culturalProduct'
 import {derivativeProduct} from './derivativeProduct'
 import {event} from './event'
 import {experienceCourse} from './experienceCourse'
+import {globalSettings} from './globalSettings'
 import {homePage} from './homePage'
 import {offlineExperiencePage} from './offlineExperiencePage'
 import {offlineWorkshop} from './offlineWorkshop'
@@ -28,6 +29,7 @@ import {shopSeries, shopSeriesBranch} from './shopTaxonomy'
 
 export const schemaTypes = [
   homePage,
+  globalSettings,
   aboutMissionPage,
   aboutContactPage,
   contactPage,

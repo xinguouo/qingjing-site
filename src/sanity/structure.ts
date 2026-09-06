@@ -119,6 +119,18 @@ export const structure: StructureResolver = (S, context) => {
           }),
         ),
       S.listItem()
+        .id('globalSettings')
+        .title('全局设置 / Global Settings')
+        .schemaType('globalSettings')
+        .child(
+          singleton({
+            id: 'globalSettingsDocument',
+            title: '全局设置 / Global Settings',
+            schemaType: 'globalSettings',
+            documentId: 'globalSettings',
+          }),
+        ),
+      S.listItem()
         .id('about')
         .title('关于我们 / About')
         .child(

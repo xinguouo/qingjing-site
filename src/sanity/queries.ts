@@ -13,6 +13,12 @@ const imageFields = `
   )
 `;
 
+const logoImageFields = `
+  asset,
+  crop,
+  hotspot
+`;
+
 const artworkImageItemFields = `
   _key,
   _type,
@@ -840,10 +846,6 @@ export const homePageQuery = defineQuery(`*[
   _id == "homePage" &&
   !(_id in path("drafts.**"))
 ][0]{
-  whiteSidebarLogo{${imageFields}},
-  blackSidebarLogo{${imageFields}},
-  "whiteSidebarLogoUrl": whiteSidebarLogo.asset->url,
-  "blackSidebarLogoUrl": blackSidebarLogo.asset->url,
   heroTitleZh,
   heroTitleEn,
   "heroTitle": ${localizedText("heroTitleEn", "heroTitleZh")},
@@ -942,15 +944,23 @@ export const homePageQuery = defineQuery(`*[
   } | order(categoryType asc, sortKey asc, _updatedAt desc)
 }`);
 
-export const sidebarLogoQuery = defineQuery(`*[
-  _type == "homePage" &&
-  _id == "homePage" &&
-  !(_id in path("drafts.**"))
-][0]{
-  whiteSidebarLogo{${imageFields}},
-  blackSidebarLogo{${imageFields}},
-  "whiteSidebarLogoUrl": whiteSidebarLogo.asset->url,
-  "blackSidebarLogoUrl": blackSidebarLogo.asset->url
+export const sidebarLogoQuery = defineQuery(`{
+  "whiteSidebarLogo": coalesce(
+    *[_type == "globalSettings" && _id == "globalSettings" && !(_id in path("drafts.**"))][0].whiteSidebarLogo{${logoImageFields}},
+    *[_type == "homePage" && _id == "homePage" && !(_id in path("drafts.**"))][0].whiteSidebarLogo{${logoImageFields}}
+  ),
+  "blackSidebarLogo": coalesce(
+    *[_type == "globalSettings" && _id == "globalSettings" && !(_id in path("drafts.**"))][0].blackSidebarLogo{${logoImageFields}},
+    *[_type == "homePage" && _id == "homePage" && !(_id in path("drafts.**"))][0].blackSidebarLogo{${logoImageFields}}
+  ),
+  "whiteSidebarLogoUrl": coalesce(
+    *[_type == "globalSettings" && _id == "globalSettings" && !(_id in path("drafts.**"))][0].whiteSidebarLogo.asset->url,
+    *[_type == "homePage" && _id == "homePage" && !(_id in path("drafts.**"))][0].whiteSidebarLogo.asset->url
+  ),
+  "blackSidebarLogoUrl": coalesce(
+    *[_type == "globalSettings" && _id == "globalSettings" && !(_id in path("drafts.**"))][0].blackSidebarLogo.asset->url,
+    *[_type == "homePage" && _id == "homePage" && !(_id in path("drafts.**"))][0].blackSidebarLogo.asset->url
+  )
 }`);
 
 export const pageTitlesQuery = defineQuery(`{
