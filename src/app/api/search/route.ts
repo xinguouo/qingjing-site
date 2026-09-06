@@ -8,11 +8,12 @@ import {
 } from "@/config/artCategories";
 import {
   getNavigationHref,
+  getNavigationGroupLabel,
   getNavigationLabel,
-  navigationGroupLabels,
   navigationItems,
   type Locale,
 } from "@/config/navigation";
+import type { PageTitleMap } from "@/config/pageTitles";
 import {client} from "@/sanity/client";
 import {urlForImage} from "@/sanity/image";
 import {siteSearchContentQuery} from "@/sanity/queries";
@@ -58,6 +59,7 @@ type SearchContent = {
   artworkProducts?: Array<Record<string, unknown>>;
   teamMembers?: Array<Record<string, unknown>>;
   artists?: Array<Record<string, unknown>>;
+  pageTitles?: PageTitleMap | null;
 };
 
 const typeLabels: Record<SearchKind, {zh: string; en: string}> = {
@@ -158,7 +160,11 @@ function artCategoryLabel(
   return category;
 }
 
-function eventTypeLabel(eventType: string, locale: Locale) {
+function eventTypeLabel(
+  eventType: string,
+  locale: Locale,
+  pageTitles?: PageTitleMap | null,
+) {
   if (eventType === "open-class") {
     return locale === "zh" ? "\u827a\u672f\u516c\u5f00\u8bfe" : "Art Open Class";
   }
@@ -167,7 +173,11 @@ function eventTypeLabel(eventType: string, locale: Locale) {
     return locale === "zh" ? "\u827a\u672f\u6d3b\u52a8" : "Art Activity";
   }
 
-  return locale === "zh" ? "\u7ebf\u4e0b\u4f53\u9a8c" : "Offline Experience";
+  const title = pageTitles?.offlineExperience;
+  const value =
+    locale === "zh" ? title?.pageTitleZh?.trim() : title?.pageTitleEn?.trim();
+
+  return value || (locale === "zh" ? "\u7ebf\u4e0b\u4f53\u9a8c" : "Offline Experience");
 }
 
 function productTypeFor(item: Record<string, unknown>) {
@@ -240,13 +250,30 @@ function eventHref(item: Record<string, unknown>, locale: Locale) {
 function pageCandidates(
   locale: Locale,
   artCategoryTitles: ArtCategoryTitleMap,
+  pageTitles?: PageTitleMap | null,
 ): SearchCandidate[] {
   const navPages = navigationItems.map((item) => {
-    const groupLabel = navigationGroupLabels[item.group];
-    const title = getNavigationLabel(item, locale, artCategoryTitles);
-    const titleZh = getNavigationLabel(item, "zh", artCategoryTitles);
-    const titleEn = getNavigationLabel(item, "en", artCategoryTitles);
-    const group = locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn;
+    const groupZh = getNavigationGroupLabel(item.group, "zh", pageTitles);
+    const groupEn = getNavigationGroupLabel(item.group, "en", pageTitles);
+    const title = getNavigationLabel(
+      item,
+      locale,
+      artCategoryTitles,
+      pageTitles,
+    );
+    const titleZh = getNavigationLabel(
+      item,
+      "zh",
+      artCategoryTitles,
+      pageTitles,
+    );
+    const titleEn = getNavigationLabel(
+      item,
+      "en",
+      artCategoryTitles,
+      pageTitles,
+    );
+    const group = locale === "zh" ? groupZh : groupEn;
 
     return {
       id: `page:${item.href}`,
@@ -257,7 +284,7 @@ function pageCandidates(
       description: group,
       href: getNavigationHref(item, locale),
       primaryFields: [titleZh, titleEn],
-      secondaryFields: [groupLabel.labelZh, groupLabel.labelEn, item.group],
+      secondaryFields: [groupZh, groupEn, item.group],
     };
   });
 
@@ -268,8 +295,9 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
   const artCategoryTitles = resolveArtCategorySettingsMap(
     data.artCategories as Parameters<typeof resolveArtCategorySettingsMap>[0],
   );
+  const pageTitles = data.pageTitles || null;
   const candidates: SearchCandidate[] = [
-    ...pageCandidates(locale, artCategoryTitles),
+    ...pageCandidates(locale, artCategoryTitles, pageTitles),
   ];
 
   (data.artworks || []).forEach((item) => {
@@ -312,14 +340,14 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       title: getString(item, "title"),
       titleZh: getString(item, "titleZh"),
       titleEn: getString(item, "titleEn"),
-      description: eventTypeLabel(eventType, locale),
+      description: eventTypeLabel(eventType, locale, pageTitles),
       href: eventHref(item, locale),
       image: getImage(item, "coverImage", "posterImage"),
       primaryFields: [item.titleZh as string, item.titleEn as string],
       secondaryFields: [
         eventType,
-        eventTypeLabel(eventType, "zh"),
-        eventTypeLabel(eventType, "en"),
+        eventTypeLabel(eventType, "zh", pageTitles),
+        eventTypeLabel(eventType, "en", pageTitles),
         item.facultyZh as string,
         item.facultyEn as string,
       ],
@@ -334,6 +362,7 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
 
   (data.studyPrograms || []).forEach((item) => {
     const href = studyHref(item, locale);
+    const programType = getString(item, "programType");
 
     if (!href) {
       return;
@@ -345,12 +374,44 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       title: getString(item, "title"),
       titleZh: getString(item, "titleZh"),
       titleEn: getString(item, "titleEn"),
-      description: getString(item, "academicHost") || getString(item, "teacherTeam"),
+      description:
+        getString(item, "academicHost") ||
+        getString(item, "teacherTeam") ||
+        (programType === "advanced-study"
+          ? getNavigationLabel(
+              navigationItems.find(
+                (navItem) => navItem.pageTitleKey === "advancedStudy",
+              ) || navigationItems[0],
+              locale,
+              artCategoryTitles,
+              pageTitles,
+            )
+          : null),
       href,
       image: getImage(item, "heroImage", "coverImage"),
       primaryFields: [item.titleZh as string, item.titleEn as string],
       secondaryFields: [
-        item.programType as string,
+        programType,
+        programType === "advanced-study"
+          ? getNavigationLabel(
+              navigationItems.find(
+                (navItem) => navItem.pageTitleKey === "advancedStudy",
+              ) || navigationItems[0],
+              "zh",
+              artCategoryTitles,
+              pageTitles,
+            )
+          : null,
+        programType === "advanced-study"
+          ? getNavigationLabel(
+              navigationItems.find(
+                (navItem) => navItem.pageTitleKey === "advancedStudy",
+              ) || navigationItems[0],
+              "en",
+              artCategoryTitles,
+              pageTitles,
+            )
+          : null,
         item.academicHostZh as string,
         item.academicHostEn as string,
         item.teacherTeamZh as string,
@@ -380,7 +441,10 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
       title: getString(item, "title"),
       titleZh: getString(item, "titleZh"),
       titleEn: getString(item, "titleEn"),
-      description: getString(item, "teacher") || getString(item, "academicSupport"),
+      description:
+        getString(item, "teacher") ||
+        getString(item, "academicSupport") ||
+        eventTypeLabel("offline-experience", locale, pageTitles),
       href: `/${locale}/events/offline-experience/${slug}`,
       image: getImage(item, "heroImage", "coverImage"),
       primaryFields: [item.titleZh as string, item.titleEn as string],
@@ -388,6 +452,8 @@ function candidatesFromContent(data: SearchContent, locale: Locale) {
         item.teacher as string,
         item.academicSupport as string,
         item.category as string,
+        eventTypeLabel("offline-experience", "zh", pageTitles),
+        eventTypeLabel("offline-experience", "en", pageTitles),
       ],
       descriptionFields: [item.descriptionZh, item.descriptionEn],
     });

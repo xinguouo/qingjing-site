@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
+import type { PageTitleMap } from "@/config/pageTitles";
 
 import type { SidebarLogoImages } from "./Logo";
 import { MobileDrawer } from "./MobileDrawer";
@@ -15,6 +16,7 @@ type MobileNavigationProps = {
   locale: Locale;
   logo?: SanityImageSource | null;
   logoImages?: SidebarLogoImages | null;
+  pageTitles?: PageTitleMap | null;
   siteName?: string | null;
 };
 
@@ -23,6 +25,7 @@ export function MobileNavigation({
   locale,
   logo,
   logoImages,
+  pageTitles,
   siteName,
 }: MobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +44,7 @@ export function MobileNavigation({
         isOpen={isOpen}
         locale={locale}
         onClose={() => setIsOpen(false)}
+        pageTitles={pageTitles}
       />
     </>
   );

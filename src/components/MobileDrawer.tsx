@@ -5,13 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
   getNavigationHref,
+  getNavigationGroupLabel,
   getNavigationLabel,
   isNavigationItemActive,
-  navigationGroupLabels,
   navigationGroupOrder,
   navigationItems,
   type Locale,
 } from "@/config/navigation";
+import type { PageTitleMap } from "@/config/pageTitles";
 
 import { SidebarNavIcon } from "./SidebarNavIcon";
 
@@ -20,6 +21,7 @@ type MobileDrawerProps = {
   isOpen: boolean;
   locale: Locale;
   onClose: () => void;
+  pageTitles?: PageTitleMap | null;
 };
 
 const labels = {
@@ -33,6 +35,7 @@ export function MobileDrawer({
   isOpen,
   locale,
   onClose,
+  pageTitles,
 }: MobileDrawerProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -89,12 +92,12 @@ export function MobileDrawer({
               return null;
             }
 
-            const groupLabel = navigationGroupLabels[group];
+            const groupLabel = getNavigationGroupLabel(group, locale, pageTitles);
 
             return (
               <div key={group}>
                 <p className="mb-3 px-2 text-xs uppercase tracking-[0.22em] text-muted-token">
-                  {locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn}
+                  {groupLabel}
                 </p>
                 <div className="flex flex-col gap-3">
                   {items.map((item) => {
@@ -135,6 +138,7 @@ export function MobileDrawer({
                             item,
                             locale,
                             artCategorySettings,
+                            pageTitles,
                           )}
                         </span>
                         {isComingSoon ? (

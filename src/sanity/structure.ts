@@ -226,7 +226,7 @@ export const structure: StructureResolver = (S, context) => {
                 .child(
                   singleton({
                     id: 'studyAdvancedStudyPageDocument',
-                    title: '高级研学页面设置 / Advanced Study Page Settings',
+                    title: '高级研学页面设置 / Page Settings',
                     schemaType: 'advancedStudyPage',
                     documentId: 'advancedStudyPage',
                   }),
@@ -250,12 +250,12 @@ export const structure: StructureResolver = (S, context) => {
             .items([
               S.listItem()
                 .id('eventsOfflineExperience')
-                .title('线下体验 / Offline Experience')
+                .title('线下体验 / Page Settings')
                 .schemaType('offlineExperiencePage')
                 .child(
                   S.list()
                     .id('eventsOfflineExperienceEntries')
-                    .title('线下体验 / Offline Experience')
+                    .title('线下体验 / Page Settings')
                     .items([
                       S.listItem()
                         .id('eventsOfflineExperienceDocument')

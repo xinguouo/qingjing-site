@@ -1,6 +1,7 @@
 import type { SanityImageSource } from "@sanity/image-url";
 
 import type { Locale } from "@/config/navigation";
+import { backToPageLabel } from "@/config/pageTitles";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
@@ -401,7 +402,7 @@ export async function ExperienceCourseDetailPage({
   locale,
   slug,
 }: ExperienceDetailPageProps) {
-  const [course, event] = await Promise.all([
+  const [course, event, pageData] = await Promise.all([
     client.fetch<ExperienceCourse | null>(
       experienceCourseBySlugQuery,
       { locale, slug },
@@ -412,6 +413,13 @@ export async function ExperienceCourseDetailPage({
       { locale, slug },
       { cache: "no-store" },
     ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<OfflineExperiencePageData | null>(
+        offlineExperiencePageQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
   ]);
   const labels = copy[locale];
   const item =
@@ -427,7 +435,9 @@ export async function ExperienceCourseDetailPage({
     <AppShell locale={locale}>
       <CourseDetailContent
         backHref={`/${locale}/events/offline-experience`}
-        backLabel={labels.backToOffline}
+        backLabel={backToPageLabel("offlineExperience", locale, {
+          offlineExperience: pageData || undefined,
+        })}
         content={content}
         fileLabels={labels}
         images={images}

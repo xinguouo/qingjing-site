@@ -4,6 +4,11 @@ import {
   type ArtCategorySlug,
   type ArtCategoryTitleMap,
 } from "./artCategories";
+import {
+  resolvePageTitle,
+  type PageTitleKey,
+  type PageTitleMap,
+} from "./pageTitles";
 
 export type Locale = "zh" | "en";
 
@@ -28,6 +33,7 @@ export type NavigationItem = {
   status: NavigationStatus;
   artCategory?: ArtCategorySlug;
   activePathPrefixes?: string[];
+  pageTitleKey?: PageTitleKey;
 };
 
 export const navigationGroupLabels: Record<
@@ -121,6 +127,7 @@ export const navigationItems: NavigationItem[] = [
     icon: "globe",
     group: "study",
     status: "live",
+    pageTitleKey: "advancedStudy",
   },
   {
     labelZh: "\u7ebf\u4e0b\u4f53\u9a8c",
@@ -130,6 +137,7 @@ export const navigationItems: NavigationItem[] = [
     group: "offlineExperience",
     status: "live",
     activePathPrefixes: ["/events/offline-workshop/"],
+    pageTitleKey: "offlineExperience",
   },
   {
     labelZh: "\u827a\u672f\u516c\u5f00\u8bfe",
@@ -196,6 +204,7 @@ export function getNavigationLabel(
   item: NavigationItem,
   locale: Locale,
   artCategoryTitles?: ArtCategoryTitleMap,
+  pageTitles?: PageTitleMap | null,
 ) {
   if (item.artCategory) {
     return resolveArtCategoryTitle(
@@ -205,7 +214,24 @@ export function getNavigationLabel(
     );
   }
 
+  if (item.pageTitleKey) {
+    return resolvePageTitle(item.pageTitleKey, locale, pageTitles);
+  }
+
   return locale === "zh" ? item.labelZh : item.labelEn;
+}
+
+export function getNavigationGroupLabel(
+  group: NavigationGroup,
+  locale: Locale,
+  pageTitles?: PageTitleMap | null,
+) {
+  if (group === "offlineExperience") {
+    return resolvePageTitle("offlineExperience", locale, pageTitles);
+  }
+
+  const groupLabel = navigationGroupLabels[group];
+  return locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn;
 }
 
 export function normalizePathForNavigation(pathname: string) {

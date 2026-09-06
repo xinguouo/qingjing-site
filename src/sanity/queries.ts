@@ -871,10 +871,12 @@ export const homePageQuery = defineQuery(`*[
   featuredStudyProgramsTitleZh,
   featuredStudyProgramsTitleEn,
   "featuredStudyProgramsTitle": ${localizedText("featuredStudyProgramsTitleEn", "featuredStudyProgramsTitleZh")},
+  featuredStudyProgramsViewAllHref,
   featuredStudyPrograms[]->{${studyProgramCardFields}},
   featuredEventsTitleZh,
   featuredEventsTitleEn,
   "featuredEventsTitle": ${localizedText("featuredEventsTitleEn", "featuredEventsTitleZh")},
+  featuredEventsViewAllHref,
   featuredEvents[]->{${homeEventReferenceFields}},
   featuredPastEventsTitleZh,
   featuredPastEventsTitleEn,
@@ -894,8 +896,28 @@ export const homePageQuery = defineQuery(`*[
   featuredArtWorksTitleZh,
   featuredArtWorksTitleEn,
   "featuredArtWorksTitle": ${localizedText("featuredArtWorksTitleEn", "featuredArtWorksTitleZh")},
+  featuredArtWorksViewAllHref,
   featuredArtWorks[]->{${homeArtWorkCardFields}},
+  featuredProductsViewAllHref,
   featuredProducts[]->{${homeProductReferenceFields}},
+  "pageTitles": {
+    "advancedStudy": *[
+      _type == "advancedStudyPage" &&
+      _id == "advancedStudyPage" &&
+      !(_id in path("drafts.**"))
+    ][0]{
+      pageTitleZh,
+      pageTitleEn
+    },
+    "offlineExperience": *[
+      _type == "offlineExperiencePage" &&
+      _id == "offlineExperiencePage" &&
+      !(_id in path("drafts.**"))
+    ][0]{
+      pageTitleZh,
+      pageTitleEn
+    }
+  },
   "artCategories": *[
     _type == "artCategory" &&
     categoryType in ["sculpture", "installation-art", "public-art"] &&
@@ -921,6 +943,25 @@ export const sidebarLogoQuery = defineQuery(`*[
   blackSidebarLogo{${imageFields}},
   "whiteSidebarLogoUrl": whiteSidebarLogo.asset->url,
   "blackSidebarLogoUrl": blackSidebarLogo.asset->url
+}`);
+
+export const pageTitlesQuery = defineQuery(`{
+  "advancedStudy": *[
+    _type == "advancedStudyPage" &&
+    _id == "advancedStudyPage" &&
+    !(_id in path("drafts.**"))
+  ][0]{
+    pageTitleZh,
+    pageTitleEn
+  },
+  "offlineExperience": *[
+    _type == "offlineExperiencePage" &&
+    _id == "offlineExperiencePage" &&
+    !(_id in path("drafts.**"))
+  ][0]{
+    pageTitleZh,
+    pageTitleEn
+  }
 }`);
 
 export const aboutMissionPageQuery = defineQuery(`{
@@ -1630,6 +1671,24 @@ export const productDetailSlugsQuery = defineQuery(`*[
 }`);
 
 export const siteSearchContentQuery = defineQuery(`{
+  "pageTitles": {
+    "advancedStudy": *[
+      _type == "advancedStudyPage" &&
+      _id == "advancedStudyPage" &&
+      !(_id in path("drafts.**"))
+    ][0]{
+      pageTitleZh,
+      pageTitleEn
+    },
+    "offlineExperience": *[
+      _type == "offlineExperiencePage" &&
+      _id == "offlineExperiencePage" &&
+      !(_id in path("drafts.**"))
+    ][0]{
+      pageTitleZh,
+      pageTitleEn
+    }
+  },
   "artCategories": *[
     _type == "artCategory" &&
     categoryType in ["sculpture", "installation-art", "public-art"] &&

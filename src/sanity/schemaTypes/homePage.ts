@@ -180,6 +180,14 @@ export const homePage = defineType({
       of: [{ type: "reference", to: [{ type: "studyProgram" }] }],
     }),
     defineField({
+      name: "featuredStudyProgramsViewAllHref",
+      title: "全部按钮跳转 / View All Link",
+      type: "string",
+      group: "featured",
+      description:
+        "填写站内路径，例如 /study/advanced-study，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+    }),
+    defineField({
       name: "featuredEventsTitleZh",
       title: "最新活动区块标题（中文） / Latest Events Section Title Zh",
       type: "string",
@@ -202,6 +210,14 @@ export const homePage = defineType({
           to: [{ type: "event" }, { type: "experienceCourse" }],
         },
       ],
+    }),
+    defineField({
+      name: "featuredEventsViewAllHref",
+      title: "全部按钮跳转 / View All Link",
+      type: "string",
+      group: "featured",
+      description:
+        "填写站内路径，例如 /events/offline-experience，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
     }),
     defineField({
       name: "featuredPastEventsTitleZh",
@@ -312,6 +328,14 @@ export const homePage = defineType({
       ],
     }),
     defineField({
+      name: "featuredArtWorksViewAllHref",
+      title: "全部按钮跳转 / View All Link",
+      type: "string",
+      group: "featured",
+      description:
+        "填写站内路径，例如 /art-creation/sculpture，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
+    }),
+    defineField({
       name: "featuredProducts",
       title: "精选商品 / Featured Products",
       type: "array",
@@ -330,6 +354,14 @@ export const homePage = defineType({
           ],
         },
       ],
+    }),
+    defineField({
+      name: "featuredProductsViewAllHref",
+      title: "全部按钮跳转 / View All Link",
+      type: "string",
+      group: "featured",
+      description:
+        "填写站内路径，例如 /shop，前端会自动加 /zh 或 /en；也可以填写完整外部 URL。",
     }),
     defineField({
       name: "featuredResidency",

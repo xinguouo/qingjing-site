@@ -7,13 +7,14 @@ import { usePathname } from "next/navigation";
 import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
   getNavigationHref,
+  getNavigationGroupLabel,
   getNavigationLabel,
   isNavigationItemActive,
-  navigationGroupLabels,
   navigationGroupOrder,
   navigationItems,
   type Locale,
 } from "@/config/navigation";
+import type { PageTitleMap } from "@/config/pageTitles";
 
 import { Logo, type SidebarLogoImages } from "./Logo";
 import { SidebarNavIcon } from "./SidebarNavIcon";
@@ -23,6 +24,7 @@ type DesktopSidebarProps = {
   locale: Locale;
   logo?: SanityImageSource | null;
   logoImages?: SidebarLogoImages | null;
+  pageTitles?: PageTitleMap | null;
   siteName?: string | null;
 };
 
@@ -36,6 +38,7 @@ export function DesktopSidebar({
   locale,
   logo,
   logoImages,
+  pageTitles,
   siteName,
 }: DesktopSidebarProps) {
   const pathname = usePathname();
@@ -54,13 +57,13 @@ export function DesktopSidebar({
             return null;
           }
 
-          const groupLabel = navigationGroupLabels[group];
+          const groupLabel = getNavigationGroupLabel(group, locale, pageTitles);
 
           return (
             <div className="mb-5 last:mb-0" key={group}>
               {group !== "home" ? (
                 <p className="mb-2.5 px-3 text-xs font-medium tracking-[0.06em] text-muted-token">
-                  {locale === "zh" ? groupLabel.labelZh : groupLabel.labelEn}
+                  {groupLabel}
                 </p>
               ) : null}
 
@@ -102,7 +105,12 @@ export function DesktopSidebar({
                             : "text-xs leading-tight"
                         }`}
                       >
-                        {getNavigationLabel(item, locale, artCategorySettings)}
+                        {getNavigationLabel(
+                          item,
+                          locale,
+                          artCategorySettings,
+                          pageTitles,
+                        )}
                       </span>
 
                       {isComingSoon ? (

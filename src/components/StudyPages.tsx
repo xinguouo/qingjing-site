@@ -2,6 +2,7 @@ import type { SanityImageSource } from "@sanity/image-url";
 import Link from "next/link";
 
 import type { Locale } from "@/config/navigation";
+import { backToPageLabel } from "@/config/pageTitles";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import {
@@ -1597,11 +1598,20 @@ export async function AdvancedStudyDetailPage({
 }: StudyPageProps & {
   slug: string;
 }) {
-  const program = await client.fetch<StudyProgramDetail | null>(
-    studyProgramBySlugQuery,
-    { locale, slug },
-    { cache: "no-store" },
-  );
+  const [program, pageData] = await Promise.all([
+    client.fetch<StudyProgramDetail | null>(
+      studyProgramBySlugQuery,
+      { locale, slug },
+      { cache: "no-store" },
+    ),
+    client
+      .withConfig({ useCdn: false })
+      .fetch<AdvancedStudyPageData | null>(
+        advancedStudyPageQuery,
+        { locale },
+        { cache: "no-store" },
+      ),
+  ]);
   const labels = copy[locale];
   const item = program?.programType === "advanced-study" ? program : null;
   const title = compactText(item?.title) || labels.empty;
@@ -1611,7 +1621,9 @@ export async function AdvancedStudyDetailPage({
     <AppShell locale={locale}>
       <CourseDetailContent
         backHref={`/${locale}/study/advanced-study`}
-        backLabel={labels.advancedStudyBack}
+        backLabel={backToPageLabel("advancedStudy", locale, {
+          advancedStudy: pageData || undefined,
+        })}
         content={content}
         fileLabels={labels}
         images={item?.courseImages}

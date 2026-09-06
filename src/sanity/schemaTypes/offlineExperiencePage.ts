@@ -4,7 +4,7 @@ import { imageCaptionFields } from "./imageCaptionFields";
 
 export const offlineExperiencePage = defineType({
   name: "offlineExperiencePage",
-  title: "线下体验页面 / Offline Experience Page",
+  title: "线下体验页面 / Page Settings",
   type: "document",
   groups: [
     { name: "page", title: "页面标题 / Page Title", default: true },
@@ -91,7 +91,7 @@ export const offlineExperiencePage = defineType({
   ],
   preview: {
     prepare: () => ({
-      title: "线下体验页面 / Offline Experience Page",
+      title: "线下体验页面 / Page Settings",
     }),
   },
 });

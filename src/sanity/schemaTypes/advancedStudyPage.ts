@@ -4,7 +4,7 @@ import {imageCaptionFields} from './imageCaptionFields'
 
 export const advancedStudyPage = defineType({
   name: 'advancedStudyPage',
-  title: '高级研学页面 / Advanced Study Page',
+  title: '高级研学页面 / Page Settings',
   type: 'document',
   groups: [
     {name: 'page', title: '页面标题 / Page Title', default: true},
@@ -91,7 +91,7 @@ export const advancedStudyPage = defineType({
   ],
   preview: {
     prepare: () => ({
-      title: '高级研学页面 / Advanced Study Page',
+      title: '高级研学页面 / Page Settings',
     }),
   },
 })

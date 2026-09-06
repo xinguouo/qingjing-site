@@ -9,6 +9,10 @@ import {
   type ArtCategoryTitleSettings,
 } from "@/config/artCategories";
 import type { Locale } from "@/config/navigation";
+import {
+  resolvePageTitle,
+  type PageTitleMap,
+} from "@/config/pageTitles";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import { homePageQuery } from "@/sanity/queries";
@@ -69,17 +73,22 @@ type HomePageData = {
   blackSidebarLogoUrl?: string | null;
   featuredArtWorks?: Artwork[] | null;
   featuredArtWorksTitle?: string | null;
+  featuredArtWorksViewAllHref?: string | null;
   featuredEvents?: HomeCardItem[] | null;
   featuredEventsTitle?: string | null;
+  featuredEventsViewAllHref?: string | null;
   featuredPastEventsTitle?: string | null;
   featuredProducts?: HomeProduct[] | null;
+  featuredProductsViewAllHref?: string | null;
   featuredStudyPrograms?: HomeCardItem[] | null;
   featuredStudyProgramsTitle?: string | null;
+  featuredStudyProgramsViewAllHref?: string | null;
   heroCarouselImages?: HeroBannerSlide[] | null;
   heroImage?: SanityImage;
   heroSubtitle?: string | null;
   heroTitle?: string | null;
   pastReviewItems?: PastReviewItem[] | null;
+  pageTitles?: PageTitleMap | null;
   quickEntries?: QuickEntry[] | null;
   whiteSidebarLogo?: SanityImage;
   whiteSidebarLogoUrl?: string | null;
@@ -138,11 +147,27 @@ function normalizeHref(href: string | null | undefined, locale: Locale) {
     return null;
   }
 
-  if (/^https?:\/\//.test(value) || value.startsWith(`/${locale}`)) {
+  if (/^https?:\/\//.test(value)) {
     return value;
   }
 
-  return value.startsWith("/") ? `/${locale}${value}` : `/${locale}/${value}`;
+  const unlocalizedValue = value.replace(/^\/(zh|en)(?=\/|$)/, "");
+
+  if (!unlocalizedValue || unlocalizedValue === "/") {
+    return `/${locale}`;
+  }
+
+  return unlocalizedValue.startsWith("/")
+    ? `/${locale}${unlocalizedValue}`
+    : `/${locale}/${unlocalizedValue}`;
+}
+
+function resolveViewAllHref(
+  configuredHref: string | null | undefined,
+  fallbackHref: string,
+  locale: Locale,
+) {
+  return normalizeHref(configuredHref, locale) || normalizeHref(fallbackHref, locale) || `/${locale}`;
 }
 
 function imageUrl(image: SanityImage, width: number) {
@@ -194,7 +219,11 @@ function eventHref(item: HomeCardItem, locale: Locale) {
     : `/${locale}/events/offline-experience`;
 }
 
-function eventTypeLabel(item: HomeCardItem, locale: Locale) {
+function eventTypeLabel(
+  item: HomeCardItem,
+  locale: Locale,
+  pageTitles?: PageTitleMap | null,
+) {
   if (item.eventType === "open-class") {
     return locale === "zh" ? "\u827a\u672f\u516c\u5f00\u8bfe" : "Art Open Class";
   }
@@ -203,7 +232,7 @@ function eventTypeLabel(item: HomeCardItem, locale: Locale) {
     return locale === "zh" ? "\u827a\u672f\u6d3b\u52a8" : "Art Activity";
   }
 
-  return locale === "zh" ? "\u7ebf\u4e0b\u4f53\u9a8c" : "Offline Experience";
+  return resolvePageTitle("offlineExperience", locale, pageTitles);
 }
 
 function productHref(item: HomeProduct, locale: Locale) {
@@ -296,15 +325,23 @@ function productTypeLabel(item: HomeProduct, locale: Locale) {
   return compactText(item.productType);
 }
 
-function defaultQuickEntries(locale: Locale): QuickEntry[] {
+function defaultQuickEntries(
+  locale: Locale,
+  pageTitles?: PageTitleMap | null,
+): QuickEntry[] {
   const labels = homeCopy[locale];
+  const offlineExperienceTitle = resolvePageTitle(
+    "offlineExperience",
+    locale,
+    pageTitles,
+  );
 
   return [
     {
       _key: "offline-experience",
       description: labels.offlineEntryDescription,
       href: "/events/offline-experience",
-      title: labels.offlineEntryTitle,
+      title: offlineExperienceTitle || labels.offlineEntryTitle,
     },
     {
       _key: "masterclass",
@@ -350,15 +387,17 @@ function QuickEntryCard({
 function QuickEntriesSection({
   entries,
   locale,
+  pageTitles,
 }: {
   entries: QuickEntry[];
   locale: Locale;
+  pageTitles?: PageTitleMap | null;
 }) {
   const cmsEntries = entries.filter(
     (entry) => compactText(entry.title) && normalizeHref(entry.href, locale),
   );
   const visibleEntries = (
-    cmsEntries.length > 0 ? cmsEntries : defaultQuickEntries(locale)
+    cmsEntries.length > 0 ? cmsEntries : defaultQuickEntries(locale, pageTitles)
   ).slice(0, 2);
 
   return (
@@ -566,11 +605,13 @@ function ArtworkCarousel({
   artworks,
   locale,
   title,
+  viewAllHref,
 }: {
   artCategorySettings?: ArtCategoryTitleMap | null;
   artworks: Artwork[];
   locale: Locale;
   title: string;
+  viewAllHref: string;
 }) {
   const cards = artworks
     .filter((artwork) =>
@@ -595,7 +636,7 @@ function ArtworkCarousel({
       itemsPerViewMobile={1}
       sectionTitle={title}
       syncGroup="home-feature-carousels"
-      viewAllHref={`/${locale}/art-creation/sculpture`}
+      viewAllHref={viewAllHref}
       viewAllLabel={homeCopy[locale].all}
     />
   );
@@ -604,9 +645,11 @@ function ArtworkCarousel({
 function ProductCarousel({
   locale,
   products,
+  viewAllHref,
 }: {
   locale: Locale;
   products: HomeProduct[];
+  viewAllHref: string;
 }) {
   const cards = products
     .filter((item) => compactText(item.title))
@@ -628,7 +671,7 @@ function ProductCarousel({
       itemsPerViewMobile={1}
       sectionTitle={homeCopy[locale].featuredProducts}
       syncGroup="home-feature-carousels"
-      viewAllHref={`/${locale}/shop`}
+      viewAllHref={viewAllHref}
       viewAllLabel={homeCopy[locale].all}
     />
   );
@@ -660,6 +703,17 @@ export async function HomePage({ locale }: HomePageProps) {
   const artCategorySettingsMap = resolveArtCategorySettingsMap(
     homePage?.artCategories,
   );
+  const pageTitles = homePage?.pageTitles || null;
+  const advancedStudyTitle = resolvePageTitle(
+    "advancedStudy",
+    locale,
+    pageTitles,
+  );
+  const offlineExperienceTitle = resolvePageTitle(
+    "offlineExperience",
+    locale,
+    pageTitles,
+  );
 
   return (
     <AppShell
@@ -674,6 +728,7 @@ export async function HomePage({ locale }: HomePageProps) {
             }
           : undefined
       }
+      initialPageTitles={pageTitles}
       locale={locale}
     >
       <div className="page-surface">
@@ -691,6 +746,7 @@ export async function HomePage({ locale }: HomePageProps) {
           <QuickEntriesSection
             entries={homePage?.quickEntries?.filter(Boolean) || []}
             locale={locale}
+            pageTitles={pageTitles}
           />
 
           <section className="mt-7 grid gap-6 lg:mt-8 lg:grid-cols-2">
@@ -702,9 +758,13 @@ export async function HomePage({ locale }: HomePageProps) {
               syncLeader
               title={sectionTitle(
                 homePage?.featuredStudyProgramsTitle,
-                homeCopy[locale].featuredStudyPrograms,
+                advancedStudyTitle || homeCopy[locale].featuredStudyPrograms,
               )}
-              viewAllHref={`/${locale}/study/masterclass`}
+              viewAllHref={resolveViewAllHref(
+                homePage?.featuredStudyProgramsViewAllHref,
+                "/study/advanced-study",
+                locale,
+              )}
             />
 
             <CourseCarousel
@@ -714,13 +774,17 @@ export async function HomePage({ locale }: HomePageProps) {
               locale={locale}
               metaForItem={(item, itemLocale) => ({
                 label: itemLocale === "zh" ? "\u7c7b\u578b" : "Type",
-                value: eventTypeLabel(item, itemLocale),
+                value: eventTypeLabel(item, itemLocale, pageTitles),
               })}
               title={sectionTitle(
                 homePage?.featuredEventsTitle,
-                homeCopy[locale].featuredEvents,
+                offlineExperienceTitle || homeCopy[locale].featuredEvents,
               )}
-              viewAllHref={`/${locale}/events/activity`}
+              viewAllHref={resolveViewAllHref(
+                homePage?.featuredEventsViewAllHref,
+                "/events/activity",
+                locale,
+              )}
             />
 
             <ArtworkCarousel
@@ -731,11 +795,21 @@ export async function HomePage({ locale }: HomePageProps) {
                 homePage?.featuredArtWorksTitle,
                 homeCopy[locale].artWorks,
               )}
+              viewAllHref={resolveViewAllHref(
+                homePage?.featuredArtWorksViewAllHref,
+                "/art-creation/sculpture",
+                locale,
+              )}
             />
 
             <ProductCarousel
               locale={locale}
               products={homePage?.featuredProducts?.filter(Boolean) || []}
+              viewAllHref={resolveViewAllHref(
+                homePage?.featuredProductsViewAllHref,
+                "/shop",
+                locale,
+              )}
             />
           </section>
 
