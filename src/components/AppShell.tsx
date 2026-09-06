@@ -24,6 +24,15 @@ type AppShellProps = {
   locale: Locale;
 };
 
+function isDynamicServerUsage(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    (error as { digest?: unknown }).digest === "DYNAMIC_SERVER_USAGE"
+  );
+}
+
 async function getGlobalLogoImages() {
   try {
     return await client
@@ -31,9 +40,13 @@ async function getGlobalLogoImages() {
       .fetch<SidebarLogoImages | null>(
         sidebarLogoQuery,
         {},
-        { next: { revalidate: 60 } },
+        { cache: "no-store" },
       );
   } catch (error) {
+    if (isDynamicServerUsage(error)) {
+      throw error;
+    }
+
     console.error("Failed to fetch global sidebar logo", error);
     return null;
   }
@@ -46,9 +59,13 @@ async function getGlobalPageTitles() {
       .fetch<PageTitleMap | null>(
         pageTitlesQuery,
         {},
-        { next: { revalidate: 60 } },
+        { cache: "no-store" },
       );
   } catch (error) {
+    if (isDynamicServerUsage(error)) {
+      throw error;
+    }
+
     console.error("Failed to fetch global page titles", error);
     return null;
   }

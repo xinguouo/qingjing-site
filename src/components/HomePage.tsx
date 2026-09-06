@@ -67,7 +67,6 @@ type HomeProduct = {
 type QuickEntry = {
   _key?: string;
   description?: string | null;
-  href?: string | null;
   title?: string | null;
 };
 
@@ -115,10 +114,6 @@ const homeCopy = {
     pastReview: "往期回顾",
     featuredProducts: "商品",
     featuredStudyPrograms: "国际大师班",
-    masterclassEntryDescription: "专业导师带领的玻璃材料课程及创作研修。",
-    masterclassEntryTitle: "国际大师班",
-    offlineEntryDescription: "亲手体验玻璃材料与工艺的创作过程。",
-    offlineEntryTitle: "线下体验",
     productFallbackDescription: "艺术机构精选作品与衍生内容。",
   },
   en: {
@@ -129,12 +124,6 @@ const homeCopy = {
     pastReview: "Past Review",
     featuredProducts: "Products",
     featuredStudyPrograms: "International Masterclass",
-    masterclassEntryDescription:
-      "Glass material courses and creative workshops led by professional mentors.",
-    masterclassEntryTitle: "International Masterclass",
-    offlineEntryDescription:
-      "Experience the creative process of glass materials and craft by hand.",
-    offlineEntryTitle: "Offline Experience",
     productFallbackDescription:
       "Selected works and derivatives from the art institution.",
   },
@@ -341,52 +330,21 @@ function productTypeLabel(item: HomeProduct, locale: Locale) {
   return compactText(item.productType);
 }
 
-function defaultQuickEntries(
-  locale: Locale,
-  pageTitles?: PageTitleMap | null,
-): QuickEntry[] {
-  const labels = homeCopy[locale];
-  const offlineExperienceTitle = resolvePageTitle(
-    "offlineExperience",
-    locale,
-    pageTitles,
-  );
-
-  return [
-    {
-      _key: "offline-experience",
-      description: labels.offlineEntryDescription,
-      href: "/events/offline-experience",
-      title: offlineExperienceTitle || labels.offlineEntryTitle,
-    },
-    {
-      _key: "masterclass",
-      description: labels.masterclassEntryDescription,
-      href: "/study/masterclass",
-      title: labels.masterclassEntryTitle,
-    },
-  ];
-}
-
 function QuickEntryCard({
   entry,
-  locale,
 }: {
   entry: QuickEntry;
-  locale: Locale;
 }) {
   const title = compactText(entry.title);
   const description = compactText(entry.description);
-  const href = normalizeHref(entry.href, locale);
 
-  if (!title || !href) {
+  if (!title) {
     return null;
   }
 
   return (
-    <Link
+    <article
       className="glass-card glass-card-hover group min-h-[96px] rounded-[12px] p-3.5 sm:min-h-[104px] sm:p-4 lg:min-h-[106px] lg:p-5"
-      href={href}
     >
       <h2 className="font-title text-[16px] font-normal leading-tight text-primary sm:text-lg lg:text-[21px]">
         {title}
@@ -396,34 +354,30 @@ function QuickEntryCard({
           {description}
         </p>
       ) : null}
-    </Link>
+    </article>
   );
 }
 
 function QuickEntriesSection({
   entries,
-  locale,
-  pageTitles,
 }: {
   entries: QuickEntry[];
-  locale: Locale;
-  pageTitles?: PageTitleMap | null;
 }) {
   const cmsEntries = entries.filter(
-    (entry) => compactText(entry.title) && normalizeHref(entry.href, locale),
+    (entry) => compactText(entry.title),
   );
-  const visibleEntries = (
-    cmsEntries.length > 0 ? cmsEntries : defaultQuickEntries(locale, pageTitles)
-  ).slice(0, 2);
+
+  if (cmsEntries.length === 0) {
+    return null;
+  }
 
   return (
     <section className="mt-5 lg:mt-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
-        {visibleEntries.map((entry, index) => (
+        {cmsEntries.map((entry, index) => (
           <QuickEntryCard
             entry={entry}
-            key={entry._key || `${entry.href}-${index}`}
-            locale={locale}
+            key={entry._key || `${entry.title}-${index}`}
           />
         ))}
       </div>
@@ -751,8 +705,6 @@ export async function HomePage({ locale }: HomePageProps) {
         <PageContainer minHeight={false} className="py-6 lg:py-6">
           <QuickEntriesSection
             entries={homePage?.quickEntries?.filter(Boolean) || []}
-            locale={locale}
-            pageTitles={pageTitles}
           />
 
           <section className="mt-7 grid gap-6 lg:mt-8 lg:grid-cols-2">

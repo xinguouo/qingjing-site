@@ -167,18 +167,10 @@ export const homePage = defineType({
               type: "text",
               rows: 3,
             }),
-            defineField({
-              name: "href",
-              title: "链接 / Link",
-              type: "string",
-              description:
-                "填写站内路径，例如 /events/offline-experience 或完整 URL。",
-            }),
           ],
           preview: {
             select: {
               title: "titleZh",
-              subtitle: "href",
             },
           },
         }),

@@ -867,8 +867,7 @@ export const homePageQuery = defineQuery(`*[
     "title": ${localizedText("titleEn", "titleZh")},
     descriptionZh,
     descriptionEn,
-    "description": ${localizedText("descriptionEn", "descriptionZh")},
-    href
+    "description": ${localizedText("descriptionEn", "descriptionZh")}
   },
   featuredStudyProgramsTitleZh,
   featuredStudyProgramsTitleEn,
