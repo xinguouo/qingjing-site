@@ -1907,7 +1907,7 @@ export async function ShopArtworkDetailPage({
           </Link>
 
           <section className="mt-9 grid gap-8 lg:grid-cols-[minmax(0,630px)_minmax(340px,390px)] lg:items-start lg:gap-14 xl:gap-16">
-            <div className="grid gap-4">
+            <div className="order-2 grid gap-4 lg:order-none">
               <ProductVideo video={product.media?.video} />
               {images.map((image, index) => (
                 <ShopArtworkImage
@@ -1921,7 +1921,7 @@ export async function ShopArtworkDetailPage({
               ))}
             </div>
 
-            <aside className="lg:sticky lg:top-[88px]">
+            <aside className="order-1 lg:sticky lg:top-[88px] lg:order-none">
               <div className="border-b border-[var(--border)] pb-7">
                 {categoryLine ? (
                   <p className="detail-meta uppercase">{categoryLine}</p>
@@ -1932,43 +1932,46 @@ export async function ShopArtworkDetailPage({
                 ) : null}
               </div>
 
-              <div className="border-b border-[var(--border)] py-7">
-                {dimensions ? (
-                  <p className="detail-meta">{dimensions}</p>
-                ) : null}
-                {material ? (
-                  <div className="mt-8">
-                    <p className="detail-meta">{labels.material}</p>
-                    <p className="mt-3 text-[16px] leading-none text-primary">
-                      {material}
+              <div className="flex flex-col border-b border-[var(--border)] py-7">
+                <div className="order-1">
+                  {dimensions ? (
+                    <p className="detail-meta">{dimensions}</p>
+                  ) : null}
+                  {material ? (
+                    <div className="mt-8">
+                      <p className="detail-meta">{labels.material}</p>
+                      <p className="mt-3 text-[16px] leading-none text-primary">
+                        {material}
+                      </p>
+                    </div>
+                  ) : null}
+                  {craft ? (
+                    <div className="mt-8">
+                      <p className="detail-meta">{labels.craft}</p>
+                      <p className="mt-3 text-[16px] leading-none text-primary">
+                        {craft}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+
+                {price ? (
+                  <div className="order-2 mt-8 border-t border-[var(--border)] pt-7 lg:order-3">
+                    <p className="font-title text-[32px] font-normal leading-none text-primary lg:text-[38px]">
+                      {price}
                     </p>
                   </div>
                 ) : null}
-                {craft ? (
-                  <div className="mt-8">
-                    <p className="detail-meta">{labels.craft}</p>
-                    <p className="mt-3 text-[16px] leading-none text-primary">
-                      {craft}
-                    </p>
-                  </div>
-                ) : null}
+
                 {description ? (
-                  <p className="mt-8 whitespace-pre-line text-[15px] leading-[1.9] text-secondary">
+                  <p className="order-3 mt-8 whitespace-pre-line text-[15px] leading-[1.9] text-secondary lg:order-2">
                     {description}
                   </p>
                 ) : null}
               </div>
 
-              {price ? (
-                <div className="border-b border-[var(--border)] py-7">
-                  <p className="font-title text-[32px] font-normal leading-none text-primary lg:text-[38px]">
-                    {price}
-                  </p>
-                </div>
-              ) : null}
-
               {relatedProducts.length ? (
-                <section className="pt-7">
+                <section className="hidden pt-7 lg:block">
                   <h2 className="text-[15px] font-normal leading-none text-muted-token">
                     {labels.related}
                   </h2>
@@ -1986,6 +1989,24 @@ export async function ShopArtworkDetailPage({
               ) : null}
             </aside>
           </section>
+
+          {relatedProducts.length ? (
+            <section className="pt-10 lg:hidden">
+              <h2 className="text-[15px] font-normal leading-none text-muted-token">
+                {labels.related}
+              </h2>
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                {relatedProducts.slice(0, 4).map((related) => (
+                  <ShopArtworkRelatedCard
+                    includeLocalePrefix={includeLocalePrefix}
+                    key={related._id}
+                    locale={locale}
+                    product={related}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
       </PageContainer>
     </AppShell>
