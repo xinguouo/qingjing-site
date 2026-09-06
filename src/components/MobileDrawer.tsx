@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import type {ArtCategoryTitleMap} from "@/config/artCategories";
 import {
@@ -38,12 +39,6 @@ export function MobileDrawer({
   pageTitles,
 }: MobileDrawerProps) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleNavigate = (href: string) => {
-    router.push(href);
-    onClose();
-  };
 
   return (
     <div
@@ -106,17 +101,15 @@ export function MobileDrawer({
                     const href = getNavigationHref(item, locale);
 
                     return (
-                      <button
+                      <Link
                         className={`group relative z-30 flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-full px-5 text-left text-base shadow-[0_6px_18px_rgba(0,0,0,0.04)] transition-colors ${
                           isActive
                             ? "sidebar-nav-item-active"
-                            : isComingSoon
-                              ? "glass-button"
-                              : "glass-button"
+                            : "glass-button"
                         }`}
+                        href={href}
                         key={item.href}
-                        onClick={() => handleNavigate(href)}
-                        type="button"
+                        onClick={onClose}
                       >
                         <span
                           className={`sidebar-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
@@ -146,7 +139,7 @@ export function MobileDrawer({
                             {locale === "zh" ? labels.preparingZh : "Soon"}
                           </span>
                         ) : null}
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>

@@ -19,12 +19,13 @@ type ComingSoonPageProps = {
 
 const defaultCopy = {
   eyebrow: "COMING SOON",
-  titleZh: "敬请期待",
+  titleZh: "\u656c\u8bf7\u671f\u5f85",
   titleEn: "Coming Soon",
-  descriptionZh: "该功能正在筹备中，更多精彩内容即将开放。",
+  descriptionZh:
+    "\u5185\u5bb9\u7b79\u5907\u4e2d\uff0c\u66f4\u591a\u7cbe\u5f69\u5185\u5bb9\u5373\u5c06\u5f00\u653e\u3002",
   descriptionEn:
     "This section is currently under preparation. Stay tuned for upcoming updates.",
-  backHomeZh: "返回首页",
+  backHomeZh: "\u8fd4\u56de\u9996\u9875",
   backHomeEn: "Back Home",
 };
 
@@ -39,16 +40,17 @@ function localizedHref(href: string, locale: Locale) {
 export function ComingSoonPage({
   descriptionEn,
   descriptionZh,
-  pageTitleEn: _pageTitleEn,
-  pageTitleZh: _pageTitleZh,
+  pageTitleEn,
+  pageTitleZh,
   titleEn,
   titleZh,
 }: ComingSoonPageProps) {
   const pathname = usePathname();
   const locale = getLocale(pathname);
-  const resolvedTitleZh = titleZh || defaultCopy.titleZh;
-  const resolvedTitleEn = titleEn || defaultCopy.titleEn;
-  const title = locale === "zh" ? resolvedTitleZh : resolvedTitleEn || resolvedTitleZh;
+  const resolvedTitleZh = titleZh || pageTitleZh || defaultCopy.titleZh;
+  const resolvedTitleEn = titleEn || pageTitleEn || defaultCopy.titleEn;
+  const title =
+    locale === "zh" ? resolvedTitleZh : resolvedTitleEn || resolvedTitleZh;
   const description =
     locale === "zh"
       ? descriptionZh || defaultCopy.descriptionZh

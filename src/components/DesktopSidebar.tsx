@@ -77,9 +77,7 @@ export function DesktopSidebar({
                       className={`group relative flex min-h-[42px] items-center gap-2.5 rounded-full px-3 pr-4 transition-colors ${
                         isActive
                           ? "sidebar-nav-item-active"
-                          : isComingSoon
-                            ? "sidebar-nav-item"
-                            : "sidebar-nav-item"
+                          : "sidebar-nav-item"
                       }`}
                       href={getNavigationHref(item, locale)}
                       key={item.href}
